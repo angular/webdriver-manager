@@ -1,0 +1,34 @@
+{
+  "name": "webdriver-manager",
+  "version": "1.0.0",
+  "description": "Webdriver Manager for E2E protractor tests",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "keywords": [
+    "angular",
+    "test",
+    "testing",
+    "protractor",
+    "webdriver",
+    "webdriverjs",
+    "selenium"
+  ],
+  "author": "Craig Nishina <craig.nishina@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "clang-format": "^1.0.35",
+    "gulp": "^3.9.1",
+    "gulp-clang-format": "^1.0.23",
+    "http": "0.0.0",
+    "jasmine": "^2.4.1",
+    "minimist": "^1.2.0",
+    "request": "^2.69.0",
+    "run-sequence": "^1.1.5",
+    "typescript": "^1.8.7",
+    "typings": "^0.7.7",
+    "url": "^0.11.0"
+  }
+}
