@@ -13,17 +13,17 @@ export interface ConfigFile {
  * The configuration for webdriver-manager.
  */
 export class Config {
-  static CONFIG_PATH: string = '../config.json';
-  static PACKAGE_PATH: string = '../package.json';
-  static BASE_DIR: string = path.resolve(__dirname, '../../');
-  static SELENIUM_DIR: string = path.resolve(Config.BASE_DIR, 'selenium');
+  static configPath: string = '../config.json';
+  static packagePath: string = '../package.json';
+  static baseDir: string = path.resolve(__dirname, '../../');
+  static seleniumDir: string = path.resolve(Config.baseDir, 'selenium');
 
   /**
    * Get the binary versions from the configuration file.
    * @returns A map of the versions defined in the configuration file.
    */
   static binaryVersions(): ConfigFile {
-    let configFile = require(Config.CONFIG_PATH);
+    let configFile = require(Config.configPath);
     let configVersions: ConfigFile = {};
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
@@ -36,7 +36,7 @@ export class Config {
    * @returns A map of the CDN versions defined in the configuration file.
    */
   static cdnUrls(): ConfigFile {
-    let configFile = require(Config.CONFIG_PATH);
+    let configFile = require(Config.configPath);
     let configCdnUrls: ConfigFile = {};
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
@@ -49,7 +49,7 @@ export class Config {
    * @returns The webdriver-manager version.
    */
   static version(): string {
-    let packageJson = require(Config.PACKAGE_PATH);
+    let packageJson = require(Config.packagePath);
     return packageJson.version;
   }
 }

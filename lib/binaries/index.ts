@@ -1,4 +1,4 @@
 export * from './binary';
-export * from './chromeDriver';
-export * from './ieDriver';
-export * from './standAlone';
+export * from './chrome_driver';
+export * from './ie_driver';
+export * from './stand_alone';

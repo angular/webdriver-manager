@@ -4,7 +4,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import {cli} from '../lib/webdriver';
 
-function runSpawn(task: string, opt_arg: Array<string>): Array<string> {
+function runSpawn(task: string, opt_arg: string[]): string[] {
   opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
   let child = child_process.spawnSync(task, opt_arg, {stdio: 'pipe'});
   return child.output[1].toString().split('\n');

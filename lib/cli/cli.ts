@@ -1,5 +1,5 @@
 import {Programs, Program} from './programs';
-import {Args, Options} from './options';
+import {MinimistArgs, Options} from './options';
 
 /**
  * The Cli contains the usage and the collection of programs.
@@ -113,10 +113,10 @@ export class Cli {
    */
   getMinimistOptions(): Object {
     let allOptions = this.getOptions();
-    let minimistOptions: Args = {}
-    let minimistBoolean: Array<string> = [];
-    let minimistString: Array<string> = [];
-    let minimistNumber: Array<string> = [];
+    let minimistOptions: MinimistArgs = {}
+    let minimistBoolean: string[] = [];
+    let minimistString: string[] = [];
+    let minimistNumber: string[] = [];
     for (let opt in allOptions) {
       let option = allOptions[opt];
       if (option.type === 'boolean') {

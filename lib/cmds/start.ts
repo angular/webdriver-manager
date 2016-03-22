@@ -39,19 +39,19 @@ if (argv._[0] === 'start-run') {
 function start(options: Options) {
   let osType = os.type();
   let binaries = FileManager.setupBinaries();
-  let seleniumPort = options['seleniumPort'].getValue();
-  let outputDir = Config.SELENIUM_DIR;
-  if (options['out_dir'].getValue()) {
-    if (path.isAbsolute(options['out_dir'].getValue())) {
-      outputDir = options['out_dir'].getValue();
+  let seleniumPort = options['seleniumPort'].getString();
+  let outputDir = Config.seleniumDir;
+  if (options['out_dir'].getString()) {
+    if (path.isAbsolute(options['out_dir'].getString())) {
+      outputDir = options['out_dir'].getString();
     } else {
-      outputDir = path.resolve(Config.BASE_DIR, options['out_dir'].getValue());
+      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
     }
   }
-  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getValue();
-  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getValue();
+  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getString();
+  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getString();
   if (options['versions_ie']) {
-    binaries[IEDriver.id].versionCustom = options['versions_ie'].getValue();
+    binaries[IEDriver.id].versionCustom = options['versions_ie'].getString();
   }
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
@@ -61,7 +61,7 @@ function start(options: Options) {
         'webdriver-manager update --standalone');
     process.exit(1);
   }
-  let args: Array<string> = ['-jar', path.join(outputDir, binaries[StandAlone.id].filename())];
+  let args: string[] = ['-jar', path.join(outputDir, binaries[StandAlone.id].filename())];
   if (seleniumPort) {
     args.push('-port', seleniumPort);
   }
@@ -99,10 +99,11 @@ function start(options: Options) {
   });
 }
 
-function spawnCommand(command: string, args?: any) {
-  let win32 = process.platform === 'win32';
-  let winCommand = win32 ? 'cmd' : command;
-  let finalArgs = win32 ? ['/c'].concat(command, args) : args;
+function spawnCommand(command: string, args?: string[]) {
+  let osType = os.type();
+  let windows: boolean = osType === 'Windows_NT';
+  let winCommand = windows ? 'cmd' : command;
+  let finalArgs: string[] = windows ? ['/c'].concat([command],args) : args;
 
   return childProcess.spawn(winCommand, finalArgs, {stdio: 'inherit'});
 }

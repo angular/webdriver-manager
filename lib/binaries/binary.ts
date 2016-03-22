@@ -17,11 +17,11 @@ export interface BinaryMap<T extends Binary> { [id: string]: T; }
  * The binary object base class
  */
 export class Binary {
-  static os: Array<OS>;             // the operating systems, the binary can run on
+  static os: OS[];             // the operating systems, the binary can run on
   static id: string;                // the binaries key identifier
   static isDefault: boolean;        // to download by default
   static versionDefault: string;    // a static default version variable
-  static shortName: Array<string>;  // the names used for a binary download
+  static shortName: string[];  // the names used for a binary download
   name: string;                     // used for logging to console
   prefixDefault: string;            // start of the file name
   versionCustom: string;            // version of file

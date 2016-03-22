@@ -1,7 +1,7 @@
 {
-  "name": "webdriver-manager",
-  "version": "1.0.0",
-  "description": "Webdriver Manager for E2E protractor tests",
+  "name": "webdriver-tool",
+  "version": "0.0.1",
+  "description": "Webdriver tool to manage selenium standalone server",
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp test"
@@ -15,20 +15,27 @@
     "webdriverjs",
     "selenium"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/angular/webdriver-tool.git"
+  },
+  "bin": {
+    "webdriver-tool": "built/lib/webdriver.js"
+  },
+  "main": "built/lib/webdriver.js",
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
     "clang-format": "^1.0.35",
     "gulp": "^3.9.1",
     "gulp-clang-format": "^1.0.23",
-    "http": "0.0.0",
     "jasmine": "^2.4.1",
-    "minimist": "^1.2.0",
-    "request": "^2.69.0",
     "run-sequence": "^1.1.5",
     "typescript": "^1.8.7",
-    "typings": "^0.7.7",
-    "url": "^0.11.0"
+    "typings": "^0.7.7"
   }
 }

@@ -6,7 +6,7 @@ import {ChromeDriver, IEDriver, StandAlone} from '../binaries';
  * The options used by the commands.
  */
 export class Opts {
-  static outputDir = new Option('out_dir', 'Location to output/expect', 'string', Config.SELENIUM_DIR);
+  static outputDir = new Option('out_dir', 'Location to output/expect', 'string', Config.seleniumDir);
   static seleniumPort = new Option('seleniumPort', 'Optional port for the selenium standalone server', 'string');
   static ignoreSsl = new Option('ignore_ssl', 'Ignore SSL certificates', 'boolean', false);
   static proxy = new Option('proxy', 'Proxy to use for the install or update command', 'string');

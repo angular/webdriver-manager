@@ -60,7 +60,7 @@ describe('file manager', () => {
   });
 
   describe('downloaded version checks', () => {
-    let existingFiles: Array<string>;
+    let existingFiles: string[];
     let selenium = new StandAlone();
     let chrome = new ChromeDriver();
     let ie = new IEDriver();

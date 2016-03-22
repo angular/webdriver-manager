@@ -82,7 +82,7 @@ export class Downloader {
 
     request(options)
         .on('response',
-            function(response) {
+            (response) => {
               if (response.statusCode !== 200) {
                 fs.unlink(filePath);
                 console.error('Error: Got code ' + response.statusCode + ' from ' + fileUrl);
@@ -90,7 +90,7 @@ export class Downloader {
               contentLength = response.headers['content-length'];
             })
         .on('error',
-            function(error) {
+            (error) => {
               console.error('Error: Got error ' + error + ' from ' + fileUrl);
               fs.unlink(filePath);
             })

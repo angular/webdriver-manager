@@ -1,3 +1,3 @@
-export * from './downloadedBinary';
+export * from './downloaded_binary';
 export * from './downloader';
-export * from './fileManager';
+export * from './file_manager';

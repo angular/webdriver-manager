@@ -27,12 +27,12 @@ if (argv._[0] === 'status-run') {
  */
 function status(options: Options) {
   let binaries = FileManager.setupBinaries();
-  let outputDir = Config.SELENIUM_DIR;
+  let outputDir = Config.seleniumDir;
   if (options['out_dir'].value) {
-    if (path.isAbsolute(options['out_dir'].getValue())) {
-      outputDir = options['out_dir'].getValue();
+    if (path.isAbsolute(options['out_dir'].getString())) {
+      outputDir = options['out_dir'].getString();
     } else {
-      outputDir = path.resolve(Config.BASE_DIR, options['out_dir'].getValue());
+      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
     }
   }
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);

@@ -1,5 +1,5 @@
 import * as minimist from 'minimist';
-import {Args, Options, Option} from './options';
+import {Args, MinimistArgs, Options, Option} from './options';
 
 /**
  * Dictionary that maps the command and the program.
@@ -33,11 +33,12 @@ export class Program {
    * Register a new option.
    * @param opt The option.
    * @param description The description of the option.
+   * @param type The type of value expected: boolean, number, or string
    * @param defaultValue The option's default value.
    * @returns The program for method chaining.
    */
-  option(opt: string, description: string, opt_defaultValue?: any): Program {
-    this.options[opt] = new Option(opt, description, opt_defaultValue);
+  option(opt: string, description: string, type: string, opt_defaultValue?: number|string|boolean): Program {
+    this.options[opt] = new Option(opt, description, type, opt_defaultValue);
     return this;
   }
 
@@ -201,10 +202,10 @@ export class Program {
   getMinimistOptions() {
     let allOptions: Options = {};
     allOptions = this.getOptions_(allOptions);
-    let minimistOptions: Args = {}
-    let minimistBoolean: Array<string> = [];
-    let minimistString: Array<string> = [];
-    let minimistNumber: Array<string> = [];
+    let minimistOptions: MinimistArgs = {}
+    let minimistBoolean: string[] = [];
+    let minimistString: string[] = [];
+    let minimistNumber: string[] = [];
     for (let opt in allOptions) {
       let option = allOptions[opt];
       if (option.type === 'boolean') {

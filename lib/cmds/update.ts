@@ -46,33 +46,33 @@ if (argv._[0] === 'update-run') {
  * @param options
  */
 function update(options: Options): void {
-  let standalone = options['standalone'].getValue() != undefined;
-  let chrome = options['chrome'].getValue() != undefined;
+  let standalone = options['standalone'].getBoolean();
+  let chrome = options['chrome'].getBoolean();
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options['ie']) {
-    ie = options['ie'].getValue() != undefined;
+    ie = options['ie'].getBoolean();
   }
   if (options['ie32']) {
-    ie32 = options['ie32'].getValue() != undefined;
+    ie32 = options['ie32'].getBoolean();
   }
-  let outputDir = Config.SELENIUM_DIR;
-  if (options['out_dir'].getValue()) {
-    if (path.isAbsolute(options['out_dir'].getValue())) {
-      outputDir = options['out_dir'].getValue();
+  let outputDir = Config.seleniumDir;
+  if (options['out_dir'].getString()) {
+    if (path.isAbsolute(options['out_dir'].getString())) {
+      outputDir = options['out_dir'].getString();
     } else {
-      outputDir = path.resolve(Config.BASE_DIR, options['out_dir'].getValue());
+      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
     }
   }
-  let ignoreSSL = options['ignore_ssl'].getValue() != undefined;
-  let proxy = options['proxy'].getValue();
+  let ignoreSSL = options['ignore_ssl'].getBoolean();
+  let proxy = options['proxy'].getString();
 
   // setup versions for binaries
   let binaries = FileManager.setupBinaries();
-  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getValue();
-  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getValue();
+  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getString();
+  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getString();
   if (options['versions_ie']) {
-    binaries[IEDriver.id].versionCustom = options['versions.ie'].getValue();
+    binaries[IEDriver.id].versionCustom = options['versions.ie'].getString();
   }
 
   // do the update

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone, OS} from '../binaries';
-import {DownloadedBinary} from './';
+import {DownloadedBinary} from './downloaded_binary';
 
 /**
  * The File Manager class is where the webdriver manager will compile a list of
@@ -25,7 +25,6 @@ export class FileManager {
    * @returns If the binary is available for the operating system.
    */
   static checkOS_(osType: string, binary: typeof Binary): boolean {
-    console.log(binary.os);
     for (let os in binary.os) {
       if (OS[os] == osType) {
         return true;
@@ -40,8 +39,8 @@ export class FileManager {
    * @param osType The operating system.
    * @returns A binary map that are available for the operating system.
    */
-  static compileBinaries_(osType: string): BinaryMap<any> {
-    let binaries: BinaryMap<any> = {};
+  static compileBinaries_(osType: string): BinaryMap<Binary> {
+    let binaries: BinaryMap<Binary> = {};
     if (FileManager.checkOS_(osType, StandAlone)) {
       binaries[StandAlone.id] = new StandAlone();
     }
@@ -59,14 +58,14 @@ export class FileManager {
    * for the system.
    * @returns A binary map that is available for the operating system.
    */
-  static setupBinaries(): BinaryMap<any> { return FileManager.compileBinaries_(os.type()); }
+  static setupBinaries(): BinaryMap<Binary> { return FileManager.compileBinaries_(os.type()); }
 
   /**
    * Get the list of existing files from the output directory
    * @param outputDir The directory where binaries are saved
    * @returns A list of existing files.
    */
-  static getExistngFiles(outputDir: string): Array<string> { return fs.readdirSync(outputDir); }
+  static getExistngFiles(outputDir: string): string[] { return fs.readdirSync(outputDir); }
 
   /**
    * For the binary, operating system, and system architecture, look through
@@ -78,8 +77,8 @@ export class FileManager {
    */
   static downloadedVersions_(
       binary: Binary, osType: string, arch: string,
-      existingFiles: Array<string>): DownloadedBinary {
-    let versions: Array<string> = [];
+      existingFiles: string[]): DownloadedBinary {
+    let versions: string[] = [];
     for (let existPos in existingFiles) {
       let existFile: string = existingFiles[existPos];
       // use only files that have a prefix and suffix that we care about
@@ -113,12 +112,12 @@ export class FileManager {
    * @param outputDir The directory where files are downloaded and stored.
    * @returns An dictionary map of all the downloaded binaries found in the output folder.
    */
-  static downloadedBinaries(outputDir: string): BinaryMap<any> {
+  static downloadedBinaries(outputDir: string): BinaryMap<DownloadedBinary> {
     let ostype = os.type();
     let arch = os.arch();
     let binaries = FileManager.setupBinaries();
     let existingFiles = FileManager.getExistngFiles(outputDir);
-    let downloaded: BinaryMap<any> = {};
+    let downloaded: BinaryMap<DownloadedBinary> = {};
     for (let bin in binaries) {
       let binary = FileManager.downloadedVersions_(binaries[bin], ostype, arch, existingFiles);
       if (binary != null) {
