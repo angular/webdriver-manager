@@ -63,6 +63,7 @@ function update(options: Options): void {
     } else {
       outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
     }
+    FileManager.makeOutputDirectory(outputDir);
   }
   let ignoreSSL = options['ignore_ssl'].getBoolean();
   let proxy = options['proxy'].getString();

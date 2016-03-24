@@ -1,67 +1,43 @@
-# webdriver-tool
+Webdriver Tool
+==============
 
-### Setup
-
-```
-npm install
-```
-
-### Testing
+Getting Started
+---------------
 
 ```
-gulp test
+npm install -g webdriver-tool
 ```
 
-### Running webdriver
-```
-webdriver-tool <command>
-```
+Setting up a Selenium Server
+----------------------------
+
+Prior to starting the selenium server, download the selenium server jar and driver binaries. By default it will download the selenium server jar and chromedriver binary.
 
 ```
-Usage:webdriver-tool <command> [options]
-
-Commands:
-  clean   removes all downloaded driver files from the out_dir
-  start   start up the selenium server
-  status   list the current available drivers
-  update   install or update selected binaries
-
-Options:
-  --out_dir               Location to output/expect                          [default: /src/webdriver-tool/selenium]
-  --seleniumPort          Optional port for the selenium standalone server
-  --versions_standalone   Optional seleniuim standalone server version       [default: 2.52.0]
-  --versions_chrome       Optional chrome driver version                     [default: 2.21]
-  --ignore_ssl            Ignore SSL certificates
-  --proxy                 Proxy to use for the install or update command
-  --alternate_cnd         Alternate CDN to binaries
-  --standalone            Install or update selenium standalone              [default: true]
-  --chrome                Install or update chromedriver                     [default: true]
+bin/webdriver-tool update
 ```
 
-### Running a specific command
+Starting the Selenium Server
+----------------------------
 
-running update
-```
-node built/lib/cmds/update.js update-run
-```
+By default, the selenium server will run on `http://localhost:4444/wd/hub`.
 
-help update
-```
-node built/lib/cmds/update.js update-help
-```
 
 ```
-Usage:        update-run [options]
-              update-help
-Description:  install or update selected binaries
+bin/webdriver-tool start
+```
 
-Options:
-  --out_dir               Location to output/expect                        [default: /src/webdriver-tool/selenium]
-  --ignore_ssl            Ignore SSL certificates
-  --proxy                 Proxy to use for the install or update command
-  --alternate_cnd         Alternate CDN to binaries
-  --standalone            Install or update selenium standalone            [default: true]
-  --chrome                Install or update chromedriver                   [default: true]
-  --versions_standalone   Optional seleniuim standalone server version     [default: 2.52.0]
-  --versions_chrome       Optional chrome driver version                   [default: 2.21]
-  ```
+Other useful commands
+---------------------
+
+View different versions of server and driver files:
+
+```
+bin/webdriver-tool status
+```
+
+Clear out the server and driver files. If `webdriver-tool start` does not work, try to clear out the saved files.
+
+```
+bin/webdriver-tool clean
+```

@@ -1,4 +1,6 @@
 lib/
+spec/
+typings/
 
 .clang-format
 .gitignore
