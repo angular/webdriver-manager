@@ -1,4 +1,4 @@
-# webdriver-manager
+# webdriver-tool
 
 ### Setup
 
@@ -14,11 +14,11 @@ gulp test
 
 ### Running webdriver
 ```
-node built/lib/webdriver.js <command>
+webdriver-tool <command>
 ```
 
 ```
-Usage:webdriver-manager <command> [options]
+Usage:webdriver-tool <command> [options]
 
 Commands:
   clean   removes all downloaded driver files from the out_dir
@@ -27,7 +27,7 @@ Commands:
   update   install or update selected binaries
 
 Options:
-  --out_dir               Location to output/expect                          [default: /src/webdriver-manager/selenium]
+  --out_dir               Location to output/expect                          [default: /src/webdriver-tool/selenium]
   --seleniumPort          Optional port for the selenium standalone server
   --versions_standalone   Optional seleniuim standalone server version       [default: 2.52.0]
   --versions_chrome       Optional chrome driver version                     [default: 2.21]
@@ -56,7 +56,7 @@ Usage:        update-run [options]
 Description:  install or update selected binaries
 
 Options:
-  --out_dir               Location to output/expect                        [default: /src/webdriver-manager/selenium]
+  --out_dir               Location to output/expect                        [default: /src/webdriver-tool/selenium]
   --ignore_ssl            Ignore SSL certificates
   --proxy                 Proxy to use for the install or update command
   --alternate_cnd         Alternate CDN to binaries

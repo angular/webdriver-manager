@@ -1,6 +1,6 @@
 {
   "name": "webdriver-tool",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Webdriver tool to manage selenium standalone server",
   "scripts": {
     "prepublish": "gulp prepublish",
@@ -27,7 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.4.7",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "request": "^2.69.0"
   },
   "devDependencies": {
     "clang-format": "^1.0.35",

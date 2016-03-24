@@ -9,7 +9,7 @@ import * as update from './cmds/update';
 import {Cli} from './cli';
 
 let commandline = new Cli()
-              .usage('webdriver-manager <command> [options]')
+              .usage('webdriver-tool <command> [options]')
               .program(clean.program)
               .program(start.program)
               .program(status.program)

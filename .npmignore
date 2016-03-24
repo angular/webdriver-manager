@@ -1,0 +1,6 @@
+lib/
+
+.clang-format
+.gitignore
+.npmignore
+

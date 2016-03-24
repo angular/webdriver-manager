@@ -1,0 +1,26 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/cnishina/.nvm/versions/node/v4.2.4/bin/node',
+1 verbose cli   '/Users/cnishina/.nvm/versions/node/v4.2.4/bin/npm',
+1 verbose cli   'adduser' ]
+2 info using npm@2.14.12
+3 info using node@v4.2.4
+4 verbose stack Error: canceled
+4 verbose stack     at Interface.<anonymous> (/Users/cnishina/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/read/lib/read.js:66:13)
+4 verbose stack     at emitNone (events.js:67:13)
+4 verbose stack     at Interface.emit (events.js:166:7)
+4 verbose stack     at Interface._ttyWrite (readline.js:690:16)
+4 verbose stack     at ReadStream.onkeypress (readline.js:105:10)
+4 verbose stack     at emitTwo (events.js:87:13)
+4 verbose stack     at ReadStream.emit (events.js:172:7)
+4 verbose stack     at emitKeys (readline.js:1250:14)
+4 verbose stack     at next (native)
+4 verbose stack     at ReadStream.onData (readline.js:918:36)
+5 verbose cwd /Users/cnishina/webdriver-tool
+6 error Darwin 15.4.0
+7 error argv "/Users/cnishina/.nvm/versions/node/v4.2.4/bin/node" "/Users/cnishina/.nvm/versions/node/v4.2.4/bin/npm" "adduser"
+8 error node v4.2.4
+9 error npm  v2.14.12
+10 error canceled
+11 error If you need help, you may report this error at:
+11 error     <https://github.com/npm/npm/issues>
+12 verbose exit [ 1, true ]
