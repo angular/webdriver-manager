@@ -118,4 +118,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, filename: string)
   let mv =
       path.join(outputDir, binary.prefix() + binary.version() + binary.executableSuffix(osType));
   fs.renameSync(path.join(outputDir, binary.name + binary.executableSuffix(osType)), mv);
+  if (osType !== 'Windows_NT') {
+    fs.chmodSync(mv, '0755');
+  }
 }
