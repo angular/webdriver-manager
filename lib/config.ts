@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 
 /**
@@ -44,12 +45,21 @@ export class Config {
     return configCdnUrls;
   }
 
-  /**
-   * Get the current version of webdriver-manager from the package.json
-   * @returns The webdriver-manager version.
-   */
-  static version(): string {
+  static localVersion(): string {
     let packageJson = require(Config.packagePath);
     return packageJson.version;
+  }
+
+  static globalVersion(): string {
+    let globalNpm = process.env.NPM_BIN || process.env.NVM_BIN;
+    let globalPackagePath = path.resolve(globalNpm, '../lib/node_modules/webdriver-tool/built/package.json');
+    try {
+      if (fs.statSync(globalPackagePath).isFile()) {
+        let globalPackageJson = require(globalPackagePath);
+        return globalPackageJson.version;
+      }
+    } catch(err) {
+      return null;
+    }
   }
 }

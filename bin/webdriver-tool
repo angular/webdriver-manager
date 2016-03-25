@@ -1,3 +1,29 @@
 #!/usr/bin/env node
 
-require('../built/lib/webdriver.js');
+var path = require('path');
+var fs = require('fs');
+var chalk = require('chalk');
+
+var Logger = require('../built/lib/cli/util').Logger;
+var Config = require('../built/lib/config').Config;
+
+var globalNpm = process.env.NPM_BIN || process.env.NVM_BIN;
+globalPath = path.resolve(globalNpm, '../lib/node_modules/webdriver-tool/built/lib/');
+localPath = path.resolve(__dirname, '../node_modules/webdriver-tool/built/lib/');
+
+try {
+  if (fs.statSync(localPath).isDirectory()) {
+    Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));;
+  }
+  try {
+    if (fs.statSync(globalPath).isDirectory()) {
+      Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
+    }
+  } catch (err) { }
+  require(path.resolve(localPath, 'webdriver.js'));
+}
+// we are using the global version
+catch (err) {
+  Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
+  require(path.resolve(globalPath, 'webdriver.js'));
+}

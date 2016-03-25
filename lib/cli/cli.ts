@@ -1,5 +1,11 @@
+import * as chalk from 'chalk';
+import * as path from 'path';
+
+import {Config} from '../config';
+import {Logger} from './util';
 import {Programs, Program} from './programs';
 import {MinimistArgs, Options} from './options';
+
 
 /**
  * The Cli contains the usage and the collection of programs.
@@ -31,15 +37,6 @@ export class Cli {
     return this;
   }
 
-
-  /**
-   * Register the version for the cli
-   */
-  setVersion(version: string): Cli {
-    this.version = version;
-    return this;
-  }
-
   /**
    * Prints help for the programs registered to the cli.
    */
@@ -66,8 +63,16 @@ export class Cli {
    * Print the version
    */
   printVersion(): void {
-    if (this.version) {
-      console.log('Version ' + this.version);
+    let localVersion = Config.localVersion();
+    Logger.info(chalk.green('local version: ' + localVersion));
+
+    let globalVersion = Config.globalVersion();
+    if (globalVersion) {
+      Logger.info(chalk.cyan('global version: ' + globalVersion));
+
+      if (globalVersion !== localVersion) {
+        Logger.info(chalk.yellow('warning version mismatch'));
+      }
     }
   }
 

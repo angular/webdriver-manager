@@ -11,7 +11,6 @@ import {Config} from './config';
 
 let commandline = new Cli()
               .usage('webdriver-tool <command> [options]')
-              .setVersion(Config.version())
               .program(clean.program)
               .program(start.program)
               .program(status.program)

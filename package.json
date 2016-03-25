@@ -1,6 +1,6 @@
 {
   "name": "webdriver-tool",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Webdriver tool to manage selenium standalone server",
   "scripts": {
     "prepublish": "gulp prepublish",
@@ -31,6 +31,7 @@
     "request": "^2.69.0"
   },
   "devDependencies": {
+    "chalk": "^1.1.1",
     "clang-format": "^1.0.35",
     "gulp": "^3.9.1",
     "gulp-clang-format": "^1.0.23",
