@@ -1,6 +1,8 @@
 Webdriver Tool
 ==============
 
+Webdriver tool is a manager for selenium standalone server jar and browser drivers executables. This is the same tool as `webdriver-manager` from the [Protractor](https://github.com/angular/protractor) repository.
+
 Getting Started
 ---------------
 
@@ -14,7 +16,7 @@ Setting up a Selenium Server
 Prior to starting the selenium server, download the selenium server jar and driver binaries. By default it will download the selenium server jar and chromedriver binary.
 
 ```
-bin/webdriver-tool update
+webdriver-tool update
 ```
 
 Starting the Selenium Server
@@ -24,7 +26,7 @@ By default, the selenium server will run on `http://localhost:4444/wd/hub`.
 
 
 ```
-bin/webdriver-tool start
+webdriver-tool start
 ```
 
 Other useful commands
@@ -33,11 +35,11 @@ Other useful commands
 View different versions of server and driver files:
 
 ```
-bin/webdriver-tool status
+webdriver-tool status
 ```
 
 Clear out the server and driver files. If `webdriver-tool start` does not work, try to clear out the saved files.
 
 ```
-bin/webdriver-tool clean
+webdriver-tool clean
 ```
