@@ -16,6 +16,7 @@ export class Program {
   options: Options = {};
   runMethod: Function;
   helpDescription: string;
+  version: string;
 
   /**
    * Register a command and the description.
@@ -157,8 +158,8 @@ export class Program {
   printHelp(): void {
     console.log(
         '\n' +
-        'Usage:        ' + this.cmd + '-run [options]\n' +
-        '              ' + this.cmd + '-help\n' +
+        'Usage:        ' + this.cmd + ' [options]\n' +
+        '              ' + this.cmd + ' help\n' +
         'Description:  ' + this.cmdDescription + '\n');
     console.log('Options:');
     this.printOptions(this.posDescription(), this.posDefault());

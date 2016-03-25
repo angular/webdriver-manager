@@ -16,9 +16,9 @@ export var program = prog;
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'clean-run') {
-  program.run(argv);
+  prog.run(argv);
 } else if (argv._[0] === 'clean-help') {
-  program.printHelp();
+  prog.printHelp();
 }
 
 /**

@@ -36,10 +36,11 @@ export var program = prog;
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'update-run') {
-  program.run(argv);
+  prog.run(argv);
 } else if (argv._[0] === 'update-help') {
-  program.printHelp();
+  prog.printHelp();
 }
+
 
 /**
  * Parses the options and downloads binaries if they do not exist.

@@ -11,6 +11,7 @@ import {MinimistArgs, Options} from './options';
 export class Cli {
   programs: Programs = {};
   usageText: string;
+  version: string;
 
   /**
    * Register a program to the command line interface.
@@ -30,11 +31,20 @@ export class Cli {
     return this;
   }
 
+
+  /**
+   * Register the version for the cli
+   */
+  setVersion(version: string): Cli {
+    this.version = version;
+    return this;
+  }
+
   /**
    * Prints help for the programs registered to the cli.
    */
   printHelp(): void {
-    console.log('Usage:' + this.usageText);
+    console.log('Usage: ' + this.usageText);
     console.log('\nCommands:');
     let cmdDescriptionPos = this.posCmdDescription();
     for (let cmd in this.programs) {
@@ -49,6 +59,15 @@ export class Cli {
     for (let cmd in this.programs) {
       let prog = this.programs[cmd];
       prog.printOptions(descriptionPos, defaultPos, extOptions);
+    }
+  }
+
+  /**
+   * Print the version
+   */
+  printVersion(): void {
+    if (this.version) {
+      console.log('Version ' + this.version);
     }
   }
 
