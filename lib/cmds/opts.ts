@@ -18,4 +18,5 @@ export class Opts {
   static versionsChrome = new Option('versions_chrome', 'Optional chrome driver version', 'string', ChromeDriver.versionDefault);
   static versionsStandAlone = new Option('versions_standalone', 'Optional seleniuim standalone server version', 'string', StandAlone.versionDefault);
   static versionsIe = new Option('versions_ie', 'Optional internet explorer driver version', 'string', IEDriver.versionDefault);
+  static chromeLogs = new Option('chrome_logs', 'File path to chrome logs', 'string', undefined);
 }

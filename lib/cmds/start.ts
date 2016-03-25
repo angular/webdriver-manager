@@ -16,7 +16,8 @@ let prog = new Program()
     .addOption(Opts.outputDir)
     .addOption(Opts.seleniumPort)
     .addOption(Opts.versionsStandAlone)
-    .addOption(Opts.versionsChrome);
+    .addOption(Opts.versionsChrome)
+    .addOption(Opts.chromeLogs);
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts.versionsIe);
@@ -48,6 +49,14 @@ function start(options: Options) {
       outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
     }
   }
+  let chromeLogs: string = null;
+  if (options['chrome_logs'].getString()) {
+    if (path.isAbsolute(options['chrome_logs'].getString())) {
+      chromeLogs = options['chrome_logs'].getString();
+    } else {
+      chromeLogs = path.resolve(Config.baseDir, options['chrome_logs'].getString());
+    }
+  }
   binaries[StandAlone.id].versionCustom = options['versions_standalone'].getString();
   binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getString();
   if (options['versions_ie']) {
@@ -69,6 +78,9 @@ function start(options: Options) {
     args.push(
         '-Dwebdriver.chrome.driver=' +
         path.join(outputDir, binaries[ChromeDriver.id].executableFilename(osType)));
+    if (chromeLogs != null) {
+      args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
+    }
   }
   if (downloadedBinaries[IEDriver.id] != null) {
     args.push(
