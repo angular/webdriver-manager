@@ -1,6 +1,6 @@
 {
   "name": "webdriver-tool",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Webdriver tool to manage selenium standalone server",
   "scripts": {
     "prepublish": "gulp prepublish",
@@ -20,9 +20,9 @@
     "url": "git://github.com/angular/webdriver-tool.git"
   },
   "bin": {
-    "webdriver-tool": "built/lib/webdriver.js"
+    "webdriver-tool": "bin/webdriver-tool"
   },
-  "main": "built/lib/webdriver.js",
+  "main": "bin/webdriver-tool",
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {

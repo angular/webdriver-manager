@@ -13,17 +13,12 @@ localPath = path.resolve(__dirname, '../node_modules/webdriver-tool/built/lib/')
 
 try {
   if (fs.statSync(localPath).isDirectory()) {
-    Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));;
+    Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()) + '\n');;
   }
-  try {
-    if (fs.statSync(globalPath).isDirectory()) {
-      Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
-    }
-  } catch (err) { }
   require(path.resolve(localPath, 'webdriver.js'));
 }
 // we are using the global version
 catch (err) {
-  Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
+  Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()) + '\n');
   require(path.resolve(globalPath, 'webdriver.js'));
 }
