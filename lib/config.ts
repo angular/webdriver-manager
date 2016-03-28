@@ -49,14 +49,8 @@ export class Config {
    * If installed as a node module, return the local version.
    */
   static localVersion(): string {
-    try {
-      if (fs.statSync(Config.packagePath).isFile()) {
-        let packageJson = require(Config.packagePath);
-        return packageJson.version;
-      }
-    } catch(err) {
-      return null;
-    }
+      let packageJson = require(Config.packagePath);
+      return packageJson.version;
   }
 
   /**

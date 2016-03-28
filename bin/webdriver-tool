@@ -31,16 +31,10 @@ else if (localPath === globalPath) {
   Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
   require(path.resolve(globalPath, 'webdriver.js'));
 } else {
-  try {
-    // try to stat the local path
-    var stat = fs.statSync(localPath);
-    Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));
-    if (Config.globalVersion() && Config.localVersion() !== Config.globalVerison()) {
-      Logger.info(chalk.yellow('warning: local version [' + Config.localVersion() +
-          '] mismatch with global version [' + Config.globalVersion() + ']\n'));
-    }
-    require(path.resolve(localPath, 'webdriver.js'));
-  } catch (err) {
-    console.error('error')
+  Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));
+  if (Config.globalVersion() && Config.localVersion() !== Config.globalVersion()) {
+    Logger.info(chalk.yellow('warning: local version [' + Config.localVersion() +
+        '] mismatch with global version [' + Config.globalVersion() + ']\n'));
   }
+  require(path.resolve(localPath, 'webdriver.js'));
 }
