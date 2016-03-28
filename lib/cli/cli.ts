@@ -60,23 +60,6 @@ export class Cli {
   }
 
   /**
-   * Print the version
-   */
-  printVersion(): void {
-    let localVersion = Config.localVersion();
-    Logger.info(chalk.green('local version: ' + localVersion));
-
-    let globalVersion = Config.globalVersion();
-    if (globalVersion) {
-      Logger.info(chalk.cyan('global version: ' + globalVersion));
-
-      if (globalVersion !== localVersion) {
-        Logger.info(chalk.yellow('warning version mismatch'));
-      }
-    }
-  }
-
-  /**
    * For commands, gets the position where the description should start so they
    * are aligned.
    * @returns The position where the command description should start.

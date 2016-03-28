@@ -1,6 +1,6 @@
 {
   "name": "webdriver-tool",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "Webdriver tool to manage selenium standalone server",
   "scripts": {
     "prepublish": "gulp prepublish",

@@ -45,11 +45,39 @@ export class Config {
     return configCdnUrls;
   }
 
+  /**
+   * If installed as a node module, return the local version.
+   */
   static localVersion(): string {
-    let packageJson = require(Config.packagePath);
-    return packageJson.version;
+    try {
+      if (fs.statSync(Config.packagePath).isFile()) {
+        let packageJson = require(Config.packagePath);
+        return packageJson.version;
+      }
+    } catch(err) {
+      return null;
+    }
   }
 
+  /**
+   * If running from the project directory, get the project's version.
+   */
+  static projectVersion(): string {
+    let projectPath = path.resolve('.');
+    let projectPackagePath = path.resolve(projectPath, 'package.json');
+    try {
+      if (fs.statSync(projectPackagePath).isFile()) {
+        let projectJson = require(projectPackagePath);
+        return projectJson.version;
+      }
+    } catch(err) {
+      return null;
+    }
+  }
+
+  /**
+   * If installed, returns the globally installed webdriver-tool.
+   */
   static globalVersion(): string {
     let globalNpm = process.env.NPM_BIN || process.env.NVM_BIN;
     let globalPackagePath = path.resolve(globalNpm, '../lib/node_modules/webdriver-tool/built/package.json');

@@ -20,10 +20,7 @@ let minimistOptions = commandline.getMinimistOptions();
 let argv = minimist(process.argv.slice(2), minimistOptions);
 let cmd = argv._;
 if (commandline.programs[cmd[0]]) {
-  if (cmd[0] === 'version') {
-    commandline.printVersion();
-  }
-  else if (cmd[0] === 'help') {
+  if (cmd[0] === 'help') {
     commandline.printHelp();
   }
   else if (cmd[1] === 'help' || argv['help'] || argv['h']) {
@@ -31,8 +28,6 @@ if (commandline.programs[cmd[0]]) {
   } else {
     commandline.programs[cmd[0]].run(argv);
   }
-} else if (argv['version'] || argv['v']) {
-  commandline.printVersion();
 } else {
   commandline.printHelp();
 }
