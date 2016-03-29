@@ -5,6 +5,7 @@ import * as childProcess from 'child_process';
 import * as http from 'http';
 
 import {Opts} from './opts';
+import * as Opt from './';
 import {Config} from '../config';
 import {FileManager} from '../files';
 import {Options, Program} from '../cli';
@@ -13,14 +14,14 @@ import {BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 let prog = new Program()
     .command('start', 'start up the selenium server')
     .action(start)
-    .addOption(Opts.outputDir)
-    .addOption(Opts.seleniumPort)
-    .addOption(Opts.versionsStandAlone)
-    .addOption(Opts.versionsChrome)
-    .addOption(Opts.chromeLogs);
+    .addOption(Opts[Opt.OUT_DIR])
+    .addOption(Opts[Opt.SELENIUM_PORT])
+    .addOption(Opts[Opt.VERSIONS_STANDALONE])
+    .addOption(Opts[Opt.VERSIONS_CHROME])
+    .addOption(Opts[Opt.CHROME_LOGS]);
 
 if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts.versionsIe);
+  prog.addOption(Opts[Opt.VERSIONS_IE]);
 }
 
 export var program = prog;
@@ -28,7 +29,7 @@ export var program = prog;
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'start-run') {
-  prog.run(argv);
+  prog.run(JSON.parse(JSON.stringify(argv)));
 } else if (argv._[0] === 'start-help') {
   prog.printHelp();
 }
@@ -40,27 +41,27 @@ if (argv._[0] === 'start-run') {
 function start(options: Options) {
   let osType = os.type();
   let binaries = FileManager.setupBinaries();
-  let seleniumPort = options['seleniumPort'].getString();
+  let seleniumPort = options[Opt.SELENIUM_PORT].getString();
   let outputDir = Config.seleniumDir;
-  if (options['out_dir'].getString()) {
-    if (path.isAbsolute(options['out_dir'].getString())) {
-      outputDir = options['out_dir'].getString();
+  if (options[Opt.OUT_DIR].getString()) {
+    if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
+      outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
+      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
     }
   }
   let chromeLogs: string = null;
-  if (options['chrome_logs'].getString()) {
-    if (path.isAbsolute(options['chrome_logs'].getString())) {
-      chromeLogs = options['chrome_logs'].getString();
+  if (options[Opt.CHROME_LOGS].getString()) {
+    if (path.isAbsolute(options[Opt.CHROME_LOGS].getString())) {
+      chromeLogs = options[Opt.CHROME_LOGS].getString();
     } else {
-      chromeLogs = path.resolve(Config.baseDir, options['chrome_logs'].getString());
+      chromeLogs = path.resolve(Config.baseDir, options[Opt.CHROME_LOGS].getString());
     }
   }
-  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getString();
-  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getString();
-  if (options['versions_ie']) {
-    binaries[IEDriver.id].versionCustom = options['versions_ie'].getString();
+  binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
+  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  if (options[Opt.VERSIONS_IE]) {
+    binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 

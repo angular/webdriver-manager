@@ -68,13 +68,26 @@ export class Program {
    * method.
    * @param args The arguments that will be parsed to run the method.
    */
-  run(args: Args): void {
-    for (let arg in args) {
-      if (this.options[arg]) {
-        this.options[arg].value = args[arg];
-      }
+  run(json: JSON): void {
+    for (let opt in this.options) {
+      this.options[opt].value = this.getValue_(opt, json);
     }
     this.runMethod(this.options);
+  }
+
+  private getValue_(key: string, json: JSON): string {
+    let keyList: string[] = key.split('.');
+    let tempJson:any = json;
+    while (keyList.length > 0) {
+      let keyItem = keyList[0];
+      if (tempJson[keyItem]) {
+        tempJson = tempJson[keyItem];
+        keyList = keyList.slice(1);
+      } else {
+        return undefined;
+      }
+    }
+    return tempJson.toString();
   }
 
   /**

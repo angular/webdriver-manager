@@ -26,7 +26,7 @@ if (commandline.programs[cmd[0]]) {
   else if (cmd[1] === 'help' || argv['help'] || argv['h']) {
     commandline.programs[cmd[0]].printHelp();
   } else {
-    commandline.programs[cmd[0]].run(argv);
+    commandline.programs[cmd[0]].run(JSON.parse(JSON.stringify(argv)));
   }
 } else {
   commandline.printHelp();

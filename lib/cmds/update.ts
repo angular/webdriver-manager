@@ -5,6 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import {Opts} from './opts';
+import * as Opt from './';
 import {Config} from '../config';
 import {Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 import {FileManager, Downloader} from '../files';
@@ -13,30 +14,30 @@ import {Options, Program} from '../cli';
 var prog = new Program()
     .command('update', 'install or update selected binaries')
     .action(update)
-    .addOption(Opts.outputDir)
-    .addOption(Opts.ignoreSsl)
-    .addOption(Opts.proxy)
-    .addOption(Opts.alternateCdn)
-    .addOption(Opts.standalone)
-    .addOption(Opts.chrome);
+    .addOption(Opts[Opt.OUT_DIR])
+    .addOption(Opts[Opt.IGNORE_SSL])
+    .addOption(Opts[Opt.PROXY])
+    .addOption(Opts[Opt.ALTERNATE_CDN])
+    .addOption(Opts[Opt.STANDALONE])
+    .addOption(Opts[Opt.CHROME]);
 
 if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts.ie).addOption(Opts.ie32);
+  prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
 }
 
 prog
-  .addOption(Opts.versionsStandAlone)
-  .addOption(Opts.versionsChrome);
+  .addOption(Opts[Opt.VERSIONS_STANDALONE])
+  .addOption(Opts[Opt.VERSIONS_CHROME]);
 
 if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts.versionsIe);
+  prog.addOption(Opts[Opt.VERSIONS_IE]);
 }
 export var program = prog;
 
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'update-run') {
-  prog.run(argv);
+  prog.run(JSON.parse(JSON.stringify(argv)));
 } else if (argv._[0] === 'update-help') {
   prog.printHelp();
 }
@@ -47,34 +48,34 @@ if (argv._[0] === 'update-run') {
  * @param options
  */
 function update(options: Options): void {
-  let standalone = options['standalone'].getBoolean();
-  let chrome = options['chrome'].getBoolean();
+  let standalone = options[Opt.STANDALONE].getBoolean();
+  let chrome = options[Opt.CHROME].getBoolean();
   let ie: boolean = false;
   let ie32: boolean = false;
-  if (options['ie']) {
-    ie = options['ie'].getBoolean();
+  if (options[Opt.IE]) {
+    ie = options[Opt.IE].getBoolean();
   }
-  if (options['ie32']) {
-    ie32 = options['ie32'].getBoolean();
+  if (options[Opt.IE32]) {
+    ie32 = options[Opt.IE32].getBoolean();
   }
   let outputDir = Config.seleniumDir;
-  if (options['out_dir'].getString()) {
-    if (path.isAbsolute(options['out_dir'].getString())) {
-      outputDir = options['out_dir'].getString();
+  if (options[Opt.OUT_DIR].getString()) {
+    if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
+      outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
+      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
     }
     FileManager.makeOutputDirectory(outputDir);
   }
-  let ignoreSSL = options['ignore_ssl'].getBoolean();
-  let proxy = options['proxy'].getString();
+  let ignoreSSL = options[Opt.IGNORE_SSL].getBoolean();
+  let proxy = options[Opt.PROXY].getString();
 
   // setup versions for binaries
   let binaries = FileManager.setupBinaries();
-  binaries[StandAlone.id].versionCustom = options['versions_standalone'].getString();
-  binaries[ChromeDriver.id].versionCustom = options['versions_chrome'].getString();
-  if (options['versions_ie']) {
-    binaries[IEDriver.id].versionCustom = options['versions.ie'].getString();
+  binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
+  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  if (options[Opt.VERSIONS_IE]) {
+    binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
 
   // do the update

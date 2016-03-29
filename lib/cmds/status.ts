@@ -2,13 +2,14 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 
 import {Opts} from './opts';
+import * as Opt from './';
 import {Config} from '../config';
 import {FileManager} from '../files';
 import {Options, Program} from '../cli';
 
 let prog = new Program()
                          .command('status', 'list the current available drivers')
-                         .addOption(Opts.outputDir)
+                         .addOption(Opts[Opt.OUT_DIR])
                          .action(status);
 
 export var program = prog;
@@ -16,7 +17,7 @@ export var program = prog;
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'status-run') {
-  prog.run(argv);
+  prog.run(JSON.parse(JSON.stringify(argv)));
 } else if (argv._[0] === 'status-help') {
   prog.printHelp();
 }
@@ -28,11 +29,11 @@ if (argv._[0] === 'status-run') {
 function status(options: Options) {
   let binaries = FileManager.setupBinaries();
   let outputDir = Config.seleniumDir;
-  if (options['out_dir'].value) {
-    if (path.isAbsolute(options['out_dir'].getString())) {
-      outputDir = options['out_dir'].getString();
+  if (options[Opt.OUT_DIR].value) {
+    if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
+      outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
+      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
     }
   }
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);

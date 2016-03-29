@@ -1,22 +1,23 @@
 import * as minimist from 'minimist';
 import * as path from 'path';
 
-import {Opts} from './opts';
 import {Config} from '../config';
 import {FileManager} from '../files';
 import {Options, Program} from '../cli';
+import {Opts} from './opts';
+import * as Opt from './';
 
 let prog = new Program()
                          .command('clean', 'removes all downloaded driver files from the out_dir')
                          .action(clean)
-                         .addOption(Opts.outputDir);
+                         .addOption(Opts[Opt.OUT_DIR]);
 
 export var program = prog;
 
 // stand alone runner
 let argv = minimist(process.argv.slice(2), prog.getMinimistOptions());
 if (argv._[0] === 'clean-run') {
-  prog.run(argv);
+  prog.run(JSON.parse(JSON.stringify(argv)));
 } else if (argv._[0] === 'clean-help') {
   prog.printHelp();
 }
@@ -27,11 +28,11 @@ if (argv._[0] === 'clean-run') {
  */
 function clean(options: Options): void {
   let outputDir = Config.seleniumDir;
-  if (options['out_dir'].getString()) {
-    if (path.isAbsolute(options['out_dir'].getString())) {
-      outputDir = options['out_dir'].getString();
+  if (options[Opt.OUT_DIR].getString()) {
+    if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
+      outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options['out_dir'].getString());
+      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
     }
   }
   FileManager.removeExistingFiles(outputDir);
