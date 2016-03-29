@@ -9,7 +9,7 @@ import * as Opt from './';
 import {Config} from '../config';
 import {Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 import {FileManager, Downloader} from '../files';
-import {Options, Program} from '../cli';
+import {Logger, Options, Program} from '../cli';
 
 var prog = new Program()
     .command('update', 'install or update selected binaries')
@@ -83,7 +83,7 @@ function update(options: Options): void {
     if (FileManager.toDownload(binaries[StandAlone.id], outputDir)) {
       Downloader.downloadBinary(binaries[StandAlone.id], outputDir);
     } else {
-      console.log(binaries[StandAlone.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      Logger.info(binaries[StandAlone.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
     }
   }
   if (chrome) {
@@ -91,7 +91,7 @@ function update(options: Options): void {
         Downloader.downloadBinary(
             binaries[ChromeDriver.id], outputDir, proxy, ignoreSSL, unzip);
       } else {
-        console.log(binaries[ChromeDriver.id].name + ' ' + binaries[ChromeDriver.id].versionCustom + ' up to date');
+        Logger.info(binaries[ChromeDriver.id].name + ' ' + binaries[ChromeDriver.id].versionCustom + ' up to date');
       }
   }
   if (ie) {
@@ -99,7 +99,7 @@ function update(options: Options): void {
       Downloader.downloadBinary(
           binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
     } else {
-      console.log(binaries[IEDriver.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      Logger.info(binaries[IEDriver.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
     }
   }
   if (ie32) {
@@ -107,7 +107,7 @@ function update(options: Options): void {
       Downloader.downloadBinary(
           binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
     } else {
-      console.log(binaries[IEDriver.id].name + ' 32-bit ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      Logger.info(binaries[IEDriver.id].name + ' 32-bit ' + binaries[StandAlone.id].versionCustom + ' up to date');
     }
   }
 }

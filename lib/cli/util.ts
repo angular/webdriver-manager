@@ -10,6 +10,20 @@ export class Logger {
     console.log(message);
   }
 
+  static warn(message: string, opt_noTimestamp?: boolean): void {
+    if (!opt_noTimestamp) {
+      message = Logger.timestamp() + ' ' + chalk.yellow(message);
+    }
+    console.log(message);
+  }
+
+  static error(message: string, opt_noTimestamp?: boolean): void {
+    if (!opt_noTimestamp) {
+      message = Logger.timestamp() + ' ' + chalk.red(message);
+    }
+    console.log(message);
+  }
+
   static timestamp(): string {
     let d = new Date();
     return '[' + chalk.gray(d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()) + ']';

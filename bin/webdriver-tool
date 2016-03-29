@@ -33,8 +33,8 @@ else if (localPath === globalPath) {
 } else {
   Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));
   if (Config.globalVersion() && Config.localVersion() !== Config.globalVersion()) {
-    Logger.info(chalk.yellow('warning: local version [' + Config.localVersion() +
-        '] mismatch with global version [' + Config.globalVersion() + ']\n'));
+    Logger.warn('warning: local version [' + Config.localVersion() +
+        '] mismatch with global version [' + Config.globalVersion() + ']\n');
   }
   require(path.resolve(localPath, 'webdriver.js'));
 }

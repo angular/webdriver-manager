@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone, OS} from '../binaries';
 import {DownloadedBinary} from './downloaded_binary';
+import {Logger} from '../cli';
 
 /**
  * The File Manager class is where the webdriver manager will compile a list of
@@ -156,12 +157,12 @@ export class FileManager {
   static removeExistingFiles(outputDir: string): void {
     // folder exists
     if (!fs.existsSync(outputDir)) {
-      console.log('The out_dir path ' + outputDir + ' does not exist.');
+      Logger.warn('The out_dir path ' + outputDir + ' does not exist.');
       return;
     }
     let existingFiles = FileManager.getExistngFiles(outputDir);
     if (existingFiles.length === 0) {
-      console.log('No files found in out_dir: ' + outputDir + '.');
+      Logger.warn('No files found in out_dir: ' + outputDir);
       return;
     }
 
@@ -171,6 +172,7 @@ export class FileManager {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
           fs.unlinkSync(path.join(outputDir, file));
+          Logger.info('Removed ' + file);
         }
       }
     })

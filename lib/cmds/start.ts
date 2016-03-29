@@ -8,7 +8,7 @@ import {Opts} from './opts';
 import * as Opt from './';
 import {Config} from '../config';
 import {FileManager} from '../files';
-import {Options, Program} from '../cli';
+import {Logger, Options, Program} from '../cli';
 import {BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 
 let prog = new Program()
@@ -66,7 +66,7 @@ function start(options: Options) {
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
   if (downloadedBinaries[StandAlone.id] == null) {
-    console.error(
+    Logger.error(
         'Selenium Standalone is not present. Install with ' +
         'webdriver-manager update --standalone');
     process.exit(1);
@@ -94,21 +94,21 @@ function start(options: Options) {
   for (let arg in args) {
     argsToString += ' ' + args[arg];
   }
-  console.log('java' + argsToString);
+  Logger.info('java' + argsToString);
 
   let seleniumProcess = spawnCommand('java', args);
-  console.log('seleniumProcess.pid: ' + seleniumProcess.pid);
+  Logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
-    console.log('Selenium Standalone has exited with code ' + code);
+    Logger.info('Selenium Standalone has exited with code ' + code);
     process.exit(code);
   });
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
-    console.log('Attempting to shut down selenium nicely');
+    Logger.info('Attempting to shut down selenium nicely');
     http.get('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
   });
   process.on('SIGINT', () => {
-    console.log('Staying alive until the Selenium Standalone process exits');
+    Logger.info('Staying alive until the Selenium Standalone process exits');
   });
 }
 
