@@ -80,35 +80,45 @@ function update(options: Options): void {
 
   // do the update
   if (standalone) {
-    if (FileManager.toDownload(binaries[StandAlone.id], outputDir)) {
-      Downloader.downloadBinary(binaries[StandAlone.id], outputDir);
-    } else {
-      Logger.info(binaries[StandAlone.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
-    }
+    FileManager.toDownload(binaries[StandAlone.id], outputDir).then((value: boolean) => {
+      if (value) {
+        Downloader.downloadBinary(binaries[StandAlone.id], outputDir);
+      } else {
+        Logger.info(binaries[StandAlone.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      }
+    });
   }
   if (chrome) {
-      if (FileManager.toDownload(binaries[ChromeDriver.id], outputDir)) {
+    FileManager.toDownload(binaries[ChromeDriver.id], outputDir).then((value: boolean) => {
+      if (value) {
         Downloader.downloadBinary(
             binaries[ChromeDriver.id], outputDir, proxy, ignoreSSL, unzip);
       } else {
+        // check to see if the executable is as expected
+        // check for correct file permissions
         Logger.info(binaries[ChromeDriver.id].name + ' ' + binaries[ChromeDriver.id].versionCustom + ' up to date');
       }
+    });
   }
   if (ie) {
-    if (FileManager.toDownload(binaries[IEDriver.id], outputDir)) {
-      Downloader.downloadBinary(
-          binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
-    } else {
-      Logger.info(binaries[IEDriver.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
-    }
+    FileManager.toDownload(binaries[IEDriver.id], outputDir).then((value: boolean) => {
+      if (value) {
+        Downloader.downloadBinary(
+            binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
+      } else {
+        Logger.info(binaries[IEDriver.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      }
+    });
   }
   if (ie32) {
-    if (FileManager.toDownload(binaries[IEDriver.id], outputDir)) {
-      Downloader.downloadBinary(
-          binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
-    } else {
-      Logger.info(binaries[IEDriver.id].name + ' 32-bit ' + binaries[StandAlone.id].versionCustom + ' up to date');
-    }
+    FileManager.toDownload(binaries[IEDriver.id], outputDir).then((value: boolean) => {
+      if (value) {
+        Downloader.downloadBinary(
+            binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
+      } else {
+        Logger.info(binaries[IEDriver.id].name + ' 32-bit ' + binaries[StandAlone.id].versionCustom + ' up to date');
+      }
+    });
   }
 }
 

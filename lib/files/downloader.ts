@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as request from 'request';
 import * as url from 'url';
+import * as q from 'q';
+import * as http from 'http';
 
 import {Binary} from '../binaries/binary';
 import {Logger} from '../cli';
@@ -23,7 +25,7 @@ export class Downloader {
   static downloadBinary(
       binary: Binary, outputDir: string, opt_proxy?: string,
       opt_ignoreSSL?: boolean, opt_callback?: Function): void {
-    Logger.info('Updating ' + binary.name + ' to version ' + binary.version());
+    Logger.info('downloading ' + binary.name + ' to version ' + binary.version());
     var url = binary.url(os.type(), os.arch());
     if (!url) {
       Logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
@@ -53,7 +55,30 @@ export class Downloader {
     } else if (protocol === 'http:') {
       return process.env.HTTP_PROXY || process.env.http_proxy;
     }
-  };
+  }
+
+  static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean): q.Promise<any> {
+    let deferred = q.defer();
+    if (opt_ignoreSSL) {
+      Logger.info('ignoring SSL certificate');
+    }
+
+    let options = {
+      method: 'HEAD',
+      url: fileUrl,
+      strictSSL: !opt_ignoreSSL,
+      rejectUnauthorized: !opt_ignoreSSL,
+      proxy: Downloader.resolveProxy_(fileUrl, opt_proxy)
+    };
+
+    let contentLength = 0;
+    request(options)
+      .on('response', (response) => {
+        contentLength = response.headers['content-length'];
+        deferred.resolve(contentLength);
+      });
+    return deferred.promise;
+  }
 
   /**
    * Ceates the GET request for the file name.
@@ -65,7 +90,7 @@ export class Downloader {
   static httpGetFile_(
       fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
       callback?: Function): void {
-    Logger.info('downloading ' + fileUrl + '...');
+    Logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
     let filePath = path.join(outputDir, fileName);
     let file = fs.createWriteStream(filePath);
     let contentLength = 0;

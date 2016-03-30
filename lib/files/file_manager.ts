@@ -1,9 +1,11 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as q from 'q';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone, OS} from '../binaries';
 import {DownloadedBinary} from './downloaded_binary';
+import {Downloader} from './downloader';
 import {Logger} from '../cli';
 
 /**
@@ -134,19 +136,41 @@ export class FileManager {
    * @param outputDir The directory where files are downloaded and stored.
    * @returns If the file should be downloaded.
    */
-  static toDownload<T extends Binary>(binary: T, outputDir: string): boolean {
+  static toDownload<T extends Binary>(binary: T, outputDir: string): q.Promise<boolean> {
+    let osType = os.type();
+    let osArch = os.arch();
+    let filePath: string;
+    let readData: Buffer;
+    let deferred = q.defer<boolean>();
     let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
+
     if (downloaded[binary.id()]) {
-      let versions = downloaded[binary.id()].versions;
+      let downloadedBinary = downloaded[binary.id()];
+      let versions = downloadedBinary.versions;
       let version = binary.version();
       for (let index in versions) {
         let v = versions[index];
         if (v === version) {
-          return false;
+          filePath = path.resolve(outputDir, binary.filename(osType, osArch));
+          readData = fs.readFileSync(filePath);
+
+          // we have the version, verify it is the correct file size
+          let contentLength = Downloader.httpHeadContentLength(binary.url(osType, osArch));
+          return contentLength.then((value: any): boolean => {
+            if (value == readData.length) {
+              return false;
+            } else {
+              Logger.warn(path.basename(filePath) + ' expected length ' + value +
+                  ', found ' + readData.length);
+              Logger.warn('removing file: ' + filePath);
+              return true;
+            }
+          });
         }
       }
     }
-    return true;
+    deferred.resolve(true);
+    return deferred.promise;
   }
 
   /**
@@ -157,12 +181,12 @@ export class FileManager {
   static removeExistingFiles(outputDir: string): void {
     // folder exists
     if (!fs.existsSync(outputDir)) {
-      Logger.warn('The out_dir path ' + outputDir + ' does not exist.');
+      Logger.warn('the out_dir path ' + outputDir + ' does not exist');
       return;
     }
     let existingFiles = FileManager.getExistngFiles(outputDir);
     if (existingFiles.length === 0) {
-      Logger.warn('No files found in out_dir: ' + outputDir);
+      Logger.warn('no files found in out_dir: ' + outputDir);
       return;
     }
 
@@ -172,7 +196,7 @@ export class FileManager {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
           fs.unlinkSync(path.join(outputDir, file));
-          Logger.info('Removed ' + file);
+          Logger.info('removed ' + file);
         }
       }
     })
