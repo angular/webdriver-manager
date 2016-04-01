@@ -1,4 +1,4 @@
-import {arch, type} from 'os';
+import * as os from 'os';
 
 import {Binary, OS} from './binary';
 import {Config} from '../config';
@@ -20,6 +20,7 @@ export class IEDriver extends Binary {
     this.prefixDefault = 'IEDriverServer';
     this.suffixDefault = '.zip';
     this.cdn = Config.cdnUrls().ie;
+    this.arch = os.arch();
   }
 
   id(): string { return IEDriver.id; }
@@ -27,8 +28,8 @@ export class IEDriver extends Binary {
   versionDefault(): string { return IEDriver.versionDefault; }
 
   version(): string {
-    if (type() == 'Windows_NT') {
-      if (arch() == 'x64') {
+    if (os.type() == 'Windows_NT') {
+      if (this.arch == 'x64') {
         return '_x64_' + this.versionCustom;
       } else {
         return '_Win32_' + this.versionCustom;

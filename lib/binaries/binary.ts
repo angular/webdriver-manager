@@ -27,6 +27,7 @@ export class Binary {
   versionCustom: string;            // version of file
   suffixDefault: string;            // file type for downloading
   cdn: string;                      // url protocol and host
+  arch: string;
 
   /**
    * @param ostype The operating system.

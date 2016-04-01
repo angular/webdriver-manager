@@ -78,58 +78,67 @@ function update(options: Options): void {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
 
-  // do the update
+  // if the file has not been completely downloaded, download it
+  // else if the file has already been downloaded, unzip the file, rename it, and give it permissions
   if (standalone) {
-    FileManager.toDownload(binaries[StandAlone.id], outputDir).then((value: boolean) => {
+    let binary = binaries[StandAlone.id];
+    FileManager.toDownload(binary, outputDir).then((value: boolean) => {
       if (value) {
-        Downloader.downloadBinary(binaries[StandAlone.id], outputDir);
+        Downloader.downloadBinary(binary, outputDir);
       } else {
-        Logger.info(binaries[StandAlone.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
+        Logger.info(binary.name + ' - file exists: ' + binary.filename(os.type(), os.arch()));
+        Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');
       }
     });
   }
   if (chrome) {
-    FileManager.toDownload(binaries[ChromeDriver.id], outputDir).then((value: boolean) => {
-      if (value) {
-        Downloader.downloadBinary(
-            binaries[ChromeDriver.id], outputDir, proxy, ignoreSSL, unzip);
-      } else {
-        // check to see if the executable is as expected
-        // check for correct file permissions
-        Logger.info(binaries[ChromeDriver.id].name + ' ' + binaries[ChromeDriver.id].versionCustom + ' up to date');
-      }
-    });
+    let binary = binaries[ChromeDriver.id];
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie) {
-    FileManager.toDownload(binaries[IEDriver.id], outputDir).then((value: boolean) => {
-      if (value) {
-        Downloader.downloadBinary(
-            binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
-      } else {
-        Logger.info(binaries[IEDriver.id].name + ' ' + binaries[StandAlone.id].versionCustom + ' up to date');
-      }
-    });
+    let binary = binaries[IEDriver.id];
+    binary.arch = os.arch(); // Win32 or x64
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie32) {
-    FileManager.toDownload(binaries[IEDriver.id], outputDir).then((value: boolean) => {
-      if (value) {
-        Downloader.downloadBinary(
-            binaries[IEDriver.id], outputDir, proxy, ignoreSSL, unzip);
-      } else {
-        Logger.info(binaries[IEDriver.id].name + ' 32-bit ' + binaries[StandAlone.id].versionCustom + ' up to date');
-      }
-    });
+    let binary = binaries[IEDriver.id];
+    binary.arch = 'Win32';
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
 }
 
-function unzip<T extends Binary>(binary: T, outputDir: string, filename: string): void {
-  let zip = new AdmZip(filename);
+function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean) {
+  FileManager.toDownload(binary, outputDir).then((value: boolean) => {
+    if (value) {
+      Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL, unzip);
+    } else {
+      Logger.info(binary.name + ' - file exists: ' + binary.filename(os.type(), os.arch()));
+      let fileName = binary.filename(os.type(), os.arch());
+      unzip(binary, outputDir, fileName);
+      Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');
+    }
+  });
+}
+
+function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string): void {
+  // remove the previously saved file and unzip it
   let osType = os.type();
+  let mv = path.join(outputDir, binary.executableFilename(osType));
+  try {
+    fs.unlinkSync(mv);
+  } catch(err) {}
+
+  // unzip the file
+  Logger.info(binary.name + ' - unzipping ' + fileName);
+  let zip = new AdmZip(path.resolve(outputDir, fileName));
   zip.extractAllTo(outputDir, true);
-  let mv =
-      path.join(outputDir, binary.prefix() + binary.version() + binary.executableSuffix(osType));
+
+  // rename
   fs.renameSync(path.join(outputDir, binary.name + binary.executableSuffix(osType)), mv);
+
+  // set permissions
   if (osType !== 'Windows_NT') {
+    Logger.info(binary.name + ' - setting permissions to 0755 for ' + mv);
     fs.chmodSync(mv, '0755');
   }
 }
