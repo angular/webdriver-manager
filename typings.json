@@ -1,12 +1,12 @@
 {
   "ambientDependencies": {
-    "adm-zip": "registry:dt/adm-zip#0.0.0+20160211023517",
+    "adm-zip": "registry:dt/adm-zip#0.0.0+20160317120654",
     "chalk": "registry:dt/chalk#0.4.0+20160317120654",
-    "form-data": "registry:dt/form-data#0.0.0+20150826060748",
-    "jasmine": "registry:dt/jasmine#2.2.0+20160308082659",
-    "minimist": "registry:dt/minimist#1.1.3+20151229171613",
-    "node": "registry:dt/node#4.0.0+20160226132328",
+    "form-data": "registry:dt/form-data#0.0.0+20160316155526",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160317120654",
+    "minimist": "registry:dt/minimist#1.1.3+20160317120654",
+    "node": "registry:dt/node#4.0.0+20160330064709",
     "q": "registry:dt/q#0.0.0+20160323171452",
-    "request": "registry:dt/request#0.0.0+20160311134650"
+    "request": "registry:dt/request#0.0.0+20160316155526"
   }
 }

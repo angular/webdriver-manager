@@ -47,14 +47,35 @@ export class Downloader {
    */
   static resolveProxy_(fileUrl: string, opt_proxy?: string): string {
     let protocol = url.parse(fileUrl).protocol;
+    let hostname = url.parse(fileUrl).hostname;
+
     if (opt_proxy) {
       return opt_proxy;
-    } else if (protocol === 'https:') {
-      return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY ||
-          process.env.http_proxy;
-    } else if (protocol === 'http:') {
-      return process.env.HTTP_PROXY || process.env.http_proxy;
+    } else {
+      // If the NO_PROXY environment variable exists and matches the host name,
+      // to ignore the resolve proxy.
+      // the checks to see if it exists and equal to empty string is to help with testing
+      let noProxy: string = process.env.NO_PROXY || process.env.no_proxy;
+      if (noProxy) {
+        // array of hostnames/domain names listed in the NO_PROXY environment variable
+        let noProxyTokens = noProxy.split(',');
+        // check if the fileUrl hostname part does not end with one of the
+        // NO_PROXY environment variable's hostnames/domain names
+        for (let noProxyToken of noProxyTokens) {
+          if (hostname.indexOf(noProxyToken) !== -1) {
+            return undefined;
+          }
+        }
+      }
+
+      // If the HTTPS_PROXY and HTTP_PROXY environment variable is set, use that as the proxy
+      if (protocol === 'https:') {
+        return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+      } else if (protocol === 'http:') {
+        return process.env.HTTP_PROXY || process.env.http_proxy;
+      }
     }
+    return null;
   }
 
   static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean): q.Promise<any> {
