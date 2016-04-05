@@ -49,20 +49,13 @@ export class Config {
    * If installed as a node module, return the local version.
    */
   static localVersion(): string {
-      let packageJson = require(Config.packagePath);
-      return packageJson.version;
-  }
-
-  /**
-   * If running from the project directory, get the project's version.
-   */
-  static projectVersion(): string {
-    let projectPath = path.resolve('.');
-    let projectPackagePath = path.resolve(projectPath, 'package.json');
+    var cwd = process.cwd();
+    var localInstall = path.resolve(cwd, 'node_modules/webdriver-tool/');
     try {
-      if (fs.statSync(projectPackagePath).isFile()) {
-        let projectJson = require(projectPackagePath);
-        return projectJson.version;
+      if (fs.statSync(localInstall).isDirectory()) {
+        return require(path.resolve(localInstall, 'package.json')).version;
+      } else {
+        return null;
       }
     } catch(err) {
       return null;
@@ -73,12 +66,13 @@ export class Config {
    * If installed, returns the globally installed webdriver-tool.
    */
   static globalVersion(): string {
-    let globalNpm = process.env.NPM_BIN || process.env.NVM_BIN;
-    let globalPackagePath = path.resolve(globalNpm, '../lib/node_modules/webdriver-tool/built/package.json');
+    var dir = __dirname;
+    let globalPackageJson = path.resolve(dir, '../package.json');
     try {
-      if (fs.statSync(globalPackagePath).isFile()) {
-        let globalPackageJson = require(globalPackagePath);
-        return globalPackageJson.version;
+      if (fs.statSync(globalPackageJson).isFile()) {
+        return require(globalPackageJson).version;
+      } else {
+        return null;
       }
     } catch(err) {
       return null;

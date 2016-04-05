@@ -2,39 +2,31 @@
 
 var path = require('path');
 var fs = require('fs');
-var chalk = require('chalk');
 
-var Logger = require('../built/lib/cli/util').Logger;
-var Config = require('../built/lib/config').Config;
+var cwd = process.cwd();
+var dir = __dirname;
+var localInstall = path.resolve(cwd, 'node_modules/webdriver-tool/');
+var parentPath = path.resolve(cwd, '..');
+var folder = cwd.replace(parentPath, '').substring(1);
 
-var globalNpm = process.env.NPM_BIN || process.env.NVM_BIN;
-
-var globalPath = path.resolve(globalNpm, '../lib/node_modules/webdriver-tool/built/lib/');
-var localPath = path.resolve(__dirname, '../../../node_modules/webdriver-tool/built/lib/');
-
-// check to see if this is webdriver-tool (the project), if it is, run this
-var projectPath = path.resolve('.');
-var parentPath = path.resolve(projectPath, '..');
-var folder = projectPath.replace(parentPath + '/', '');
-
+// Project version.
 if (folder === 'webdriver-tool') {
-  Logger.info('webdriver-tool: using ' + chalk.magenta('project version ' + Config.projectVersion()));
-  // compare project version to global
-  if (Config.globalVersion() && Config.projectVersion() !== Config.globalVersion()) {
-    Logger.info(chalk.yellow('warning: project version [' + Config.projectVersion() +
-        '] mismatch with global version [' + Config.globalVersion() + ']\n'));
-  }
-  require(path.resolve(projectPath, 'built/lib/webdriver.js'));
+  var chalk = require('chalk');
+  console.log('Webdriver Tool: using ' + chalk.magenta('project version ' +
+      require(path.resolve('package.json')).version));
+  require(path.resolve('built/lib/webdriver.js'));
 }
-else if (localPath === globalPath) {
-  // we are using the global version
-  Logger.info('webdriver-tool: using ' + chalk.cyan('global version ' + Config.globalVersion()));
-  require(path.resolve(globalPath, 'webdriver.js'));
-} else {
-  Logger.info('webdriver-tool: using ' + chalk.green('local version ' + Config.localVersion()));
-  if (Config.globalVersion() && Config.localVersion() !== Config.globalVersion()) {
-    Logger.warn('warning: local version [' + Config.localVersion() +
-        '] mismatch with global version [' + Config.globalVersion() + ']\n');
-  }
-  require(path.resolve(localPath, 'webdriver.js'));
+// Local version.
+else if (fs.statSync(path.resolve(localInstall)).isDirectory()) {
+  var chalk = require(path.resolve(localInstall, 'node_modules/chalk/index.js'));
+  console.log('Webdriver Tool: using ' + chalk.cyan('local installed version ' +
+      require(path.resolve(localInstall, 'package.json')).version));
+  require(path.resolve(localInstall, 'built/lib/webdriver.js'));
+}
+// Global version.
+else {
+  var chalk = require(path.resolve(dir, '../node_modules/chalk/index.js'));
+  console.log('Webdriver Tool: using ' + chalk.green('global installed version ',
+      require(path.resolve(dir, '../package.json')).version));
+  require(path.resolve(dir, '../built/lib/webdriver.js'));
 }
