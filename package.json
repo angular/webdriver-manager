@@ -1,7 +1,7 @@
 {
-  "name": "webdriver-tool",
+  "name": "webdriver-manager",
   "version": "0.1.0",
-  "description": "Webdriver tool to manage selenium standalone server",
+  "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp test"
@@ -17,12 +17,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/angular/webdriver-tool.git"
+    "url": "git://github.com/angular/webdriver-manager.git"
   },
   "bin": {
-    "webdriver-tool": "bin/webdriver-tool"
+    "webdriver-manager": "bin/webdriver-manager"
   },
-  "main": "bin/webdriver-tool",
+  "main": "bin/webdriver-manager",
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {
