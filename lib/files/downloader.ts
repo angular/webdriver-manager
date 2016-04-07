@@ -25,7 +25,7 @@ export class Downloader {
   static downloadBinary(
       binary: Binary, outputDir: string, opt_proxy?: string,
       opt_ignoreSSL?: boolean, opt_callback?: Function): void {
-    Logger.info('downloading ' + binary.name + ' to version ' + binary.version());
+    Logger.info(binary.name + ' - downloading version ' + binary.version());
     var url = binary.url(os.type(), os.arch());
     if (!url) {
       Logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
@@ -117,7 +117,7 @@ export class Downloader {
     let contentLength = 0;
 
     if (opt_ignoreSSL) {
-      Logger.info('Ignoring SSL certificate');
+      Logger.info('ignoring SSL certificate');
     }
 
     let options = {
@@ -156,7 +156,6 @@ export class Downloader {
           fs.unlink(filePath);
           return;
         }
-        Logger.info(fileName + ' downloaded to ' + filePath);
         if (callback) {
           callback(filePath);
         }

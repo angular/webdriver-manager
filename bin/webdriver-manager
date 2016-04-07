@@ -10,23 +10,23 @@ var parentPath = path.resolve(cwd, '..');
 var folder = cwd.replace(parentPath, '').substring(1);
 
 // Project version.
-if (folder === 'webdriver-tool') {
+if (folder === 'webdriver-manager') {
   var chalk = require('chalk');
-  console.log('Webdriver Tool: using ' + chalk.magenta('project version ' +
+  console.log('Webdriver Manager: using ' + chalk.magenta('project version ' +
       require(path.resolve('package.json')).version));
   require(path.resolve('built/lib/webdriver.js'));
 }
 // Local version.
 else if (fs.statSync(path.resolve(localInstall)).isDirectory()) {
   var chalk = require(path.resolve(localInstall, 'node_modules/chalk/index.js'));
-  console.log('Webdriver Tool: using ' + chalk.cyan('local installed version ' +
+  console.log('Webdriver Manager: using ' + chalk.cyan('local installed version ' +
       require(path.resolve(localInstall, 'package.json')).version));
   require(path.resolve(localInstall, 'built/lib/webdriver.js'));
 }
 // Global version.
 else {
   var chalk = require(path.resolve(dir, '../node_modules/chalk/index.js'));
-  console.log('Webdriver Tool: using ' + chalk.green('global installed version ',
+  console.log('Webdriver Manager: using ' + chalk.green('global installed version ',
       require(path.resolve(dir, '../package.json')).version));
   require(path.resolve(dir, '../built/lib/webdriver.js'));
 }

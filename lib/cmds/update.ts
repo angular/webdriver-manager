@@ -86,7 +86,7 @@ function update(options: Options): void {
       if (value) {
         Downloader.downloadBinary(binary, outputDir);
       } else {
-        Logger.info(binary.name + ' - file exists: ' + binary.filename(os.type(), os.arch()));
+        Logger.info(binary.name + ' - file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
         Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');
       }
     });
@@ -112,7 +112,7 @@ function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSS
     if (value) {
       Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL, unzip);
     } else {
-      Logger.info(binary.name + ' - file exists: ' + binary.filename(os.type(), os.arch()));
+      Logger.info(binary.name + ' - file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
       let fileName = binary.filename(os.type(), os.arch());
       unzip(binary, outputDir, fileName);
       Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');

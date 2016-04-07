@@ -10,7 +10,7 @@ import {Cli} from './cli';
 import {Config} from './config';
 
 let commandline = new Cli()
-              .usage('webdriver-tool <command> [options]')
+              .usage('webdriver-manager <command> [options]')
               .program(clean.program)
               .program(start.program)
               .program(status.program)
