@@ -2,7 +2,6 @@ import * as chalk from 'chalk';
 import * as path from 'path';
 
 import {Config} from '../config';
-import {Logger} from './util';
 import {Programs, Program} from './programs';
 import {MinimistArgs, Options} from './options';
 
