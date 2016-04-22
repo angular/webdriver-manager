@@ -9,6 +9,8 @@ import * as http from 'http';
 import {Binary} from '../binaries/binary';
 import {Logger} from '../cli';
 
+let logger = new Logger('downloader');
+
 /**
  * The file downloader.
  */
@@ -25,10 +27,10 @@ export class Downloader {
   static downloadBinary(
       binary: Binary, outputDir: string, opt_proxy?: string,
       opt_ignoreSSL?: boolean, opt_callback?: Function): void {
-    Logger.info(binary.name + ' - downloading version ' + binary.version());
+    logger.info(binary.name + ': downloading version ' + binary.version());
     var url = binary.url(os.type(), os.arch());
     if (!url) {
-      Logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
+      logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
       return;
     }
     Downloader.httpGetFile_(
@@ -81,7 +83,7 @@ export class Downloader {
   static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean): q.Promise<any> {
     let deferred = q.defer();
     if (opt_ignoreSSL) {
-      Logger.info('ignoring SSL certificate');
+      logger.info('ignoring SSL certificate');
     }
 
     let options = {
@@ -111,13 +113,13 @@ export class Downloader {
   static httpGetFile_(
       fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
       callback?: Function): void {
-    Logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
+    logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
     let filePath = path.join(outputDir, fileName);
     let file = fs.createWriteStream(filePath);
     let contentLength = 0;
 
     if (opt_ignoreSSL) {
-      Logger.info('ignoring SSL certificate');
+      logger.info('ignoring SSL certificate');
     }
 
     let options = {
@@ -132,13 +134,13 @@ export class Downloader {
             (response) => {
               if (response.statusCode !== 200) {
                 fs.unlink(filePath);
-                Logger.error('Error: Got code ' + response.statusCode + ' from ' + fileUrl);
+                logger.error('Error: Got code ' + response.statusCode + ' from ' + fileUrl);
               }
               contentLength = response.headers['content-length'];
             })
         .on('error',
             (error) => {
-              Logger.error('Error: Got error ' + error + ' from ' + fileUrl);
+              logger.error('Error: Got error ' + error + ' from ' + fileUrl);
               fs.unlink(filePath);
             })
         .pipe(file);
@@ -146,11 +148,11 @@ export class Downloader {
     file.on('close', function() {
       fs.stat(filePath, function(err, stats) {
         if (err) {
-          Logger.error('Error: Got error ' + err + ' from ' + fileUrl);
+          logger.error('Error: Got error ' + err + ' from ' + fileUrl);
           return;
         }
         if (stats.size != contentLength) {
-          Logger.error(
+          logger.error(
               'Error: corrupt download for ' + fileName +
               '. Please re-run webdriver-manager update');
           fs.unlink(filePath);

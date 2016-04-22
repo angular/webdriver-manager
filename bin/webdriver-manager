@@ -5,7 +5,7 @@ var fs = require('fs');
 
 var cwd = process.cwd();
 var dir = __dirname;
-var localInstall = path.resolve(cwd, 'node_modules/webdriver-tool/');
+var localInstall = path.resolve(cwd, 'node_modules/webdriver-manager/');
 var parentPath = path.resolve(cwd, '..');
 var folder = cwd.replace(parentPath, '').substring(1);
 

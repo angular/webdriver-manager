@@ -1,4 +1,4 @@
 export * from './cli';
 export * from './options';
 export * from './programs';
-export * from './util';
+export * from './logger';

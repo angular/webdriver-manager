@@ -11,7 +11,8 @@ import {Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 import {FileManager, Downloader} from '../files';
 import {Logger, Options, Program} from '../cli';
 
-var prog = new Program()
+let logger = new Logger('update');
+let prog = new Program()
     .command('update', 'install or update selected binaries')
     .action(update)
     .addOption(Opts[Opt.OUT_DIR])
@@ -86,8 +87,8 @@ function update(options: Options): void {
       if (value) {
         Downloader.downloadBinary(binary, outputDir);
       } else {
-        Logger.info(binary.name + ' - file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
-        Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');
+        logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
+        logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
       }
     });
   }
@@ -112,10 +113,10 @@ function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSS
     if (value) {
       Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL, unzip);
     } else {
-      Logger.info(binary.name + ' - file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
+      logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
       let fileName = binary.filename(os.type(), os.arch());
       unzip(binary, outputDir, fileName);
-      Logger.info(binary.name + ' - v' + binary.versionCustom + ' up to date');
+      logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
     }
   });
 }
@@ -129,7 +130,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   } catch(err) {}
 
   // unzip the file
-  Logger.info(binary.name + ' - unzipping ' + fileName);
+  logger.info(binary.name + ': unzipping ' + fileName);
   let zip = new AdmZip(path.resolve(outputDir, fileName));
   zip.extractAllTo(outputDir, true);
 
@@ -138,7 +139,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
 
   // set permissions
   if (osType !== 'Windows_NT') {
-    Logger.info(binary.name + ' - setting permissions to 0755 for ' + mv);
+    logger.info(binary.name + ': setting permissions to 0755 for ' + mv);
     fs.chmodSync(mv, '0755');
   }
 }

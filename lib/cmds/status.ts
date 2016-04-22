@@ -7,6 +7,7 @@ import {Config} from '../config';
 import {FileManager} from '../files';
 import {Logger, Options, Program} from '../cli';
 
+let logger = new Logger('status');
 let prog = new Program()
                          .command('status', 'list the current available drivers')
                          .addOption(Opts[Opt.OUT_DIR])
@@ -52,12 +53,12 @@ function status(options: Options) {
         log += ', ';
       }
     }
-    Logger.info(log);
+    logger.info(log);
   }
   // for binaries that are available for the operating system, show them here
   for (let bin in binaries) {
     if (downloadedBinaries[bin] == null) {
-      Logger.info(binaries[bin].name + ' is not present');
+      logger.info(binaries[bin].name + ' is not present');
     }
   }
 }

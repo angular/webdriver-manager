@@ -8,6 +8,8 @@ import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
 
+let logger = new Logger('file_manager');
+
 /**
  * The File Manager class is where the webdriver manager will compile a list of
  * binaries that could be downloaded and get a list of previously downloaded
@@ -160,9 +162,9 @@ export class FileManager {
             if (value == readData.length) {
               return false;
             } else {
-              Logger.warn(path.basename(filePath) + ' expected length ' + value +
+              logger.warn(path.basename(filePath) + ' expected length ' + value +
                   ', found ' + readData.length);
-              Logger.warn('removing file: ' + filePath);
+              logger.warn('removing file: ' + filePath);
               return true;
             }
           });
@@ -181,12 +183,12 @@ export class FileManager {
   static removeExistingFiles(outputDir: string): void {
     // folder exists
     if (!fs.existsSync(outputDir)) {
-      Logger.warn('the out_dir path ' + outputDir + ' does not exist');
+      logger.warn('the out_dir path ' + outputDir + ' does not exist');
       return;
     }
     let existingFiles = FileManager.getExistngFiles(outputDir);
     if (existingFiles.length === 0) {
-      Logger.warn('no files found in out_dir: ' + outputDir);
+      logger.warn('no files found in out_dir: ' + outputDir);
       return;
     }
 
@@ -196,7 +198,7 @@ export class FileManager {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
           fs.unlinkSync(path.join(outputDir, file));
-          Logger.info('removed ' + file);
+          logger.info('removed ' + file);
         }
       }
     })

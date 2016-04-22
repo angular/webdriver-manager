@@ -50,7 +50,7 @@ export class Config {
    */
   static localVersion(): string {
     var cwd = process.cwd();
-    var localInstall = path.resolve(cwd, 'node_modules/webdriver-tool/');
+    var localInstall = path.resolve(cwd, 'node_modules/webdriver-manager/');
     try {
       if (fs.statSync(localInstall).isDirectory()) {
         return require(path.resolve(localInstall, 'package.json')).version;
