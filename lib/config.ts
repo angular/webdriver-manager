@@ -47,7 +47,7 @@ export class Config {
 
     // global version
     else {
-      return path.resolve(Config.dir, '../built', jsonFile);
+      return path.resolve(Config.dir, '..', jsonFile);
     }
   }
 
