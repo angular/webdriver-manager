@@ -1,6 +1,7 @@
 lib/
 spec/
 typings/
+selenium/
 
 .clang-format
 .gitignore
