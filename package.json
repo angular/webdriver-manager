@@ -22,7 +22,7 @@
   "bin": {
     "webdriver-manager": "bin/webdriver-manager"
   },
-  "main": "bin/webdriver-manager",
+  "main": "built/lib/webdriver.js",
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {
