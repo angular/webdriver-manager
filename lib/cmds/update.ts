@@ -59,12 +59,12 @@ function update(options: Options): void {
   if (options[Opt.IE32]) {
     ie32 = options[Opt.IE32].getBoolean();
   }
-  let outputDir = Config.seleniumDir;
+  let outputDir = Config.getSeleniumDir();
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
     }
     FileManager.makeOutputDirectory(outputDir);
   }

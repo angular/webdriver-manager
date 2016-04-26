@@ -2,31 +2,41 @@
 
 var path = require('path');
 var fs = require('fs');
-
 var cwd = process.cwd();
-var dir = __dirname;
-var localInstall = path.resolve(cwd, 'node_modules/webdriver-manager/');
+
+var nodeModuleName = 'webdriver-manager';
+var localInstall = path.resolve(cwd, 'node_modules', nodeModuleName);
 var parentPath = path.resolve(cwd, '..');
+var dir = __dirname;
 var folder = cwd.replace(parentPath, '').substring(1);
 
-// Project version.
-if (folder === 'webdriver-manager') {
+var isProjectVersion = folder === nodeModuleName;
+var isLocalVersion = false;
+try {
+  isLocalVersion = fs.statSync(localInstall).isDirectory();
+} catch(e) {
+}
+
+// project version
+if (folder === nodeModuleName) {
   var chalk = require('chalk');
-  console.log('Webdriver Manager: using ' + chalk.magenta('project version ' +
-      require(path.resolve('package.json')).version));
-  require(path.resolve('built/lib/webdriver.js'));
+  console.log(nodeModuleName + ': using ' + chalk.magenta('project version ' +
+    require(path.resolve('package.json')).version));
+  require(path.resolve('built/lib/webdriver'));
 }
-// Local version.
-else if (fs.statSync(path.resolve(localInstall)).isDirectory()) {
+
+// local version
+else if (isLocalVersion) {
   var chalk = require(path.resolve(localInstall, 'node_modules/chalk/index.js'));
-  console.log('Webdriver Manager: using ' + chalk.cyan('local installed version ' +
-      require(path.resolve(localInstall, 'package.json')).version));
-  require(path.resolve(localInstall, 'built/lib/webdriver.js'));
+  console.log(nodeModuleName + ': using ' + chalk.cyan('local installed version ' +
+    require(path.resolve(localInstall, 'package.json')).version));
+  require(path.resolve(localInstall, 'built/lib/webdriver'));
 }
-// Global version.
+
+// global version
 else {
   var chalk = require(path.resolve(dir, '../node_modules/chalk/index.js'));
-  console.log('Webdriver Manager: using ' + chalk.green('global installed version ',
-      require(path.resolve(dir, '../package.json')).version));
-  require(path.resolve(dir, '../built/lib/webdriver.js'));
+  console.log(nodeModuleName + ': using ' + chalk.green('global installed version ' +
+    require(path.resolve(dir, '../package.json')).version));
+  require(path.resolve(dir, '../built/lib/webdriver'));
 }
