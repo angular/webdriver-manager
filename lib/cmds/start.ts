@@ -43,12 +43,12 @@ function start(options: Options) {
   let osType = os.type();
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
-  let outputDir = Config.seleniumDir;
+  let outputDir = Config.getSeleniumDir();
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
     }
   }
   let chromeLogs: string = null;
@@ -56,7 +56,7 @@ function start(options: Options) {
     if (path.isAbsolute(options[Opt.CHROME_LOGS].getString())) {
       chromeLogs = options[Opt.CHROME_LOGS].getString();
     } else {
-      chromeLogs = path.resolve(Config.baseDir, options[Opt.CHROME_LOGS].getString());
+      chromeLogs = path.resolve(Config.getBaseDir(), options[Opt.CHROME_LOGS].getString());
     }
   }
   binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();

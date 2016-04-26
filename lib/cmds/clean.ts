@@ -27,12 +27,12 @@ if (argv._[0] === 'clean-run') {
  * @param: options
  */
 function clean(options: Options): void {
-  let outputDir = Config.seleniumDir;
+  let outputDir = Config.getSeleniumDir();
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.baseDir, options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
     }
   }
   FileManager.removeExistingFiles(outputDir);

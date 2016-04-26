@@ -14,17 +14,78 @@ export interface ConfigFile {
  * The configuration for webdriver-manager.
  */
 export class Config {
-  static configPath: string = '../config.json';
-  static packagePath: string = '../package.json';
-  static baseDir: string = path.resolve(__dirname, '../../');
-  static seleniumDir: string = path.resolve(Config.baseDir, 'selenium');
+  static configFile: string = 'config.json';
+  static packageFile: string = 'package.json';
+
+  static cwd = process.cwd();
+
+  static nodeModuleName = 'webdriver-manager';
+  static localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
+  static parentPath = path.resolve(Config.cwd, '..');
+  static dir = __dirname;
+  static folder = Config.cwd.replace(Config.parentPath, '').substring(1);
+
+  static isProjectVersion = Config.folder === Config.nodeModuleName;
+  static isLocalVersion = false;
+
+
+  static getFile(jsonFile: string): string {
+    try {
+      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
+    } catch(e) {
+    }
+
+    // project version
+    if (Config.folder === Config.nodeModuleName) {
+      return path.resolve('built', jsonFile);
+    }
+
+    // local version
+    else if (Config.isLocalVersion) {
+      return path.resolve(Config.localInstall, 'built', jsonFile);
+    }
+
+    // global version
+    else {
+      return path.resolve(Config.dir, '../built', jsonFile);
+    }
+  }
+
+  static getFolder(folder: string): string {
+    try {
+      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
+    } catch(e) {
+    }
+
+    // project version
+    if (Config.folder === Config.nodeModuleName) {
+      return path.resolve(folder);
+    }
+
+    // local version
+    else if (Config.isLocalVersion) {
+      return path.resolve(Config.localInstall, folder);
+    }
+
+    // global version
+    else {
+      return path.resolve(Config.dir, folder);
+    }
+  }
+
+  static getSeleniumDir(): string {
+    return Config.getFolder('selenium/');
+  }
+  static getBaseDir(): string {
+    return Config.getFolder('/');
+  }
 
   /**
    * Get the binary versions from the configuration file.
    * @returns A map of the versions defined in the configuration file.
    */
   static binaryVersions(): ConfigFile {
-    let configFile = require(Config.configPath);
+    let configFile = require(Config.getFile(Config.configFile));
     let configVersions: ConfigFile = {};
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
@@ -37,7 +98,7 @@ export class Config {
    * @returns A map of the CDN versions defined in the configuration file.
    */
   static cdnUrls(): ConfigFile {
-    let configFile = require(Config.configPath);
+    let configFile = require(Config.getFile(Config.configFile));
     let configCdnUrls: ConfigFile = {};
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
@@ -46,36 +107,10 @@ export class Config {
   }
 
   /**
-   * If installed as a node module, return the local version.
+   * Get the package version.
    */
-  static localVersion(): string {
-    var cwd = process.cwd();
-    var localInstall = path.resolve(cwd, 'node_modules/webdriver-manager/');
-    try {
-      if (fs.statSync(localInstall).isDirectory()) {
-        return require(path.resolve(localInstall, 'package.json')).version;
-      } else {
-        return null;
-      }
-    } catch(err) {
-      return null;
-    }
-  }
-
-  /**
-   * If installed, returns the globally installed webdriver-tool.
-   */
-  static globalVersion(): string {
-    var dir = __dirname;
-    let globalPackageJson = path.resolve(dir, '../package.json');
-    try {
-      if (fs.statSync(globalPackageJson).isFile()) {
-        return require(globalPackageJson).version;
-      } else {
-        return null;
-      }
-    } catch(err) {
-      return null;
-    }
+  static getVersion(): string {
+    let packageFile = require(Config.getFile(Config.packageFile));
+    return packageFile.version;
   }
 }

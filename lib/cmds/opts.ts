@@ -21,7 +21,7 @@ export const CHROME_LOGS = 'chrome_logs';
  * The options used by the commands.
  */
 var opts: Options = {};
-opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.seleniumDir);
+opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
 opts[SELENIUM_PORT] = new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string');
 opts[IGNORE_SSL] = new Option(IGNORE_SSL, 'Ignore SSL certificates', 'boolean', false);
 opts[PROXY] = new Option(PROXY, 'Proxy to use for the install or update command', 'string');
