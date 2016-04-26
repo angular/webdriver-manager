@@ -70,7 +70,13 @@ export class FileManager {
    * @param outputDir The directory where binaries are saved
    * @returns A list of existing files.
    */
-  static getExistngFiles(outputDir: string): string[] { return fs.readdirSync(outputDir); }
+  static getExistngFiles(outputDir: string): string[] {
+    try {
+      return fs.readdirSync(outputDir);
+    } catch (e) {
+      return [];
+    }
+   }
 
   /**
    * For the binary, operating system, and system architecture, look through
