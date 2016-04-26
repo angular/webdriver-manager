@@ -1,8 +1,8 @@
 {
   "webdriverVersions": {
-    "selenium": "2.52.0",
+    "selenium": "2.53.0",
     "chromedriver": "2.21",
-    "iedriver": "2.52.0"
+    "iedriver": "2.52.1"
   },
   "cdnUrls": {
     "selenium": "https://selenium-release.storage.googleapis.com/",
