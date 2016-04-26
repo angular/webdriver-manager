@@ -1,4 +1,5 @@
-Webdriver Manager
+
+Webdriver Manager [![Build Status](https://travis-ci.org/angular/webdriver-manager.png?branch=master)](https://travis-ci.org/angular/webdriver-manager) 
 =================
 
 A selenium server and browser driver manager for your end to end tests. This is the same tool as `webdriver-manager` from the [Protractor](https://github.com/angular/protractor) repository.
