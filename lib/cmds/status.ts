@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 
@@ -37,6 +38,17 @@ function status(options: Options) {
       outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
     }
   }
+
+  try {
+    // check if folder exists
+    fs.statSync(outputDir).isDirectory();
+  } catch (e) {
+    // if the folder does not exist, quit early.
+    logger.warn('the out_dir path ' + outputDir + ' does not exist');
+    return;
+  }
+
+
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
   // log which binaries have been downloaded
   for (let bin in downloadedBinaries) {

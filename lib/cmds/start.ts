@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 import * as os from 'os';
@@ -51,6 +52,16 @@ function start(options: Options) {
       outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
     }
   }
+
+  try {
+    // check if folder exists
+    fs.statSync(outputDir).isDirectory();
+  } catch (e) {
+    // if the folder does not exist, quit early.
+    logger.warn('the out_dir path ' + outputDir + ' does not exist, run webdriver-manager update');
+    return;
+  }
+
   let chromeLogs: string = null;
   if (options[Opt.CHROME_LOGS].getString()) {
     if (path.isAbsolute(options[Opt.CHROME_LOGS].getString())) {
