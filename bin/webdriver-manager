@@ -12,6 +12,21 @@ var folder = cwd.replace(parentPath, '').substring(1);
 
 var isProjectVersion = folder === nodeModuleName;
 var isLocalVersion = false;
+
+var printCyan, printMagenta, printGreen;
+try {
+  var chalk = require('chalk');
+  printMagenta = chalk.magenta;
+  printCyan = chalk.cyan;
+  printGreen = chalk.green;
+}
+catch (e) {
+  var logThis = function(message) {
+    return message;
+  }
+  printMagenta = pringCyan = printGreen = logThis;
+}
+
 try {
   isLocalVersion = fs.statSync(localInstall).isDirectory();
 } catch(e) {
@@ -19,24 +34,21 @@ try {
 
 // project version
 if (folder === nodeModuleName) {
-  var chalk = require('chalk');
-  console.log(nodeModuleName + ': using ' + chalk.magenta('project version ' +
+  console.log(nodeModuleName + ': using ' + printMagenta('project version ' +
     require(path.resolve('package.json')).version));
   require(path.resolve('built/lib/webdriver'));
 }
 
 // local version
 else if (isLocalVersion) {
-  var chalk = require(path.resolve(localInstall, 'node_modules/chalk/index.js'));
-  console.log(nodeModuleName + ': using ' + chalk.cyan('local installed version ' +
+  console.log(nodeModuleName + ': using ' + printCyan('local installed version ' +
     require(path.resolve(localInstall, 'package.json')).version));
   require(path.resolve(localInstall, 'built/lib/webdriver'));
 }
 
 // global version
 else {
-  var chalk = require(path.resolve(dir, '../node_modules/chalk/index.js'));
-  console.log(nodeModuleName + ': using ' + chalk.green('global installed version ' +
+  console.log(nodeModuleName + ': using ' + printGreen('global installed version ' +
     require(path.resolve(dir, '../package.json')).version));
   require(path.resolve(dir, '../built/lib/webdriver'));
 }
