@@ -28,8 +28,7 @@ export class Config {
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
 
-
-  static getFile(jsonFile: string): string {
+  static getFile_(jsonFile: string): string {
     try {
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
     } catch(e) {
@@ -51,7 +50,21 @@ export class Config {
     }
   }
 
-  static getFolder(folder: string): string {
+  static getConfigFile_(): string {
+    try {
+      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
+      return path.resolve(Config.localInstall, '../..', Config.configFile);
+
+    } catch(e) {
+      return Config.getFile_(Config.configFile);
+    }
+  }
+
+  static getPackageFile_(): string {
+    return Config.getFile_(Config.packageFile)
+  }
+
+  static getFolder_(folder: string): string {
     try {
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
     } catch(e) {
@@ -64,7 +77,7 @@ export class Config {
 
     // local version
     else if (Config.isLocalVersion) {
-      return path.resolve(Config.localInstall, folder);
+      return path.resolve(Config.localInstall, '../..', folder);
     }
 
     // global version
@@ -74,10 +87,10 @@ export class Config {
   }
 
   static getSeleniumDir(): string {
-    return Config.getFolder('selenium/');
+    return Config.getFolder_('selenium/');
   }
   static getBaseDir(): string {
-    return Config.getFolder('/');
+    return Config.getFolder_('/');
   }
 
   /**
@@ -85,7 +98,7 @@ export class Config {
    * @returns A map of the versions defined in the configuration file.
    */
   static binaryVersions(): ConfigFile {
-    let configFile = require(Config.getFile(Config.configFile));
+    let configFile = require(Config.getConfigFile_());
     let configVersions: ConfigFile = {};
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
@@ -98,7 +111,7 @@ export class Config {
    * @returns A map of the CDN versions defined in the configuration file.
    */
   static cdnUrls(): ConfigFile {
-    let configFile = require(Config.getFile(Config.configFile));
+    let configFile = require(Config.getConfigFile_());
     let configCdnUrls: ConfigFile = {};
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
@@ -110,7 +123,7 @@ export class Config {
    * Get the package version.
    */
   static getVersion(): string {
-    let packageFile = require(Config.getFile(Config.packageFile));
+    let packageFile = require(Config.getPackageFile_());
     return packageFile.version;
   }
 }
