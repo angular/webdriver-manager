@@ -13,7 +13,12 @@ var folder = cwd.replace(parentPath, '').substring(1);
 var isProjectVersion = folder === nodeModuleName;
 var isLocalVersion = false;
 
-var printCyan, printMagenta, printGreen;
+var printCyan, printMagent, printGreen;
+
+printCyan = printMagenta = printGreen = function(message) {
+    return message;
+}
+
 try {
   var chalk = require('chalk');
   printMagenta = chalk.magenta;
@@ -21,10 +26,7 @@ try {
   printGreen = chalk.green;
 }
 catch (e) {
-  var logThis = function(message) {
-    return message;
-  }
-  printMagenta = pringCyan = printGreen = logThis;
+  console.log("Error loading chalk, output will be boring.");
 }
 
 try {
