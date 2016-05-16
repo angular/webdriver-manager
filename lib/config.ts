@@ -1,6 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import {Logger} from './cli';
+
+
+let logger = new Logger('config');
 /**
  * Dictionary map of the different binaries.
  */
@@ -20,7 +24,7 @@ export class Config {
   static cwd = process.cwd();
 
   static nodeModuleName = 'webdriver-manager';
-  static localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
+  static localInstall: string;
   static parentPath = path.resolve(Config.cwd, '..');
   static dir = __dirname;
   static folder = Config.cwd.replace(Config.parentPath, '').substring(1);
@@ -30,6 +34,7 @@ export class Config {
 
   static getFile_(jsonFile: string): string {
     try {
+      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
     } catch(e) {
     }
@@ -52,12 +57,21 @@ export class Config {
 
   static getConfigFile_(): string {
     try {
+      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-      return path.resolve(Config.localInstall, '../..', Config.configFile);
-
-    } catch(e) {
-      return Config.getFile_(Config.configFile);
+      let pathConfig = path.resolve(Config.localInstall, '../..', Config.configFile);
+      fs.statSync(pathConfig).isFile();
+      return pathConfig;
+    } catch (e) {
+      try {
+        fs.statSync(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile)).isFile();
+        return Config.getFile_(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile));
+      } catch (e1) {
+        logger.error('nothing to return for a config file');
+        return null;
+      }
     }
+
   }
 
   static getPackageFile_(): string {
@@ -66,6 +80,7 @@ export class Config {
 
   static getFolder_(folder: string): string {
     try {
+      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
     } catch(e) {
     }
@@ -77,6 +92,7 @@ export class Config {
 
     // local version
     else if (Config.isLocalVersion) {
+      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
       return path.resolve(Config.localInstall, '../..', folder);
     }
 
