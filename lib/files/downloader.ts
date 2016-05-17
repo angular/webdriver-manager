@@ -34,9 +34,9 @@ export class Downloader {
       return;
     }
     Downloader.httpGetFile_(
-        url, binary.filename(os.type(), os.arch()), outputDir, opt_proxy, opt_ignoreSSL, (downloaded: boolean) => {
+        url, binary.filename(os.type(), os.arch()), outputDir, opt_proxy, opt_ignoreSSL, (filePath: string) => {
           if (opt_callback) {
-            opt_callback(binary, outputDir, downloaded);
+            opt_callback(binary, outputDir, filePath);
           }
         });
   }

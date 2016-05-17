@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 /**
  * operating system enum
  */
@@ -57,6 +59,14 @@ export class Binary {
 
   filename(ostype?: string, arch?: string): string { return this.prefix() + this.version() + this.suffix(ostype, arch); }
 
+  /**
+   * @param ostype The operating system.
+   * @returns The file name for the file inside the downloaded zip file
+   */
+  zipContentName(ostype: string): string {
+    return this.name + this.executableSuffix(ostype);
+  }
+
   shortVersion(version: string): string { return version.slice(0, version.lastIndexOf('.')); }
 
   /**
@@ -73,4 +83,9 @@ export class Binary {
    * A base class method that should be overridden.
    */
   url(ostype?: string, arch?: string): string { return 'not implemented'; }
+
+  /**
+   * Delete an instance of this binary from the file system
+   */
+  remove(filename: string): void { fs.unlinkSync(filename); }
 }

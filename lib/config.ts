@@ -10,6 +10,7 @@ export interface ConfigFile {
   selenium?: string;
   chrome?: string;
   ie?: string;
+  android?: string;
 }
 
 /**
@@ -60,6 +61,7 @@ export class Config {
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
     configVersions.ie = configFile.webdriverVersions.iedriver;
+    configVersions.android = configFile.webdriverVersions.androidsdk;
     return configVersions;
   }
 
@@ -73,6 +75,7 @@ export class Config {
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
     configCdnUrls.ie = configFile.cdnUrls.iedriver;
+    configCdnUrls.android = configFile.cdnUrls.androidsdk;
     return configCdnUrls;
   }
 

@@ -46,3 +46,8 @@ Clear out the server and driver files. If `webdriver-manager start` does not wor
 ```
 webdriver-manager clean
 ```
+
+Mobile Support
+--------------
+
+See [`mobile.md`](mobile.md).

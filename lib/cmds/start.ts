@@ -10,7 +10,7 @@ import * as Opt from './';
 import {Config} from '../config';
 import {FileManager} from '../files';
 import {Logger, Options, Program} from '../cli';
-import {BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {BinaryMap, Binary, ChromeDriver, IEDriver, AndroidSDK, StandAlone} from '../binaries';
 
 let logger = new Logger('start');
 let prog = new Program()
@@ -18,9 +18,15 @@ let prog = new Program()
     .action(start)
     .addOption(Opts[Opt.OUT_DIR])
     .addOption(Opts[Opt.SELENIUM_PORT])
+    .addOption(Opts[Opt.APPIUM_PORT])
+    .addOption(Opts[Opt.AVD_PORT])
     .addOption(Opts[Opt.VERSIONS_STANDALONE])
     .addOption(Opts[Opt.VERSIONS_CHROME])
-    .addOption(Opts[Opt.CHROME_LOGS]);
+    .addOption(Opts[Opt.VERSIONS_ANDROID])
+    .addOption(Opts[Opt.CHROME_LOGS])
+    .addOption(Opts[Opt.ANDROID])
+    .addOption(Opts[Opt.AVDS])
+    .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
@@ -75,6 +81,7 @@ function start(options: Options) {
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
+  binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
   if (downloadedBinaries[StandAlone.id] == null) {
@@ -100,6 +107,16 @@ function start(options: Options) {
         '-Dwebdriver.ie.driver=' +
         path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
   }
+  if (options[Opt.ANDROID].getBoolean()) {
+    if (downloadedBinaries[AndroidSDK.id] != null) {
+      let avds = options[Opt.AVDS].getString();
+      startAndroid(outputDir, binaries[AndroidSDK.id], avds.split(','),
+          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(),
+          options[Opt.APPIUM_PORT].getString());
+      startAppium(outputDir, options[Opt.APPIUM_PORT].getString());
+    } else {
+    }
+  }
 
   // log the command to launch selenium server
   let argsToString = '';
@@ -112,12 +129,16 @@ function start(options: Options) {
   logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
     logger.info('Selenium Standalone has exited with code ' + code);
+    killAndroid();
+    killAppium();
     process.exit(code);
   });
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     logger.info('Attempting to shut down selenium nicely');
     http.get('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
+    killAndroid();
+    killAppium();
   });
   process.on('SIGINT', () => {
     logger.info('Staying alive until the Selenium Standalone process exits');
@@ -131,4 +152,60 @@ function spawnCommand(command: string, args?: string[]) {
   let finalArgs: string[] = windows ? ['/c'].concat([command],args) : args;
 
   return childProcess.spawn(winCommand, finalArgs, {stdio: 'inherit'});
+}
+
+// Manage processes used in android emulation
+let androidProcesses: childProcess.ChildProcess[] = [];
+
+function startAndroid(outputDir: string, sdk: Binary, avds: string[],
+    useSnapshots: boolean, port: string): void {
+  let sdkPath = path.join(outputDir, sdk.executableFilename(os.type()));
+  if (avds[0] == 'all') {
+    avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
+  } else if (avds[0] == 'none') {
+    avds.length = 0;
+  }
+  avds.forEach((avd: string, i: number) => {
+    logger.info('Booting up AVD ' + avd);
+    // Credit to appium-ci, which this code was adapted from
+    let emuBin = 'emulator'; //TODO(sjelin): get the 64bit linux version working
+    let emuArgs = [
+      '-avd', avd + '-v' + sdk.versionCustom + '-wd-manager',
+      '-netfast',
+    ];
+    if (!useSnapshots) {
+      emuArgs = emuArgs.concat(['-no-snapshot-load', '-no-snapshot-save']);
+    }
+    if (port) {
+      emuArgs = emuArgs.concat(['-ports', (port+2*i) + ',' + (port+2*i+1)]);
+    }
+    if (emuBin !== 'emulator') {
+      emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
+    }
+    androidProcesses.push(childProcess.spawn(path.join(sdkPath, 'tools',
+        emuBin), emuArgs, {stdio: 'inherit'}));
+  });
+}
+
+function killAndroid() {
+  androidProcesses.forEach((androidProcess: childProcess.ChildProcess) => {
+    androidProcess.kill();
+  });
+  androidProcesses.length = 0;
+}
+
+// Manage appium process
+let appiumProcess: childProcess.ChildProcess;
+
+function startAppium(outputDir: string, port: string) {
+  logger.info('Starting appium server');
+  appiumProcess = childProcess.spawn(path.join(outputDir, 'appium',
+      'node_modules', '.bin', 'appium'), port ? ['--port', port] : []);
+}
+
+function killAppium() {
+  if (appiumProcess != null) {
+    appiumProcess.kill();
+    appiumProcess = null;
+  }
 }

@@ -2,8 +2,9 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as q from 'q';
+import * as rimraf from 'rimraf';
 
-import {Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone, OS} from '../binaries';
+import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, StandAlone, OS} from '../binaries';
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
@@ -54,6 +55,9 @@ export class FileManager {
     }
     if (FileManager.checkOS_(osType, IEDriver)) {
       binaries[IEDriver.id] = new IEDriver();
+    }
+    if (FileManager.checkOS_(osType, AndroidSDK)) {
+      binaries[AndroidSDK.id] = new AndroidSDK();
     }
     return binaries;
   }
@@ -203,10 +207,14 @@ export class FileManager {
       for (let binPos in binaries) {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
-          fs.unlinkSync(path.join(outputDir, file));
+          
+          bin.remove(path.join(outputDir, file));
           logger.info('removed ' + file);
         }
       }
     })
+    try {
+      rimraf.sync(path.join(outputDir, 'appium'));
+    } catch (e) {}
   }
 }

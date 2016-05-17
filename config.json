@@ -2,12 +2,13 @@
   "webdriverVersions": {
     "selenium": "2.53.0",
     "chromedriver": "2.21",
-    "iedriver": "2.53.1"
+    "iedriver": "2.53.1",
+    "androidsdk": "24.4.1"
   },
   "cdnUrls": {
     "selenium": "https://selenium-release.storage.googleapis.com/",
     "chromedriver": "https://chromedriver.storage.googleapis.com/",
-    "iedriver": "https://selenium-release.storage.googleapis.com/"
+    "iedriver": "https://selenium-release.storage.googleapis.com/",
+    "androidsdk": "http://dl.google.com/android/"
   }
-
 }
