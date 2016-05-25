@@ -4,7 +4,8 @@
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp test"
+    "test": "gulp test",
+    "typings": "typings install"
   },
   "keywords": [
     "angular",
@@ -39,6 +40,6 @@
     "jasmine": "^2.4.1",
     "run-sequence": "^1.1.5",
     "typescript": "^1.8.7",
-    "typings": "^0.7.12"
+    "typings": "^1.0.4"
   }
 }

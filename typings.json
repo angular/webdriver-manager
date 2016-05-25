@@ -1,5 +1,5 @@
 {
-  "ambientDependencies": {
+  "globalDependencies": {
     "adm-zip": "registry:dt/adm-zip#0.0.0+20160317120654",
     "chalk": "registry:dt/chalk#0.4.0+20160317120654",
     "form-data": "registry:dt/form-data#0.0.0+20160316155526",

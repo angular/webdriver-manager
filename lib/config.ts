@@ -16,6 +16,8 @@ export interface ConfigFile {
 
 /**
  * The configuration for webdriver-manager.
+ * Locally installed: when webdriver-manager is used as a dependency
+ * Project: when we are in the project folder
  */
 export class Config {
   static configFile: string = 'config.json';
@@ -32,80 +34,93 @@ export class Config {
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
 
-  static getFile_(jsonFile: string): string {
+  static setupLocal() {
+    if (Config.localInstall) {
+      return;
+    }
     try {
       Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
       Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
     } catch(e) {
     }
+  }
 
+  static getFile_(jsonFile: string): string {
     // project version
     if (Config.folder === Config.nodeModuleName) {
-      return path.resolve('built', jsonFile);
+      return path.resolve(jsonFile);
     }
 
     // local version
     else if (Config.isLocalVersion) {
-      return path.resolve(Config.localInstall, 'built', jsonFile);
+      return path.resolve(Config.localInstall, jsonFile);
     }
 
     // global version
     else {
-      return path.resolve(Config.dir, '..', jsonFile);
+      return path.resolve(Config.dir, '../..', jsonFile);
     }
   }
 
+  /**
+   * In the project folder, if there is a config file provided, use it over the
+   * default one.
+   */
   static getConfigFile_(): string {
-    try {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-      let pathConfig = path.resolve(Config.localInstall, '../..', Config.configFile);
-      fs.statSync(pathConfig).isFile();
-      return pathConfig;
-    } catch (e) {
+    Config.setupLocal();
+    // Get the default configuration file
+    let pathConfig = Config.getFile_(Config.configFile);
+
+    if (Config.isLocalVersion) {
+
+      // The file is local project folder. For project foo/ the file is foo/config.json.
+      let opt_localPath = path.resolve(Config.cwd, Config.configFile);
       try {
-        fs.statSync(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile)).isFile();
-        return Config.getFile_(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile));
-      } catch (e1) {
-        logger.error('nothing to return for a config file');
-        return null;
+        fs.statSync(opt_localPath).isFile();
+        pathConfig = opt_localPath;
+      } catch (e) {
+        // Do nothing, use the default config file.
       }
     }
-
+    return pathConfig;
   }
 
+  /**
+   * Get the package.json file from the default location
+   */
   static getPackageFile_(): string {
+    Config.setupLocal();
     return Config.getFile_(Config.packageFile)
   }
 
+  /**
+   * Gets the path to the folder
+   */
   static getFolder_(folder: string): string {
-    try {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-    } catch(e) {
-    }
-
     // project version
     if (Config.folder === Config.nodeModuleName) {
       return path.resolve(folder);
     }
 
-    // local version
+    // local version should always create the selenium directory int he project
+    // and not under the node_modules/webdriver-manager/selenium folder
     else if (Config.isLocalVersion) {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      return path.resolve(Config.localInstall, '../..', folder);
+      return path.resolve(Config.cwd, folder);
     }
 
     // global version
     else {
-      return path.resolve(Config.dir, folder);
+      return path.resolve(Config.dir, '../..', folder);
     }
   }
 
   static getSeleniumDir(): string {
+    Config.setupLocal();
     return Config.getFolder_('selenium/');
   }
+
   static getBaseDir(): string {
+    Config.setupLocal();
     return Config.getFolder_('/');
   }
 
