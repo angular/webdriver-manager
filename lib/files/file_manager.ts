@@ -207,6 +207,6 @@ export class FileManager {
           logger.info('removed ' + file);
         }
       }
-    })
+    });
   }
 }
