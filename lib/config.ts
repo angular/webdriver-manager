@@ -5,9 +5,7 @@ import {Logger} from './cli';
 
 
 let logger = new Logger('config');
-/**
- * Dictionary map of the different binaries.
- */
+
 export interface ConfigFile {
   selenium?: string;
   chrome?: string;
@@ -15,15 +13,20 @@ export interface ConfigFile {
 }
 
 /**
- * The configuration for webdriver-manager.
+ * The configuration for webdriver-manager
+ *
+ * The config.json, package.json, and selenium directory are found in the
+ * same location at the root directory in webdriver-manager.
+ *
  */
 export class Config {
   static configFile: string = 'config.json';
   static packageFile: string = 'package.json';
+  static nodeModuleName = 'webdriver-manager';
 
   static cwd = process.cwd();
 
-  static nodeModuleName = 'webdriver-manager';
+
   static localInstall: string;
   static parentPath = path.resolve(Config.cwd, '..');
   static dir = __dirname;
@@ -32,81 +35,19 @@ export class Config {
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
 
-  static getFile_(jsonFile: string): string {
-    try {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-    } catch(e) {
-    }
-
-    // project version
-    if (Config.folder === Config.nodeModuleName) {
-      return path.resolve('built', jsonFile);
-    }
-
-    // local version
-    else if (Config.isLocalVersion) {
-      return path.resolve(Config.localInstall, 'built', jsonFile);
-    }
-
-    // global version
-    else {
-      return path.resolve(Config.dir, '..', jsonFile);
-    }
-  }
-
   static getConfigFile_(): string {
-    try {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-      let pathConfig = path.resolve(Config.localInstall, '../..', Config.configFile);
-      fs.statSync(pathConfig).isFile();
-      return pathConfig;
-    } catch (e) {
-      try {
-        fs.statSync(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile)).isFile();
-        return Config.getFile_(path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName, Config.configFile));
-      } catch (e1) {
-        logger.error('nothing to return for a config file');
-        return null;
-      }
-    }
-
+    return path.resolve(Config.dir, '..', Config.configFile);
   }
 
   static getPackageFile_(): string {
-    return Config.getFile_(Config.packageFile)
-  }
-
-  static getFolder_(folder: string): string {
-    try {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      Config.isLocalVersion = fs.statSync(Config.localInstall).isDirectory();
-    } catch(e) {
-    }
-
-    // project version
-    if (Config.folder === Config.nodeModuleName) {
-      return path.resolve(folder);
-    }
-
-    // local version
-    else if (Config.isLocalVersion) {
-      Config.localInstall = path.resolve(Config.cwd, 'node_modules', Config.nodeModuleName);
-      return path.resolve(Config.localInstall, '../..', folder);
-    }
-
-    // global version
-    else {
-      return path.resolve(Config.dir, folder);
-    }
+    return path.resolve(Config.dir, '..', Config.packageFile)
   }
 
   static getSeleniumDir(): string {
-    return Config.getFolder_('selenium/');
+    return path.resolve(Config.dir, '..', 'selenium/');
   }
   static getBaseDir(): string {
-    return Config.getFolder_('/');
+    return path.resolve(Config.dir, '..');
   }
 
   /**
