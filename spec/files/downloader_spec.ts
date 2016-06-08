@@ -1,4 +1,4 @@
-/// <reference path = "../../typings/main/ambient/jasmine/index.d.ts"/>
+/// <reference path = "../../typings/index.d.ts"/>
 
 import {Downloader} from '../../lib/files';
 

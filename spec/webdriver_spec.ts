@@ -1,4 +1,4 @@
-/// <reference path = "../typings/main/ambient/jasmine/index.d.ts"/>
+/// <reference path = "../typings/index.d.ts"/>
 
 import * as child_process from 'child_process';
 import * as path from 'path';
