@@ -44,10 +44,10 @@ export class Config {
   }
 
   static getSeleniumDir(): string {
-    return path.resolve(Config.dir, '..', 'selenium/');
+    return path.resolve(Config.dir, '..', '..', 'selenium/');
   }
   static getBaseDir(): string {
-    return path.resolve(Config.dir, '..');
+    return path.resolve(Config.dir, '..', '..');
   }
 
   /**
