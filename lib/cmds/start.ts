@@ -136,7 +136,8 @@ function start(options: Options) {
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     logger.info('Attempting to shut down selenium nicely');
-    http.get('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
+    let port = seleniumPort || '4444';
+    http.get('http://localhost:' + port + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
     killAndroid();
     killAppium();
   });
