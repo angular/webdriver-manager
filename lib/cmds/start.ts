@@ -117,7 +117,7 @@ function start(options: Options) {
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     logger.info('Attempting to shut down selenium nicely');
-    http.get('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer');
+    http.get('http://localhost:'+seleniumPort+'/selenium-server/driver/?cmd=shutDownSeleniumServer');
   });
   process.on('SIGINT', () => {
     logger.info('Staying alive until the Selenium Standalone process exits');
