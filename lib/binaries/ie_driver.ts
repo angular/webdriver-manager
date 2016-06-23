@@ -15,7 +15,7 @@ export class IEDriver extends Binary {
 
   constructor() {
     super();
-    this.name = 'IEDriver';
+    this.name = 'IEDriverServer';
     this.versionCustom = IEDriver.versionDefault;
     this.prefixDefault = 'IEDriverServer';
     this.suffixDefault = '.zip';
@@ -40,7 +40,7 @@ export class IEDriver extends Binary {
   }
 
   url(): string {
-    let urlBase = this.cdn + this.shortVersion(this.version()) + '/';
+    let urlBase = this.cdn + this.shortVersion(this.versionCustom) + '/';
     let filename = this.prefix() + this.version() + this.suffix();
     return urlBase + filename;
   }
