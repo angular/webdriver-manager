@@ -30,6 +30,7 @@ let prog = new Program()
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
+  prog.addOption(Opts[Opt.EDGE]);
 }
 
 export var program = prog;
@@ -106,6 +107,11 @@ function start(options: Options) {
     args.push(
         '-Dwebdriver.ie.driver=' +
         path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
+  }
+  if (options[Opt.EDGE]) {
+    args.push(
+        '-Dwebdriver.edge.driver=' +
+        options[Opt.EDGE].getString());
   }
   if (options[Opt.ANDROID].getBoolean()) {
     if (downloadedBinaries[AndroidSDK.id] != null) {
