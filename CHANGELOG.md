@@ -1,10 +1,28 @@
+# 10.1.0
+
+## Bug Fixes
+
+- ([81c2aa3](https://github.com/angular/webdriver-manager/commit/81c2aa3ea6435934797b4d10c6734945484a641d))
+  fix(iedriver): download url fix for iedriver (#54)
+
+  closes #53
+
+## Features
+
+- ([57372eb](https://github.com/angular/webdriver-manager/commit/57372ebd076f6b1ccaf41d920601e867b7b3084c))
+  feat(edge): add Microsoft Edge support in CLI (#56)
+
+  closes #55
+- ([d937245](https://github.com/angular/webdriver-manager/commit/d9372459c51a1aec553a79edaa32e497608a65de))
+  feat(android): support android
+
 # 10.0.4
 
 ## Dependency Upgrades
 
 - ([970167a](https://github.com/angular/webdriver-manager/commit/970167a1b2db24fc8ca34db2994507ef0187ee7e))
   dep(typings): update typings (#42)
-  
+
 ## Bug Fixes
 
 - ([5073e23](https://github.com/angular/webdriver-manager/commit/5073e230574237047dd593a702f08f84907871bd))
