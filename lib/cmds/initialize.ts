@@ -230,3 +230,14 @@ export function android(sdkPath: string, apiLevels: string[], abis: string[],
     logger.info('android-sdk: Initialization complete');
   }).done();
 };
+
+export function iOS(logger: Logger) {
+  if (os.type() != 'Darwin') {
+    throw new Error('Must be on a Mac to simulate iOS devices.');
+  }
+  try {
+    fs.statSync('/Applications/Xcode.app');
+  } catch(e) {
+    logger.warn('You must install the xcode commandline tools!');
+  }
+}

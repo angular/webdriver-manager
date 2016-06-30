@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {Binary, AndroidSDK, ChromeDriver, IEDriver, StandAlone} from '../../lib/binaries';
+import {Binary, AndroidSDK, ChromeDriver, IEDriver, Appium, StandAlone} from '../../lib/binaries';
 import {DownloadedBinary, FileManager} from '../../lib/files';
 
 
@@ -16,6 +16,7 @@ describe('file manager', () => {
       expect(FileManager.checkOS_(osType, IEDriver)).toBe(true);
       expect(FileManager.checkOS_(osType, StandAlone)).toBe(true);
       expect(FileManager.checkOS_(osType, AndroidSDK)).toBe(true);
+      expect(FileManager.checkOS_(osType, Appium)).toBe(true);
     });
 
     it('should return the binary array', () => {
@@ -24,6 +25,7 @@ describe('file manager', () => {
       expect(binaries[ChromeDriver.id].name).toBe((new ChromeDriver()).name);
       expect(binaries[IEDriver.id].name).toBe((new IEDriver()).name);
       expect(binaries[AndroidSDK.id].name).toBe((new AndroidSDK()).name);
+      expect(binaries[Appium.id].name).toBe((new Appium()).name);
     });
   });
 
@@ -35,6 +37,7 @@ describe('file manager', () => {
       expect(FileManager.checkOS_(osType, IEDriver)).toBe(false);
       expect(FileManager.checkOS_(osType, StandAlone)).toBe(true);
       expect(FileManager.checkOS_(osType, AndroidSDK)).toBe(true);
+      expect(FileManager.checkOS_(osType, Appium)).toBe(true);
     });
 
     it('should return the binary array', () => {
@@ -42,6 +45,7 @@ describe('file manager', () => {
       expect(binaries[StandAlone.id].name).toBe((new StandAlone()).name);
       expect(binaries[ChromeDriver.id].name).toBe((new ChromeDriver()).name);
       expect(binaries[AndroidSDK.id].name).toBe((new AndroidSDK()).name);
+      expect(binaries[Appium.id].name).toBe((new Appium()).name);
       expect(binaries[IEDriver.id]).toBeUndefined();
     });
   });
@@ -54,6 +58,7 @@ describe('file manager', () => {
       expect(FileManager.checkOS_(osType, IEDriver)).toBe(false);
       expect(FileManager.checkOS_(osType, StandAlone)).toBe(true);
       expect(FileManager.checkOS_(osType, AndroidSDK)).toBe(true);
+      expect(FileManager.checkOS_(osType, Appium)).toBe(true);
     });
 
     it('should return the binary array', () => {
@@ -62,6 +67,7 @@ describe('file manager', () => {
       expect(binaries[ChromeDriver.id].name).toBe((new ChromeDriver()).name);
       expect(binaries[IEDriver.id]).toBeUndefined();
       expect(binaries[AndroidSDK.id].name).toBe((new AndroidSDK()).name);
+      expect(binaries[Appium.id].name).toBe((new Appium()).name);
     });
   });
 
@@ -70,6 +76,7 @@ describe('file manager', () => {
     let selenium = new StandAlone();
     let chrome = new ChromeDriver();
     let android = new AndroidSDK();
+    let appium = new Appium();
     let ie = new IEDriver();
     let ostype: string;
     let arch: string;
@@ -88,6 +95,7 @@ describe('file manager', () => {
       existingFiles.push(android.prefix() + '24.1.0' + android.executableSuffix());
       existingFiles.push(android.prefix() + '24.1.1' + android.suffix(ostype));
       existingFiles.push(android.prefix() + '24.1.1' + android.executableSuffix());
+      existingFiles.push(appium.prefix() + '1.5.3' + appium.suffix(ostype));
       if (ostype == 'Windows_NT') {
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.suffix());
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.executableSuffix(ostype));
@@ -169,6 +177,27 @@ describe('file manager', () => {
         expect(downloaded.versions.length).toBe(2);
         expect(downloaded.versions[0]).toBe('24.1.0');
         expect(downloaded.versions[1]).toBe('24.1.1');
+      });
+    });
+
+    describe('versions for appium', () => {
+      it('should find the correct version for windows', () => {
+        setup('Windows_NT');
+        let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
+        expect(downloaded.versions.length).toBe(1);
+        expect(downloaded.versions[0]).toBe('1.5.3');
+      });
+      it('should find the correct version for mac', () => {
+        setup('Darwin');
+        let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
+        expect(downloaded.versions.length).toBe(1);
+        expect(downloaded.versions[0]).toBe('1.5.3');
+      });
+      it('should find the correct version for linux', () => {
+        setup('Linux');
+        let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
+        expect(downloaded.versions.length).toBe(1);
+        expect(downloaded.versions[0]).toBe('1.5.3');
       });
     });
 
