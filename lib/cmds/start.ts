@@ -10,7 +10,8 @@ import * as Opt from './';
 import {Config} from '../config';
 import {FileManager} from '../files';
 import {Logger, Options, Program} from '../cli';
-import {BinaryMap, Binary, ChromeDriver, IEDriver, AndroidSDK, StandAlone} from '../binaries';
+import {BinaryMap, Binary, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone} from
+    '../binaries';
 
 let logger = new Logger('start');
 let prog = new Program()
@@ -23,10 +24,15 @@ let prog = new Program()
     .addOption(Opts[Opt.VERSIONS_STANDALONE])
     .addOption(Opts[Opt.VERSIONS_CHROME])
     .addOption(Opts[Opt.VERSIONS_ANDROID])
+    .addOption(Opts[Opt.VERSIONS_APPIUM])
     .addOption(Opts[Opt.CHROME_LOGS])
     .addOption(Opts[Opt.ANDROID])
     .addOption(Opts[Opt.AVDS])
     .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
+
+if (os.type() === 'Darwin') {
+  prog.addOption(Opts[Opt.IOS]);
+}
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
@@ -83,6 +89,7 @@ function start(options: Options) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
   binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
+  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
   if (downloadedBinaries[StandAlone.id] == null) {
@@ -118,10 +125,13 @@ function start(options: Options) {
       let avds = options[Opt.AVDS].getString();
       startAndroid(outputDir, binaries[AndroidSDK.id], avds.split(','),
           options[Opt.AVD_USE_SNAPSHOTS].getBoolean(),
-          options[Opt.APPIUM_PORT].getString());
-      startAppium(outputDir, options[Opt.APPIUM_PORT].getString());
+          options[Opt.AVD_PORT].getString());
     } else {
+      logger.warn('Not starting android because it is not installed');
     }
+  }
+  if (downloadedBinaries[Appium.id] != null) {
+    startAppium(outputDir, binaries[Appium.id], options[Opt.APPIUM_PORT].getString());
   }
 
   // log the command to launch selenium server
@@ -204,9 +214,9 @@ function killAndroid() {
 // Manage appium process
 let appiumProcess: childProcess.ChildProcess;
 
-function startAppium(outputDir: string, port: string) {
+function startAppium(outputDir: string, binary: Binary, port: string) {
   logger.info('Starting appium server');
-  appiumProcess = childProcess.spawn(path.join(outputDir, 'appium',
+  appiumProcess = childProcess.spawn(path.join(outputDir, binary.filename(),
       'node_modules', '.bin', 'appium'), port ? ['--port', port] : []);
 }
 

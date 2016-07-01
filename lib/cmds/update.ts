@@ -10,10 +10,10 @@ import * as rimraf from 'rimraf';
 import {Opts} from './opts';
 import * as Opt from './';
 import {Config} from '../config';
-import {Binary, ChromeDriver, IEDriver, AndroidSDK, StandAlone} from '../binaries';
+import {Binary, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone} from '../binaries';
 import {FileManager, Downloader} from '../files';
 import {Logger, Options, Program} from '../cli';
-import {android as initializeAndroid} from './initialize';
+import {android as initializeAndroid, iOS as checkIOS} from './initialize';
 
 let logger = new Logger('update');
 let prog = new Program()
@@ -30,6 +30,10 @@ let prog = new Program()
     .addOption(Opts[Opt.ANDROID_ABIS])
     .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
 
+if (os.type() === 'Darwin') {
+  prog.addOption(Opts[Opt.IOS]);
+}
+
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
 }
@@ -37,6 +41,7 @@ if (os.type() === 'Windows_NT') {
 prog
   .addOption(Opts[Opt.VERSIONS_STANDALONE])
   .addOption(Opts[Opt.VERSIONS_CHROME])
+  .addOption(Opts[Opt.VERSIONS_APPIUM])
   .addOption(Opts[Opt.VERSIONS_ANDROID]);
 
 if (os.type() === 'Windows_NT') {
@@ -69,6 +74,10 @@ function update(options: Options): void {
     ie32 = options[Opt.IE32].getBoolean();
   }
   let android: boolean = options[Opt.ANDROID].getBoolean();
+  let ios: boolean = false;
+  if (options[Opt.IOS]) {
+    ios = options[Opt.IOS].getBoolean();
+  }
   let outputDir = Config.getSeleniumDir();
   let android_api_levels: string[] = options[Opt.ANDROID_API_LEVELS].getString().split(',');
   let android_abis: string[] = options[Opt.ANDROID_ABIS].getString().split(',');
@@ -92,6 +101,7 @@ function update(options: Options): void {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
   binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
+  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
 
   // if the file has not been completely downloaded, download it
   // else if the file has already been downloaded, unzip the file, rename it, and give it permissions
@@ -129,7 +139,12 @@ function update(options: Options): void {
           ))), android_api_levels, android_abis, android_accept_licenses,
           binaries[AndroidSDK.id].versionCustom, logger);
     });
-    installAppium(outputDir);
+  }
+  if (ios) {
+    checkIOS(logger);
+  }
+  if (android || ios) {
+    installAppium(binaries[Appium.id], outputDir);
   }
 }
 
@@ -192,15 +207,16 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   }
 }
 
-function installAppium(outputDir: string): void {
+function installAppium(binary: Binary, outputDir: string): void {
   logger.info('appium: installing appium');
 
-  let folder = path.join(outputDir, 'appium');
+  let folder = path.join(outputDir, binary.filename());
   try {
     rimraf.sync(folder);
   } catch(err) {}
 
   fs.mkdirSync(folder);
   fs.writeFileSync(path.join(folder, 'package.json'), '{}');
-  child_process.spawn('npm', ['install', 'appium'], {cwd: folder});
+  child_process.spawn('npm', ['install', 'appium@' + binary.version()], {cwd:
+      folder});
 }
