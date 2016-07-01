@@ -1,3 +1,8 @@
+# 10.2.0
+
+- ([aa1b8b7](https://github.com/angular/webdriver-manager/commit/aa1b8b7cd9295f02b9bf69274e21eef1a7f3b7f0))
+  feat(ios): iOS support (#57)
+
 # 10.1.0
 
 ## Bug Fixes
