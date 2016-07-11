@@ -1,7 +1,7 @@
 {
   "webdriverVersions": {
-    "selenium": "2.53.0",
-    "chromedriver": "2.21",
+    "selenium": "2.53.1",
+    "chromedriver": "2.22",
     "iedriver": "2.53.1",
     "androidsdk": "24.4.1",
     "appium": "1.5.3"
