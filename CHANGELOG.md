@@ -1,3 +1,7 @@
+# 10.2.1
+
+upgrade to latest chrome driver and selenium standalone server versions
+
 # 10.2.0
 
 - ([aa1b8b7](https://github.com/angular/webdriver-manager/commit/aa1b8b7cd9295f02b9bf69274e21eef1a7f3b7f0))
