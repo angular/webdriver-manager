@@ -71,6 +71,27 @@ describe('file manager', () => {
     });
   });
 
+  describe('setting up for freebsd', () => {
+    let osType = 'FreeBSD';
+
+    it('should find correct binaries', () => {
+      expect(FileManager.checkOS_(osType, ChromeDriver)).toBe(false);
+      expect(FileManager.checkOS_(osType, IEDriver)).toBe(false);
+      expect(FileManager.checkOS_(osType, StandAlone)).toBe(true);
+      expect(FileManager.checkOS_(osType, AndroidSDK)).toBe(false);
+      expect(FileManager.checkOS_(osType, Appium)).toBe(false);
+    });
+
+    it('should return the binary array', () => {
+      let binaries = FileManager.compileBinaries_(osType);
+      expect(binaries[StandAlone.id].name).toBe((new StandAlone()).name);
+      expect(binaries[ChromeDriver.id]).toBeUndefined();
+      expect(binaries[AndroidSDK.id]).toBeUndefined();
+      expect(binaries[Appium.id]).toBeUndefined();
+      expect(binaries[IEDriver.id]).toBeUndefined();
+    });
+  });
+
   describe('downloaded version checks', () => {
     let existingFiles: string[];
     let selenium = new StandAlone();
@@ -87,15 +108,17 @@ describe('file manager', () => {
       existingFiles = [
         selenium.prefix() + '2.51.0' + selenium.executableSuffix(),
         selenium.prefix() + '2.52.0' + selenium.executableSuffix()];
-      existingFiles.push(chrome.prefix() + '2.20' + chrome.suffix(ostype, arch));
-      existingFiles.push(chrome.prefix() + '2.20' + chrome.executableSuffix(ostype));
-      existingFiles.push(chrome.prefix() + '2.21' + chrome.suffix(ostype, arch));
-      existingFiles.push(chrome.prefix() + '2.21' + chrome.executableSuffix(ostype));
-      existingFiles.push(android.prefix() + '24.1.0' + android.suffix(ostype));
-      existingFiles.push(android.prefix() + '24.1.0' + android.executableSuffix());
-      existingFiles.push(android.prefix() + '24.1.1' + android.suffix(ostype));
-      existingFiles.push(android.prefix() + '24.1.1' + android.executableSuffix());
-      existingFiles.push(appium.prefix() + '1.5.3' + appium.suffix(ostype));
+      if (ostype == 'Windows_NT' || ostype == 'Linux' || ostype == 'Darwin') {
+        existingFiles.push(chrome.prefix() + '2.20' + chrome.suffix(ostype, arch));
+        existingFiles.push(chrome.prefix() + '2.20' + chrome.executableSuffix(ostype));
+        existingFiles.push(chrome.prefix() + '2.21' + chrome.suffix(ostype, arch));
+        existingFiles.push(chrome.prefix() + '2.21' + chrome.executableSuffix(ostype));
+        existingFiles.push(android.prefix() + '24.1.0' + android.suffix(ostype));
+        existingFiles.push(android.prefix() + '24.1.0' + android.executableSuffix());
+        existingFiles.push(android.prefix() + '24.1.1' + android.suffix(ostype));
+        existingFiles.push(android.prefix() + '24.1.1' + android.executableSuffix());
+        existingFiles.push(appium.prefix() + '1.5.3' + appium.suffix(ostype));
+      }
       if (ostype == 'Windows_NT') {
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.suffix());
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.executableSuffix(ostype));
@@ -123,8 +146,15 @@ describe('file manager', () => {
         expect(downloaded.versions[0]).toBe('2.51.0');
         expect(downloaded.versions[1]).toBe('2.52.0');
       });
-      it('should find the correct version for mac', () => {
+      it('should find the correct version for linux', () => {
         setup('Linux');
+        let downloaded = FileManager.downloadedVersions_(selenium, ostype, arch, existingFiles);
+        expect(downloaded.versions.length).toBe(2);
+        expect(downloaded.versions[0]).toBe('2.51.0');
+        expect(downloaded.versions[1]).toBe('2.52.0');
+      });
+      it('should find the correct version for freebsd', () => {
+        setup('FreeBSD');
         let downloaded = FileManager.downloadedVersions_(selenium, ostype, arch, existingFiles);
         expect(downloaded.versions.length).toBe(2);
         expect(downloaded.versions[0]).toBe('2.51.0');
