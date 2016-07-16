@@ -6,7 +6,8 @@ import * as fs from 'fs';
 export enum OS {
   Windows_NT,
   Linux,
-  Darwin
+  Darwin,
+  FreeBSD
 }
 
 /**
