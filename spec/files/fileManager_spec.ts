@@ -85,9 +85,9 @@ describe('file manager', () => {
     it('should return the binary array', () => {
       let binaries = FileManager.compileBinaries_(osType);
       expect(binaries[StandAlone.id].name).toBe((new StandAlone()).name);
-      expect(binaries[ChromeDriver.id].name).toBeUndefined();
-      expect(binaries[AndroidSDK.id].name).toBeUndefined();
-      expect(binaries[Appium.id].name).toBeUndefined();
+      expect(binaries[ChromeDriver.id]).toBeUndefined();
+      expect(binaries[AndroidSDK.id]).toBeUndefined();
+      expect(binaries[Appium.id]).toBeUndefined();
       expect(binaries[IEDriver.id]).toBeUndefined();
     });
   });
