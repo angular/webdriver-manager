@@ -24,29 +24,31 @@ let prog = new Program()
     .addOption(Opts[Opt.PROXY])
     .addOption(Opts[Opt.ALTERNATE_CDN])
     .addOption(Opts[Opt.STANDALONE])
+    .addOption(Opts[Opt.VERSIONS_STANDALONE]);
+
+if (os.type() === 'Darwin' || os.type() === 'Linux' || os.type() === 'Windows_NT') {
+  prog
     .addOption(Opts[Opt.CHROME])
     .addOption(Opts[Opt.ANDROID])
     .addOption(Opts[Opt.ANDROID_API_LEVELS])
     .addOption(Opts[Opt.ANDROID_ABIS])
-    .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
+    .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES])
+    .addOption(Opts[Opt.VERSIONS_CHROME])
+    .addOption(Opts[Opt.VERSIONS_APPIUM])
+    .addOption(Opts[Opt.VERSIONS_ANDROID]);
+}
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
 }
 
 if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
+  prog
+    .addOption(Opts[Opt.IE])
+    .addOption(Opts[Opt.IE32])
+    .addOption(Opts[Opt.VERSIONS_IE]);
 }
 
-prog
-  .addOption(Opts[Opt.VERSIONS_STANDALONE])
-  .addOption(Opts[Opt.VERSIONS_CHROME])
-  .addOption(Opts[Opt.VERSIONS_APPIUM])
-  .addOption(Opts[Opt.VERSIONS_ANDROID]);
-
-if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts[Opt.VERSIONS_IE]);
-}
 export let program = prog;
 
 // stand alone runner
@@ -64,7 +66,10 @@ if (argv._[0] === 'update-run') {
  */
 function update(options: Options): void {
   let standalone = options[Opt.STANDALONE].getBoolean();
-  let chrome = options[Opt.CHROME].getBoolean();
+  let chrome: boolean = false;
+  if (options[Opt.CHROME]) {
+    chrome = options[Opt.CHROME].getBoolean();
+  }
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options[Opt.IE]) {
@@ -73,15 +78,27 @@ function update(options: Options): void {
   if (options[Opt.IE32]) {
     ie32 = options[Opt.IE32].getBoolean();
   }
-  let android: boolean = options[Opt.ANDROID].getBoolean();
+  let android: boolean = false;
+  if (options[Opt.ANDROID]) {
+    options[Opt.ANDROID].getBoolean();
+  }
   let ios: boolean = false;
   if (options[Opt.IOS]) {
     ios = options[Opt.IOS].getBoolean();
   }
   let outputDir = Config.getSeleniumDir();
-  let android_api_levels: string[] = options[Opt.ANDROID_API_LEVELS].getString().split(',');
-  let android_abis: string[] = options[Opt.ANDROID_ABIS].getString().split(',');
-  let android_accept_licenses: boolean = options[Opt.ANDROID_ACCEPT_LICENSES].getBoolean();
+  let android_api_levels: string[] = [];
+  if (options[Opt.ANDROID_API_LEVELS]) {
+    android_api_levels = options[Opt.ANDROID_API_LEVELS].getString().split(',');
+  }
+  let android_abis: string[] = [];
+  if (options[Opt.ANDROID_ABIS]) {
+    android_abis = options[Opt.ANDROID_ABIS].getString().split(',');
+  }
+  let android_accept_licenses: boolean = false;
+  if (options[Opt.ANDROID_ACCEPT_LICENSES]) {
+    android_accept_licenses = options[Opt.ANDROID_ACCEPT_LICENSES].getBoolean();
+  }
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
@@ -96,12 +113,18 @@ function update(options: Options): void {
   // setup versions for binaries
   let binaries = FileManager.setupBinaries();
   binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  if (options[Opt.VERSIONS_CHROME]) {
+    binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  }
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
-  binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
-  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  if (options[Opt.VERSIONS_ANDROID]) {
+    binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
+  }
+  if (options[Opt.VERSIONS_APPIUM]) {
+    binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  }
 
   // if the file has not been completely downloaded, download it
   // else if the file has already been downloaded, unzip the file, rename it, and give it permissions

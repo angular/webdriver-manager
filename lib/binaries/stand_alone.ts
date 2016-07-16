@@ -5,7 +5,7 @@ import {Config} from '../config';
  * The selenium server jar.
  */
 export class StandAlone extends Binary {
-  static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
+  static os = [OS.Windows_NT, OS.Linux, OS.Darwin, OS.FreeBSD];
   static id = 'standalone';
   static versionDefault = Config.binaryVersions().selenium;
   static isDefault = true;
