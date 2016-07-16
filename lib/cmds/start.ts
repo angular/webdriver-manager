@@ -19,16 +19,20 @@ let prog = new Program()
     .action(start)
     .addOption(Opts[Opt.OUT_DIR])
     .addOption(Opts[Opt.SELENIUM_PORT])
-    .addOption(Opts[Opt.APPIUM_PORT])
-    .addOption(Opts[Opt.AVD_PORT])
-    .addOption(Opts[Opt.VERSIONS_STANDALONE])
-    .addOption(Opts[Opt.VERSIONS_CHROME])
-    .addOption(Opts[Opt.VERSIONS_ANDROID])
-    .addOption(Opts[Opt.VERSIONS_APPIUM])
-    .addOption(Opts[Opt.CHROME_LOGS])
-    .addOption(Opts[Opt.ANDROID])
-    .addOption(Opts[Opt.AVDS])
-    .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
+    .addOption(Opts[Opt.VERSIONS_STANDALONE]);
+
+if (os.type() === 'Darwin' || os.type() === 'Linux' || os.type() === 'Windows_NT') {
+    prog
+      .addOption(Opts[Opt.APPIUM_PORT])
+      .addOption(Opts[Opt.AVD_PORT])
+      .addOption(Opts[Opt.VERSIONS_CHROME])
+      .addOption(Opts[Opt.VERSIONS_ANDROID])
+      .addOption(Opts[Opt.VERSIONS_APPIUM])
+      .addOption(Opts[Opt.CHROME_LOGS])
+      .addOption(Opts[Opt.ANDROID])
+      .addOption(Opts[Opt.AVDS])
+      .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
+}
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -76,7 +80,7 @@ function start(options: Options) {
   }
 
   let chromeLogs: string = null;
-  if (options[Opt.CHROME_LOGS].getString()) {
+  if (options[Opt.CHROME_LOGS] && options[Opt.CHROME_LOGS].getString()) {
     if (path.isAbsolute(options[Opt.CHROME_LOGS].getString())) {
       chromeLogs = options[Opt.CHROME_LOGS].getString();
     } else {
@@ -84,12 +88,18 @@ function start(options: Options) {
     }
   }
   binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  if (options[Opt.VERSIONS_CHROME]) {
+    binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  }
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
-  binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
-  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  if (options[Opt.VERSIONS_ANDROID]) {
+    binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
+  }
+  if (options[Opt.VERSIONS_APPIUM]) {
+    binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  }
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
   if (downloadedBinaries[StandAlone.id] == null) {
@@ -120,7 +130,7 @@ function start(options: Options) {
         '-Dwebdriver.edge.driver=' +
         options[Opt.EDGE].getString());
   }
-  if (options[Opt.ANDROID].getBoolean()) {
+  if (options[Opt.ANDROID] && options[Opt.ANDROID].getBoolean()) {
     if (downloadedBinaries[AndroidSDK.id] != null) {
       let avds = options[Opt.AVDS].getString();
       startAndroid(outputDir, binaries[AndroidSDK.id], avds.split(','),
