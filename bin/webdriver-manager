@@ -13,11 +13,11 @@ var folder = cwd.replace(parentPath, '').substring(1);
 var isProjectVersion = folder === nodeModuleName;
 var isLocalVersion = false;
 
-var printCyan, printMagent, printGreen;
+var printCyan, printMagenta, printGreen;
 
 printCyan = printMagenta = printGreen = function(message) {
-    return message;
-}
+  return message;
+};
 
 try {
   var chalk = require('chalk');

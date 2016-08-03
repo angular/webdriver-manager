@@ -119,7 +119,7 @@ export class Cli {
    */
   getMinimistOptions(): Object {
     let allOptions = this.getOptions();
-    let minimistOptions: MinimistArgs = {}
+    let minimistOptions: MinimistArgs = {};
     let minimistBoolean: string[] = [];
     let minimistString: string[] = [];
     let minimistNumber: string[] = [];

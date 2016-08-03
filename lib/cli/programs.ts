@@ -216,7 +216,7 @@ export class Program {
   getMinimistOptions() {
     let allOptions: Options = {};
     allOptions = this.getOptions_(allOptions);
-    let minimistOptions: MinimistArgs = {}
+    let minimistOptions: MinimistArgs = {};
     let minimistBoolean: string[] = [];
     let minimistString: string[] = [];
     let minimistNumber: string[] = [];
