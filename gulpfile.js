@@ -1,8 +1,6 @@
 'use strict';
 
 var gulp = require('gulp');
-var clangFormat = require('clang-format');
-var gulpFormat = require('gulp-clang-format');
 var runSequence = require('run-sequence');
 var spawn = require('child_process').spawn;
 
