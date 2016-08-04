@@ -1,5 +1,7 @@
 import * as minimist from 'minimist';
-import {Args, MinimistArgs, Options, Option} from './options';
+
+import {Args, MinimistArgs, Option, Options} from './options';
+
 
 /**
  * Dictionary that maps the command and the program.
@@ -38,7 +40,8 @@ export class Program {
    * @param defaultValue The option's default value.
    * @returns The program for method chaining.
    */
-  option(opt: string, description: string, type: string, opt_defaultValue?: number|string|boolean): Program {
+  option(opt: string, description: string, type: string, opt_defaultValue?: number|string|boolean):
+      Program {
     this.options[opt] = new Option(opt, description, type, opt_defaultValue);
     return this;
   }
@@ -77,7 +80,7 @@ export class Program {
 
   private getValue_(key: string, json: JSON): string {
     let keyList: string[] = key.split('.');
-    let tempJson:any = json;
+    let tempJson: any = json;
     while (keyList.length > 0) {
       let keyItem = keyList[0];
       if (tempJson[keyItem]) {
@@ -216,7 +219,7 @@ export class Program {
   getMinimistOptions() {
     let allOptions: Options = {};
     allOptions = this.getOptions_(allOptions);
-    let minimistOptions: MinimistArgs = {}
+    let minimistOptions: MinimistArgs = {};
     let minimistBoolean: string[] = [];
     let minimistString: string[] = [];
     let minimistNumber: string[] = [];
@@ -232,7 +235,7 @@ export class Program {
     }
     minimistOptions['boolean'] = minimistBoolean;
     minimistOptions['string'] = minimistString;
-    minimistOptions['number']= minimistNumber;
+    minimistOptions['number'] = minimistNumber;
     return minimistOptions;
   }
 }

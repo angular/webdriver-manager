@@ -1,7 +1,9 @@
 import {arch, type} from 'os';
 
-import {Binary, OS} from './binary';
 import {Config} from '../config';
+
+import {Binary, OS} from './binary';
+
 
 /**
  * The chrome driver binary.

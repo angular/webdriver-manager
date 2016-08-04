@@ -7,28 +7,29 @@ import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
-import {Opts} from './opts';
-import * as Opt from './';
-import {Config} from '../config';
-import {Binary, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone} from '../binaries';
-import {FileManager, Downloader} from '../files';
+import {AndroidSDK, Appium, Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
+import {Config} from '../config';
+import {Downloader, FileManager} from '../files';
+
+import * as Opt from './';
 import {android as initializeAndroid, iOS as checkIOS} from './initialize';
+import {Opts} from './opts';
 
 let logger = new Logger('update');
 let prog = new Program()
-    .command('update', 'install or update selected binaries')
-    .action(update)
-    .addOption(Opts[Opt.OUT_DIR])
-    .addOption(Opts[Opt.IGNORE_SSL])
-    .addOption(Opts[Opt.PROXY])
-    .addOption(Opts[Opt.ALTERNATE_CDN])
-    .addOption(Opts[Opt.STANDALONE])
-    .addOption(Opts[Opt.CHROME])
-    .addOption(Opts[Opt.ANDROID])
-    .addOption(Opts[Opt.ANDROID_API_LEVELS])
-    .addOption(Opts[Opt.ANDROID_ABIS])
-    .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
+               .command('update', 'install or update selected binaries')
+               .action(update)
+               .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.IGNORE_SSL])
+               .addOption(Opts[Opt.PROXY])
+               .addOption(Opts[Opt.ALTERNATE_CDN])
+               .addOption(Opts[Opt.STANDALONE])
+               .addOption(Opts[Opt.CHROME])
+               .addOption(Opts[Opt.ANDROID])
+               .addOption(Opts[Opt.ANDROID_API_LEVELS])
+               .addOption(Opts[Opt.ANDROID_ABIS])
+               .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -38,11 +39,10 @@ if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
 }
 
-prog
-  .addOption(Opts[Opt.VERSIONS_STANDALONE])
-  .addOption(Opts[Opt.VERSIONS_CHROME])
-  .addOption(Opts[Opt.VERSIONS_APPIUM])
-  .addOption(Opts[Opt.VERSIONS_ANDROID]);
+prog.addOption(Opts[Opt.VERSIONS_STANDALONE])
+    .addOption(Opts[Opt.VERSIONS_CHROME])
+    .addOption(Opts[Opt.VERSIONS_APPIUM])
+    .addOption(Opts[Opt.VERSIONS_ANDROID]);
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
@@ -104,14 +104,17 @@ function update(options: Options): void {
   binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
 
   // if the file has not been completely downloaded, download it
-  // else if the file has already been downloaded, unzip the file, rename it, and give it permissions
+  // else if the file has already been downloaded, unzip the file, rename it, and give it
+  // permissions
   if (standalone) {
     let binary = binaries[StandAlone.id];
     FileManager.toDownload(binary, outputDir).then((value: boolean) => {
       if (value) {
         Downloader.downloadBinary(binary, outputDir);
       } else {
-        logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
+        logger.info(
+            binary.name + ': file exists ' +
+            path.resolve(outputDir, binary.filename(os.type(), os.arch())));
         logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
       }
     });
@@ -122,7 +125,7 @@ function update(options: Options): void {
   }
   if (ie) {
     let binary = binaries[IEDriver.id];
-    binary.arch = os.arch(); // Win32 or x64
+    binary.arch = os.arch();  // Win32 or x64
     updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie32) {
@@ -135,9 +138,9 @@ function update(options: Options): void {
     let sdk_path = path.join(outputDir, binary.executableFilename(os.type()));
 
     updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      initializeAndroid(path.join(outputDir, binary.executableFilename(os.type(
-          ))), android_api_levels, android_abis, android_accept_licenses,
-          binaries[AndroidSDK.id].versionCustom, logger);
+      initializeAndroid(
+          path.join(outputDir, binary.executableFilename(os.type())), android_api_levels,
+          android_abis, android_accept_licenses, binaries[AndroidSDK.id].versionCustom, logger);
     });
   }
   if (ios) {
@@ -148,19 +151,22 @@ function update(options: Options): void {
   }
 }
 
-function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<any> {
+function updateBinary(
+    binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<any> {
   return FileManager.toDownload(binary, outputDir).then((value: boolean) => {
     if (value) {
       let deferred = q.defer();
-      Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL, 
-        (binary: Binary, outputDir: string, fileName: string) => {
-          unzip(binary, outputDir, fileName);
-          deferred.resolve();
-        }
-      );
+      Downloader.downloadBinary(
+          binary, outputDir, proxy, ignoreSSL,
+          (binary: Binary, outputDir: string, fileName: string) => {
+            unzip(binary, outputDir, fileName);
+            deferred.resolve();
+          });
       return deferred.promise;
     } else {
-      logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename(os.type(), os.arch())));
+      logger.info(
+          binary.name + ': file exists ' +
+          path.resolve(outputDir, binary.filename(os.type(), os.arch())));
       let fileName = binary.filename(os.type(), os.arch());
       unzip(binary, outputDir, fileName);
       logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
@@ -174,10 +180,11 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   let mv = path.join(outputDir, binary.executableFilename(osType));
   try {
     fs.unlinkSync(mv);
-  } catch(err) {
+  } catch (err) {
     try {
       rimraf.sync(mv);
-    } catch (err2) {}
+    } catch (err2) {
+    }
   }
 
   // unzip the file
@@ -187,8 +194,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
     zip.extractAllTo(outputDir, true);
   } else {
     // We will only ever get .tar files on linux
-    child_process.spawnSync('tar', ['zxvf', path.resolve(outputDir, fileName),
-      '-C', outputDir]);
+    child_process.spawnSync('tar', ['zxvf', path.resolve(outputDir, fileName), '-C', outputDir]);
   }
 
   // rename
@@ -202,7 +208,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
     } else {
       fs.chmodSync(path.join(mv, 'tools', 'android'), '0755');
       fs.chmodSync(path.join(mv, 'tools', 'emulator'), '0755');
-      //TODO(sjelin): get 64 bit versions working
+      // TODO(sjelin): get 64 bit versions working
     }
   }
 }
@@ -213,10 +219,10 @@ function installAppium(binary: Binary, outputDir: string): void {
   let folder = path.join(outputDir, binary.filename());
   try {
     rimraf.sync(folder);
-  } catch(err) {}
+  } catch (err) {
+  }
 
   fs.mkdirSync(folder);
   fs.writeFileSync(path.join(folder, 'package.json'), '{}');
-  child_process.spawn('npm', ['install', 'appium@' + binary.version()], {cwd:
-      folder});
+  child_process.spawn('npm', ['install', 'appium@' + binary.version()], {cwd: folder});
 }

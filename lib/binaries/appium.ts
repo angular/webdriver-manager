@@ -1,10 +1,12 @@
 import * as child_process from 'child_process';
-import * as rimraf from 'rimraf';
-import * as path from 'path';
 import {arch, type} from 'os';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+
+import {Config} from '../config';
 
 import {Binary, OS} from './binary';
-import {Config} from '../config';
+
 
 /**
  * The appium binary.
@@ -30,7 +32,5 @@ export class Appium extends Binary {
 
   executableSuffix(): string { return ''; }
 
-  remove(sdkPath: string): void {
-    rimraf.sync(sdkPath);
-  }
+  remove(sdkPath: string): void { rimraf.sync(sdkPath); }
 }

@@ -11,7 +11,8 @@ export class Option {
   defaultValue: number|string|boolean;
   value: number|string|boolean;
 
-  constructor(opt: string, description: string, type: string, defaultValue?: number|string|boolean) {
+  constructor(
+      opt: string, description: string, type: string, defaultValue?: number|string|boolean) {
     this.opt = opt;
     this.description = description;
     this.type = type;

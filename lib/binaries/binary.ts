@@ -19,16 +19,16 @@ export interface BinaryMap<T extends Binary> { [id: string]: T; }
  * The binary object base class
  */
 export class Binary {
-  static os: OS[];             // the operating systems, the binary can run on
-  static id: string;                // the binaries key identifier
-  static isDefault: boolean;        // to download by default
-  static versionDefault: string;    // a static default version variable
-  static shortName: string[];  // the names used for a binary download
-  name: string;                     // used for logging to console
-  prefixDefault: string;            // start of the file name
-  versionCustom: string;            // version of file
-  suffixDefault: string;            // file type for downloading
-  cdn: string;                      // url protocol and host
+  static os: OS[];                // the operating systems, the binary can run on
+  static id: string;              // the binaries key identifier
+  static isDefault: boolean;      // to download by default
+  static versionDefault: string;  // a static default version variable
+  static shortName: string[];     // the names used for a binary download
+  name: string;                   // used for logging to console
+  prefixDefault: string;          // start of the file name
+  versionCustom: string;          // version of file
+  suffixDefault: string;          // file type for downloading
+  cdn: string;                    // url protocol and host
   arch: string;
 
   /**
@@ -57,15 +57,15 @@ export class Binary {
 
   suffix(ostype?: string, arch?: string): string { return this.suffixDefault; }
 
-  filename(ostype?: string, arch?: string): string { return this.prefix() + this.version() + this.suffix(ostype, arch); }
+  filename(ostype?: string, arch?: string): string {
+    return this.prefix() + this.version() + this.suffix(ostype, arch);
+  }
 
   /**
    * @param ostype The operating system.
    * @returns The file name for the file inside the downloaded zip file
    */
-  zipContentName(ostype: string): string {
-    return this.name + this.executableSuffix(ostype);
-  }
+  zipContentName(ostype: string): string { return this.name + this.executableSuffix(ostype); }
 
   shortVersion(version: string): string { return version.slice(0, version.lastIndexOf('.')); }
 

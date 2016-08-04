@@ -1,34 +1,34 @@
-import * as fs from 'fs';
-import * as minimist from 'minimist';
-import * as path from 'path';
-import * as os from 'os';
 import * as childProcess from 'child_process';
+import * as fs from 'fs';
 import * as http from 'http';
+import * as minimist from 'minimist';
+import * as os from 'os';
+import * as path from 'path';
 
-import {Opts} from './opts';
-import * as Opt from './';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
-import {Logger, Options, Program} from '../cli';
-import {BinaryMap, Binary, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone} from
-    '../binaries';
+
+import * as Opt from './';
+import {Opts} from './opts';
 
 let logger = new Logger('start');
 let prog = new Program()
-    .command('start', 'start up the selenium server')
-    .action(start)
-    .addOption(Opts[Opt.OUT_DIR])
-    .addOption(Opts[Opt.SELENIUM_PORT])
-    .addOption(Opts[Opt.APPIUM_PORT])
-    .addOption(Opts[Opt.AVD_PORT])
-    .addOption(Opts[Opt.VERSIONS_STANDALONE])
-    .addOption(Opts[Opt.VERSIONS_CHROME])
-    .addOption(Opts[Opt.VERSIONS_ANDROID])
-    .addOption(Opts[Opt.VERSIONS_APPIUM])
-    .addOption(Opts[Opt.CHROME_LOGS])
-    .addOption(Opts[Opt.ANDROID])
-    .addOption(Opts[Opt.AVDS])
-    .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
+               .command('start', 'start up the selenium server')
+               .action(start)
+               .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.SELENIUM_PORT])
+               .addOption(Opts[Opt.APPIUM_PORT])
+               .addOption(Opts[Opt.AVD_PORT])
+               .addOption(Opts[Opt.VERSIONS_STANDALONE])
+               .addOption(Opts[Opt.VERSIONS_CHROME])
+               .addOption(Opts[Opt.VERSIONS_ANDROID])
+               .addOption(Opts[Opt.VERSIONS_APPIUM])
+               .addOption(Opts[Opt.CHROME_LOGS])
+               .addOption(Opts[Opt.ANDROID])
+               .addOption(Opts[Opt.AVDS])
+               .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -123,16 +123,14 @@ function start(options: Options) {
         path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
   }
   if (options[Opt.EDGE]) {
-    args.push(
-        '-Dwebdriver.edge.driver=' +
-        options[Opt.EDGE].getString());
+    args.push('-Dwebdriver.edge.driver=' + options[Opt.EDGE].getString());
   }
   if (options[Opt.ANDROID].getBoolean()) {
     if (downloadedBinaries[AndroidSDK.id] != null) {
       let avds = options[Opt.AVDS].getString();
-      startAndroid(outputDir, binaries[AndroidSDK.id], avds.split(','),
-          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(),
-          options[Opt.AVD_PORT].getString());
+      startAndroid(
+          outputDir, binaries[AndroidSDK.id], avds.split(','),
+          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), options[Opt.AVD_PORT].getString());
     } else {
       logger.warn('Not starting android because it is not installed');
     }
@@ -173,7 +171,7 @@ function spawnCommand(command: string, args?: string[]) {
   let osType = os.type();
   let windows: boolean = osType === 'Windows_NT';
   let winCommand = windows ? 'cmd' : command;
-  let finalArgs: string[] = windows ? ['/c'].concat([command],args) : args;
+  let finalArgs: string[] = windows ? ['/c'].concat([command], args) : args;
 
   return childProcess.spawn(winCommand, finalArgs, {stdio: 'inherit'});
 }
@@ -181,8 +179,8 @@ function spawnCommand(command: string, args?: string[]) {
 // Manage processes used in android emulation
 let androidProcesses: childProcess.ChildProcess[] = [];
 
-function startAndroid(outputDir: string, sdk: Binary, avds: string[],
-    useSnapshots: boolean, port: string): void {
+function startAndroid(
+    outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: string): void {
   let sdkPath = path.join(outputDir, sdk.executableFilename(os.type()));
   if (avds[0] == 'all') {
     avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
@@ -192,29 +190,29 @@ function startAndroid(outputDir: string, sdk: Binary, avds: string[],
   avds.forEach((avd: string, i: number) => {
     logger.info('Booting up AVD ' + avd);
     // Credit to appium-ci, which this code was adapted from
-    let emuBin = 'emulator'; //TODO(sjelin): get the 64bit linux version working
+    let emuBin = 'emulator';  // TODO(sjelin): get the 64bit linux version working
     let emuArgs = [
-      '-avd', avd + '-v' + sdk.versionCustom + '-wd-manager',
+      '-avd',
+      avd + '-v' + sdk.versionCustom + '-wd-manager',
       '-netfast',
     ];
     if (!useSnapshots) {
       emuArgs = emuArgs.concat(['-no-snapshot-load', '-no-snapshot-save']);
     }
     if (port) {
-      emuArgs = emuArgs.concat(['-ports', (port+2*i) + ',' + (port+2*i+1)]);
+      emuArgs = emuArgs.concat(['-ports', (port + 2 * i) + ',' + (port + 2 * i + 1)]);
     }
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
     }
-    androidProcesses.push(childProcess.spawn(path.join(sdkPath, 'tools',
-        emuBin), emuArgs, {stdio: 'inherit'}));
+    androidProcesses.push(
+        childProcess.spawn(path.join(sdkPath, 'tools', emuBin), emuArgs, {stdio: 'inherit'}));
   });
 }
 
 function killAndroid() {
-  androidProcesses.forEach((androidProcess: childProcess.ChildProcess) => {
-    androidProcess.kill();
-  });
+  androidProcesses.forEach(
+      (androidProcess: childProcess.ChildProcess) => { androidProcess.kill(); });
   androidProcesses.length = 0;
 }
 
@@ -223,8 +221,9 @@ let appiumProcess: childProcess.ChildProcess;
 
 function startAppium(outputDir: string, binary: Binary, port: string) {
   logger.info('Starting appium server');
-  appiumProcess = childProcess.spawn(path.join(outputDir, binary.filename(),
-      'node_modules', '.bin', 'appium'), port ? ['--port', port] : []);
+  appiumProcess = childProcess.spawn(
+      path.join(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
+      port ? ['--port', port] : []);
 }
 
 function killAppium() {
