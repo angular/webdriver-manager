@@ -1,16 +1,17 @@
 import * as minimist from 'minimist';
 import * as path from 'path';
 
+import {Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
-import {Options, Program} from '../cli';
-import {Opts} from './opts';
+
 import * as Opt from './';
+import {Opts} from './opts';
 
 let prog = new Program()
-                         .command('clean', 'removes all downloaded driver files from the out_dir')
-                         .action(clean)
-                         .addOption(Opts[Opt.OUT_DIR]);
+               .command('clean', 'removes all downloaded driver files from the out_dir')
+               .action(clean)
+               .addOption(Opts[Opt.OUT_DIR]);
 
 export var program = prog;
 

@@ -1,10 +1,10 @@
+import * as fs from 'fs';
+import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as q from 'q';
 import * as request from 'request';
 import * as url from 'url';
-import * as q from 'q';
-import * as http from 'http';
 
 import {Binary} from '../binaries/binary';
 import {Logger} from '../cli';
@@ -15,7 +15,6 @@ let logger = new Logger('downloader');
  * The file downloader.
  */
 export class Downloader {
-
   /**
    * Download the binary file.
    * @param binary The binary of interest.
@@ -25,8 +24,8 @@ export class Downloader {
    * @param opt_callback Callback method to be executed after the file is downloaded.
    */
   static downloadBinary(
-      binary: Binary, outputDir: string, opt_proxy?: string,
-      opt_ignoreSSL?: boolean, opt_callback?: Function): void {
+      binary: Binary, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
+      opt_callback?: Function): void {
     logger.info(binary.name + ': downloading version ' + binary.version());
     var url = binary.url(os.type(), os.arch());
     if (!url) {
@@ -34,7 +33,8 @@ export class Downloader {
       return;
     }
     Downloader.httpGetFile_(
-        url, binary.filename(os.type(), os.arch()), outputDir, opt_proxy, opt_ignoreSSL, (filePath: string) => {
+        url, binary.filename(os.type(), os.arch()), outputDir, opt_proxy, opt_ignoreSSL,
+        (filePath: string) => {
           if (opt_callback) {
             opt_callback(binary, outputDir, filePath);
           }
@@ -72,7 +72,8 @@ export class Downloader {
 
       // If the HTTPS_PROXY and HTTP_PROXY environment variable is set, use that as the proxy
       if (protocol === 'https:') {
-        return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+        return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY ||
+            process.env.http_proxy;
       } else if (protocol === 'http:') {
         return process.env.HTTP_PROXY || process.env.http_proxy;
       }
@@ -80,7 +81,8 @@ export class Downloader {
     return null;
   }
 
-  static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean): q.Promise<any> {
+  static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean):
+      q.Promise<any> {
     let deferred = q.defer();
     if (opt_ignoreSSL) {
       logger.info('ignoring SSL certificate');
@@ -95,11 +97,10 @@ export class Downloader {
     };
 
     let contentLength = 0;
-    request(options)
-      .on('response', (response) => {
-        contentLength = response.headers['content-length'];
-        deferred.resolve(contentLength);
-      });
+    request(options).on('response', (response) => {
+      contentLength = response.headers['content-length'];
+      deferred.resolve(contentLength);
+    });
     return deferred.promise;
   }
 
@@ -111,8 +112,8 @@ export class Downloader {
    * @param opt_ignoreSSL To ignore SSL.
    */
   static httpGetFile_(
-      fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
-      callback?: Function): void {
+      fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string,
+      opt_ignoreSSL?: boolean, callback?: Function): void {
     logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
     let filePath = path.join(outputDir, fileName);
     let file = fs.createWriteStream(filePath);

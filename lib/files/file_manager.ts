@@ -1,11 +1,11 @@
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import * as fs from 'fs';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone, OS} from
-    '../binaries';
+'../binaries';
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
@@ -84,7 +84,7 @@ export class FileManager {
     } catch (e) {
       return [];
     }
-   }
+  }
 
   /**
    * For the binary, operating system, and system architecture, look through
@@ -94,9 +94,8 @@ export class FileManager {
    * @param existingFiles A list of existing files.
    * @returns The downloaded binary with all the versions found.
    */
-  static downloadedVersions_(
-      binary: Binary, osType: string, arch: string,
-      existingFiles: string[]): DownloadedBinary {
+  static downloadedVersions_(binary: Binary, osType: string, arch: string, existingFiles: string[]):
+      DownloadedBinary {
     let versions: string[] = [];
     for (let existPos in existingFiles) {
       let existFile: string = existingFiles[existPos];
@@ -176,8 +175,9 @@ export class FileManager {
             if (value == readData.length) {
               return false;
             } else {
-              logger.warn(path.basename(filePath) + ' expected length ' + value +
-                  ', found ' + readData.length);
+              logger.warn(
+                  path.basename(filePath) + ' expected length ' + value + ', found ' +
+                  readData.length);
               logger.warn('removing file: ' + filePath);
               return true;
             }
@@ -211,7 +211,6 @@ export class FileManager {
       for (let binPos in binaries) {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
-          
           bin.remove(path.join(outputDir, file));
           logger.info('removed ' + file);
         }

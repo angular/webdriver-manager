@@ -2,8 +2,10 @@ import * as chalk from 'chalk';
 import * as path from 'path';
 
 import {Config} from '../config';
-import {Programs, Program} from './programs';
+
 import {MinimistArgs, Options} from './options';
+import {Program, Programs} from './programs';
+
 
 
 /**
@@ -119,7 +121,7 @@ export class Cli {
    */
   getMinimistOptions(): Object {
     let allOptions = this.getOptions();
-    let minimistOptions: MinimistArgs = {}
+    let minimistOptions: MinimistArgs = {};
     let minimistBoolean: string[] = [];
     let minimistString: string[] = [];
     let minimistNumber: string[] = [];
@@ -135,7 +137,7 @@ export class Cli {
     }
     minimistOptions['boolean'] = minimistBoolean;
     minimistOptions['string'] = minimistString;
-    minimistOptions['number']= minimistNumber;
+    minimistOptions['number'] = minimistNumber;
     return minimistOptions;
   }
 }

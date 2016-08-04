@@ -1,7 +1,9 @@
 import * as os from 'os';
 
-import {Binary, OS} from './binary';
 import {Config} from '../config';
+
+import {Binary, OS} from './binary';
+
 
 /**
  * The internet explorer binary.

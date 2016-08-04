@@ -37,20 +37,12 @@ export class Config {
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
 
-  static getConfigFile_(): string {
-    return path.resolve(Config.dir, '..', Config.configFile);
-  }
+  static getConfigFile_(): string { return path.resolve(Config.dir, '..', Config.configFile); }
 
-  static getPackageFile_(): string {
-    return path.resolve(Config.dir, '..', Config.packageFile)
-  }
+  static getPackageFile_(): string { return path.resolve(Config.dir, '..', Config.packageFile) }
 
-  static getSeleniumDir(): string {
-    return path.resolve(Config.dir, '..', '..', 'selenium/');
-  }
-  static getBaseDir(): string {
-    return path.resolve(Config.dir, '..', '..');
-  }
+  static getSeleniumDir(): string { return path.resolve(Config.dir, '..', '..', 'selenium/'); }
+  static getBaseDir(): string { return path.resolve(Config.dir, '..', '..'); }
 
   /**
    * Get the binary versions from the configuration file.

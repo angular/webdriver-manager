@@ -1,10 +1,12 @@
 import * as child_process from 'child_process';
-import * as rimraf from 'rimraf';
-import * as path from 'path';
 import {arch, type} from 'os';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+
+import {Config} from '../config';
 
 import {Binary, OS} from './binary';
-import {Config} from '../config';
+
 
 /**
  * The android sdk binary.
@@ -41,9 +43,7 @@ export class AndroidSDK extends Binary {
     }
   }
 
-  url(ostype: string): string {
-    return this.cdn + this.filename(ostype);
-  }
+  url(ostype: string): string { return this.cdn + this.filename(ostype); }
 
   zipContentName(ostype: string): string {
     if (ostype === 'Darwin') {
@@ -62,10 +62,12 @@ export class AndroidSDK extends Binary {
       let avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
       let version = path.basename(sdkPath).slice(this.prefixDefault.length);
       avds.forEach((avd: string) => {
-        child_process.spawnSync(path.join(sdkPath, 'tools', 'android'), ['delete',
-            'avd', '-n', avd + '-v' + version + '-wd-manager']);
+        child_process.spawnSync(
+            path.join(sdkPath, 'tools', 'android'),
+            ['delete', 'avd', '-n', avd + '-v' + version + '-wd-manager']);
       });
-    } catch (e) {}
+    } catch (e) {
+    }
     rimraf.sync(sdkPath);
   }
 }

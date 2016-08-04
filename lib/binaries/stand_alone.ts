@@ -1,5 +1,7 @@
-import {Binary, OS} from './binary';
 import {Config} from '../config';
+
+import {Binary, OS} from './binary';
+
 
 /**
  * The selenium server jar.

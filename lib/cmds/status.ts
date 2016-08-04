@@ -2,17 +2,18 @@ import * as fs from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 
-import {Opts} from './opts';
-import * as Opt from './';
+import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
-import {Logger, Options, Program} from '../cli';
+
+import * as Opt from './';
+import {Opts} from './opts';
 
 let logger = new Logger('status');
 let prog = new Program()
-                         .command('status', 'list the current available drivers')
-                         .addOption(Opts[Opt.OUT_DIR])
-                         .action(status);
+               .command('status', 'list the current available drivers')
+               .addOption(Opts[Opt.OUT_DIR])
+               .action(status);
 
 export var program = prog;
 
