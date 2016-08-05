@@ -100,8 +100,9 @@ function start(options: Options) {
   }
   let args: string[] = ['-jar', path.join(outputDir, binaries[StandAlone.id].filename())];
   if (osType === 'Linux') {
-    // selenium server may take a long time to start because /dev/random is BLOCKING if there is not enough entropy
-    // the solution is to use /dev/urandom, which is NON-BLOCKING (use /dev/./urandom because of a java bug)
+    // selenium server may take a long time to start because /dev/random is BLOCKING if there is not
+    // enough entropy the solution is to use /dev/urandom, which is NON-BLOCKING (use /dev/./urandom
+    // because of a java bug)
     // https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/1301
     // https://bugs.openjdk.java.net/browse/JDK-6202721
     args.push('-Djava.security.egd=file:///dev/./urandom');
