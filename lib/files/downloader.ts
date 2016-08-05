@@ -127,22 +127,32 @@ export class Downloader {
       url: fileUrl,
       strictSSL: !opt_ignoreSSL,
       rejectUnauthorized: !opt_ignoreSSL,
-      proxy: Downloader.resolveProxy_(fileUrl, opt_proxy)
+      proxy: Downloader.resolveProxy_(fileUrl, opt_proxy),
+      // default Linux can be anywhere from 20-120 seconds
+      // increasing this arbitrarily to 4 minutes
+      timeout: 240000
     };
 
     request(options)
         .on('response',
             (response) => {
               if (response.statusCode !== 200) {
-                fs.unlink(filePath);
+                fs.unlinkSync(filePath);
                 logger.error('Error: Got code ' + response.statusCode + ' from ' + fileUrl);
               }
               contentLength = response.headers['content-length'];
             })
         .on('error',
             (error) => {
-              logger.error('Error: Got error ' + error + ' from ' + fileUrl);
-              fs.unlink(filePath);
+              if (error.code === 'ETIMEDOUT') {
+                logger.error('Connection timeout downloading: ' + fileUrl);
+                logger.error('Default timeout is 4 minutes.');
+
+              } else if (error.connect){
+                logger.error('Could not connect to the server to download: ' + fileUrl);
+              }
+              logger.error(error);
+              fs.unlinkSync(filePath);
             })
         .pipe(file);
 
@@ -156,7 +166,7 @@ export class Downloader {
           logger.error(
               'Error: corrupt download for ' + fileName +
               '. Please re-run webdriver-manager update');
-          fs.unlink(filePath);
+          fs.unlinkSync(filePath);
           return;
         }
         if (callback) {
