@@ -119,6 +119,9 @@ function start(options: Options) {
     }
   }
   if (downloadedBinaries[IEDriver.id] != null) {
+    if (options[Opt.IE32]) {
+      binaries[IEDriver.id].arch = 'Win32';
+    }
     args.push(
         '-Dwebdriver.ie.driver=' +
         path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
