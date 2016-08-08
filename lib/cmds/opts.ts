@@ -22,6 +22,7 @@ export const VERSIONS_IE = 'versions.ie';
 export const VERSIONS_ANDROID = 'versions.android';
 export const VERSIONS_APPIUM = 'versions.appium';
 export const CHROME_LOGS = 'chrome_logs';
+export const LOGGING = 'logging';
 export const ANDROID_API_LEVELS = 'android-api-levels';
 export const ANDROID_ABIS = 'android-abis';
 export const ANDROID_ACCEPT_LICENSES = 'android-accept-licenses';
@@ -64,6 +65,7 @@ opts[VERSIONS_APPIUM] =
 opts[VERSIONS_IE] = new Option(
     VERSIONS_IE, 'Optional internet explorer driver version', 'string', IEDriver.versionDefault);
 opts[CHROME_LOGS] = new Option(CHROME_LOGS, 'File path to chrome logs', 'string', undefined);
+opts[LOGGING] = new Option(LOGGING, 'File path to logging properties file', 'string', undefined);
 opts[ANDROID_API_LEVELS] = new Option(
     ANDROID_API_LEVELS, 'Which versions of the android API you want to emulate', 'string',
     AndroidSDK.DEFAULT_API_LEVELS);

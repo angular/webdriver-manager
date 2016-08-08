@@ -26,6 +26,7 @@ let prog = new Program()
                .addOption(Opts[Opt.VERSIONS_ANDROID])
                .addOption(Opts[Opt.VERSIONS_APPIUM])
                .addOption(Opts[Opt.CHROME_LOGS])
+               .addOption(Opts[Opt.LOGGING])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.AVDS])
                .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
@@ -76,6 +77,7 @@ function start(options: Options) {
   }
 
   let chromeLogs: string = null;
+  let loggingFile: string = null;
   if (options[Opt.CHROME_LOGS].getString()) {
     if (path.isAbsolute(options[Opt.CHROME_LOGS].getString())) {
       chromeLogs = options[Opt.CHROME_LOGS].getString();
@@ -107,6 +109,16 @@ function start(options: Options) {
     // https://bugs.openjdk.java.net/browse/JDK-6202721
     args.push('-Djava.security.egd=file:///dev/./urandom');
   }
+
+  if (options[Opt.LOGGING].getString()) {
+    if (path.isAbsolute(options[Opt.LOGGING].getString())) {
+      loggingFile = options[Opt.LOGGING].getString();
+    } else {
+      loggingFile = path.resolve(Config.getBaseDir(), options[Opt.LOGGING].getString());
+    }
+    args.push('-Djava.util.logging.config.file=' + loggingFile);
+  }
+
   if (seleniumPort) {
     args.push('-port', seleniumPort);
   }
