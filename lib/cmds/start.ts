@@ -127,7 +127,16 @@ function start(options: Options) {
         path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
   }
   if (options[Opt.EDGE]) {
-    args.push('-Dwebdriver.edge.driver=' + options[Opt.EDGE].getString());
+    // validate that the file exists prior to adding it to args
+    try {
+      let edgeFile = options[Opt.EDGE].getString();
+      if (fs.statSync(edgeFile).isFile()) {
+        args.push('-Dwebdriver.edge.driver=' + options[Opt.EDGE].getString());
+      }
+    } catch (err) {
+      // Either the default file or user specified location of the edge
+      // driver does not exist.
+    }
   }
   if (options[Opt.ANDROID].getBoolean()) {
     if (downloadedBinaries[AndroidSDK.id] != null) {
