@@ -144,11 +144,11 @@ export class Downloader {
             })
         .on('error',
             (error) => {
-              if (error.code === 'ETIMEDOUT') {
+              if ((error as any).code === 'ETIMEDOUT') {
                 logger.error('Connection timeout downloading: ' + fileUrl);
                 logger.error('Default timeout is 4 minutes.');
 
-              } else if (error.connect){
+              } else if ((error as any).connect) {
                 logger.error('Could not connect to the server to download: ' + fileUrl);
               }
               logger.error(error);
