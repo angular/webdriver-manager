@@ -18,8 +18,15 @@ let logger = new Logger('file_manager');
  * file versions.
  */
 export class FileManager {
+  /**
+   * Create a directory if it does not exist.
+   * @param outputDir The directory to create.
+   */
   static makeOutputDirectory(outputDir: string) {
-    if (!fs.existsSync(outputDir) || !fs.statSync(outputDir).isDirectory()) {
+    try {
+      fs.statSync(outputDir);
+    } catch (e) {
+      logger.info('creating folder ' + outputDir);
       fs.mkdirSync(outputDir);
     }
   }
@@ -78,7 +85,7 @@ export class FileManager {
    * @param outputDir The directory where binaries are saved
    * @returns A list of existing files.
    */
-  static getExistngFiles(outputDir: string): string[] {
+  static getExistingFiles(outputDir: string): string[] {
     try {
       return fs.readdirSync(outputDir);
     } catch (e) {
@@ -134,7 +141,7 @@ export class FileManager {
     let ostype = os.type();
     let arch = os.arch();
     let binaries = FileManager.setupBinaries();
-    let existingFiles = FileManager.getExistngFiles(outputDir);
+    let existingFiles = FileManager.getExistingFiles(outputDir);
     let downloaded: BinaryMap<DownloadedBinary> = {};
     for (let bin in binaries) {
       let binary = FileManager.downloadedVersions_(binaries[bin], ostype, arch, existingFiles);
@@ -195,14 +202,15 @@ export class FileManager {
    * @param outputDir The directory where files are downloaded and stored.
    */
   static removeExistingFiles(outputDir: string): void {
-    // folder exists
-    if (!fs.existsSync(outputDir)) {
-      logger.warn('the out_dir path ' + outputDir + ' does not exist');
+    try {
+      fs.statSync(outputDir);
+    } catch (e) {
+      logger.warn('path does not exist ' + outputDir);
       return;
     }
-    let existingFiles = FileManager.getExistngFiles(outputDir);
+    let existingFiles = FileManager.getExistingFiles(outputDir);
     if (existingFiles.length === 0) {
-      logger.warn('no files found in out_dir: ' + outputDir);
+      logger.warn('no files found in path ' + outputDir);
       return;
     }
 
