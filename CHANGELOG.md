@@ -1,3 +1,29 @@
+# 10.2.2
+
+## Bug Fixes
+- ([236a8ec](https://github.com/angular/webdriver-manager/commit/236a8ec901133cb21247fc452d7ef7c9d5fed172))
+  fix(downloader): increase timeouts and unlink sync on download errors (#75)
+
+  closes #62 and #63
+- ([fa20ca8](https://github.com/angular/webdriver-manager/commit/fa20ca82e191b122ed49b144b8ebc53ee3b92a9d))
+  fix(start): check if edge driver exists before adding to args (#73)
+
+  closes #60
+- ([8b61b71](https://github.com/angular/webdriver-manager/commit/8b61b71410dbca6e205fbc599b954fe61a8ee937))
+  fix(start): use ie32 if specified via command line (#72)
+
+  closes #68
+
+## Features
+
+- ([8346858](https://github.com/angular/webdriver-manager/commit/83468588fc21f7584b76a8c55afe659db045a4c9))
+  feat(logging): add logging property to selenium standalone (#76)
+
+  closes #61
+- ([18f9f1d](https://github.com/angular/webdriver-manager/commit/18f9f1dfea02cd8f5c5a2cd5f09130f0ca24f68a))
+  chore(selenium): add dev/urandom to selenium start args to prevent startup delays in linux
+
+
 # 10.2.1
 
 upgrade to latest chrome driver and selenium standalone server versions
