@@ -1,64 +1,141 @@
 'use strict';
 
 var gulp = require('gulp');
-var runSequence = require('run-sequence');
+var gutil = require('gulp-util');
 var spawn = require('child_process').spawn;
 
-var runSpawn = function(done, task, opt_arg) {
-  opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
-  var child = spawn(task, opt_arg, {stdio: 'inherit'});
-  var running = false;
-  child.on('close', function() {
-    if (!running) {
-      running = true;
-      done();
+var format = require('gulp-clang-format');
+var clangFormat = require('clang-format');
+
+/**
+ * Runs a command from the command line as 'node <opt_arg>'.
+ * @param {String|Array} opt_arg the filename and/or arguments to run.
+ * @return {Promise}
+ */
+var runNodeCommand = (opt_arg) => {
+    if (typeof opt_arg === 'string') {
+        opt_arg = opt_arg.split(/\s/);
+    } else {
+        opt_arg = opt_arg || [];
     }
-  });
-  child.on('error', function() {
-    if (!running) {
-      console.error('gulp encountered a child error');
-      running = true;
-      done();
-    }
-  });
+    var err;
+    return new Promise((fulfill, reject) => {
+        spawn('node', opt_arg, {stdio: 'inherit'})
+            .on('error', (childError) => {
+                err = err || childError;
+            })
+            .on('exit', (result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    fulfill(result);
+                }
+            });
+    });
 };
 
-gulp.task('copy', function() {
-  return gulp.src(['config.json', 'package.json'])
-      .pipe(gulp.dest('built/'));
+var typescriptCompile = () => {
+    gutil.log('compiling typescript...');
+    return runNodeCommand('node_modules/typescript/bin/tsc');
+};
+
+var installTypings = () => {
+    gutil.log('installing typings...');
+    return runNodeCommand(['node_modules/typings/dist/bin.js', 'install']);
+};
+
+var copyFilesToBuilt = () => {
+    gutil.log('copying files to built...');
+    return new Promise((fulfill) => {
+        gulp.src(['config.json', 'package.json'])
+            .pipe(gulp.dest('built/'))
+            .on('end', () => {
+                fulfill();
+            });
+    });
+};
+
+var checkFormat = () => {
+    gutil.log('checking file formatting...');
+    return new Promise((fulfill, reject) => {
+        var err;
+        gulp.src(['lib/**/*.ts'], {base: '.'})
+            .pipe(format.checkFormat('file', clangFormat, {verbose: true, fail: true}))
+            .on('error', (e) => {
+                err = err || e;
+            })
+            .on('data', () => {
+            }) // this 'data' event listener ensures the stream flows through to the 'end' event
+            .on('end', () => {
+                if (err) {
+                    reject(err);
+                } else {
+                    fulfill();
+                }
+            });
+    });
+};
+
+var autoFormat = () => {
+    return checkFormat().then(() => {
+        // do nothing if there are no formatting errors
+    }, () => {
+        // catch any error and auto-format the files
+        gutil.log();
+        gutil.log('... AUTO-FORMATTING FILES ...');
+        gutil.log();
+        return new Promise((fulfill) => {
+            gulp.src(['lib/**/*.ts'], {base: '.'})
+                .pipe(format.format('file', clangFormat))
+                .pipe(gulp.dest('.'))
+                .on('end', () => {
+                    fulfill();
+                });
+        });
+    });
+};
+
+var prePublish = () => {
+    return Promise.all([
+        installTypings(),
+        autoFormat(),
+    ]).then(() => {
+        return typescriptCompile();
+    }).then(() => {
+        return copyFilesToBuilt();
+    });
+};
+
+gulp.task('copy', () => {
+    return copyFilesToBuilt();
 });
 
 gulp.task('format:enforce', () => {
-  const format = require('gulp-clang-format');
-  const clangFormat = require('clang-format');
-  return gulp.src(['lib/**/*.ts']).pipe(
-    format.checkFormat('file', clangFormat, {verbose: true, fail: true}));
+    return checkFormat();
 });
 
 gulp.task('format', () => {
-  const format = require('gulp-clang-format');
-  const clangFormat = require('clang-format');
-  return gulp.src(['lib/**/*.ts'], { base: '.' }).pipe(
-    format.format('file', clangFormat)).pipe(gulp.dest('.'));
+    return autoFormat();
 });
 
-gulp.task('typings', function(done) {
-  runSpawn(done, 'node', ['node_modules/typings/dist/bin.js', 'install']);
+gulp.task('typings', () => {
+    return installTypings();
 });
 
-gulp.task('tsc', function(done) {
-  runSpawn(done, 'node', ['node_modules/typescript/bin/tsc']);
+gulp.task('tsc', () => {
+    return typescriptCompile();
 });
 
-gulp.task('prepublish', function(done) {
-  runSequence(['typings', 'format'], 'tsc', 'copy', done);
+
+['prepublish', 'default', 'build'].forEach((alias) => {
+    gulp.task(alias, () => {
+        return prePublish();
+    });
 });
 
-gulp.task('default',['prepublish']);
-gulp.task('build',['prepublish']);
-
-gulp.task('test', ['build'], function(done) {
-  var opt_arg = [];
-  opt_arg.push('node_modules/jasmine/bin/jasmine.js');
-  runSpawn(done, 'node', opt_arg);
+gulp.task('test', () => {
+    return prePublish().then(() => {
+        gutil.log('running tests...');
+        return runNodeCommand('node_modules/jasmine/bin/jasmine.js');
+    });
 });
