@@ -1,9 +1,13 @@
 lib/
-spec/
-typings/
 selenium/
+spec/
 
 .clang-format
+.gitattributes
+.github/
 .gitignore
 .npmignore
-
+.travis.yml
+npm-debug.log
+release.md
+tsconfig.json

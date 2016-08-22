@@ -1,12 +1,10 @@
-#!/usr/bin/env node
-
 import * as minimist from 'minimist';
+
+import {Cli} from './cli';
 import * as clean from './cmds/clean';
 import * as start from './cmds/start';
 import * as status from './cmds/status';
 import * as update from './cmds/update';
-
-import {Cli} from './cli';
 import {Config} from './config';
 
 let commandline = new Cli()
