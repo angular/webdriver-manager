@@ -36,8 +36,10 @@ if (os.type() === 'Darwin') {
 }
 
 if (os.type() === 'Windows_NT') {
-  prog.addOption(Opts[Opt.VERSIONS_IE]);
-  prog.addOption(Opts[Opt.EDGE]);
+  prog.addOption(Opts[Opt.VERSIONS_IE])
+      .addOption(Opts[Opt.IE32])
+      .addOption(Opts[Opt.IE])
+      .addOption(Opts[Opt.EDGE]);
 }
 
 export var program = prog;
