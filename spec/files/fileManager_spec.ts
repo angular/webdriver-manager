@@ -1,5 +1,3 @@
-/// <reference path = "../../typings/index.d.ts"/>
-
 import * as fs from 'fs';
 import * as path from 'path';
 import {Binary, AndroidSDK, ChromeDriver, IEDriver, Appium, StandAlone} from '../../lib/binaries';

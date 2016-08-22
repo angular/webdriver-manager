@@ -1,5 +1,3 @@
-/// <reference path = "../typings/index.d.ts"/>
-
 import * as child_process from 'child_process';
 import * as path from 'path';
 import {cli} from '../lib/webdriver';
