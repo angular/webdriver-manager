@@ -26,6 +26,7 @@ let prog = new Program()
                .addOption(Opts[Opt.VERSIONS_ANDROID])
                .addOption(Opts[Opt.VERSIONS_APPIUM])
                .addOption(Opts[Opt.CHROME_LOGS])
+               .addOption(Opts[Opt.GECKO])
                .addOption(Opts[Opt.LOGGING])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.AVDS])
@@ -150,6 +151,17 @@ function start(options: Options) {
     } catch (err) {
       // Either the default file or user specified location of the edge
       // driver does not exist.
+    }
+  }
+  if (options[Opt.GECKO].getString()) {
+    let gecko = options[Opt.GECKO].getString();
+    try {
+      if (fs.statSync(gecko).isFile()) {
+        args.push('-Dwebdriver.edge.driver=' + gecko);
+      }
+    } catch (err) {
+      // The file does not exist.
+      logger.warn('The absolute path provided for gecko (' + gecko + ') does not exist');
     }
   }
   if (options[Opt.ANDROID].getBoolean()) {

@@ -14,6 +14,7 @@ export const CHROME = 'chrome';
 export const IE = 'ie';
 export const IE32 = 'ie32';
 export const EDGE = 'edge';
+export const GECKO = 'gecko';
 export const ANDROID = 'android';
 export const IOS = 'ios';
 export const VERSIONS_CHROME = 'versions.chrome';
@@ -51,6 +52,7 @@ opts[IE32] = new Option(IE32, 'Install or update 32-bit ie driver', 'boolean', I
 opts[EDGE] = new Option(
     EDGE, 'Use installed Microsoft Edge driver', 'string',
     'C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe');
+opts[GECKO] = new Option(GECKO, 'Use path for gecko driver', 'string');
 opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', AndroidSDK.isDefault);
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
