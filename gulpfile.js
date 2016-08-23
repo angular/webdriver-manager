@@ -42,16 +42,12 @@ gulp.task('format', () => {
     format.format('file', clangFormat)).pipe(gulp.dest('.'));
 });
 
-gulp.task('typings', function(done) {
-  runSpawn(done, 'node', ['node_modules/typings/dist/bin.js', 'install']);
-});
-
 gulp.task('tsc', function(done) {
   runSpawn(done, 'node', ['node_modules/typescript/bin/tsc']);
 });
 
 gulp.task('prepublish', function(done) {
-  runSequence(['typings', 'format'], 'tsc', 'copy', done);
+  runSequence('format', 'tsc', 'copy', done);
 });
 
 gulp.task('default',['prepublish']);
