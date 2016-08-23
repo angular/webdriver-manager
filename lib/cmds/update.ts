@@ -110,7 +110,7 @@ function update(options: Options): void {
     let binary = binaries[StandAlone.id];
     FileManager.toDownload(binary, outputDir).then((value: boolean) => {
       if (value) {
-        Downloader.downloadBinary(binary, outputDir);
+        Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL);
       } else {
         logger.info(
             binary.name + ': file exists ' +
