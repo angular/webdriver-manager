@@ -119,19 +119,35 @@ export class Downloader {
     let file = fs.createWriteStream(filePath);
     let contentLength = 0;
 
-    if (opt_ignoreSSL) {
-      logger.info('ignoring SSL certificate');
+    interface Options {
+      url: string;
+      timeout: number;
+      strictSSL?: boolean;
+      rejectUnauthorized?: boolean;
+      proxy?: string;
+      headers?: {[key: string]: any};
+      [key: string]: any;
     }
 
-    let options = {
+    let options: Options = {
       url: fileUrl,
-      strictSSL: !opt_ignoreSSL,
-      rejectUnauthorized: !opt_ignoreSSL,
-      proxy: Downloader.resolveProxy_(fileUrl, opt_proxy),
       // default Linux can be anywhere from 20-120 seconds
       // increasing this arbitrarily to 4 minutes
       timeout: 240000
-    };
+    }
+
+    if (opt_ignoreSSL) {
+      logger.info('ignoring SSL certificate');
+      options.strictSSL = !opt_ignoreSSL;
+      options.rejectUnauthorized = !opt_ignoreSSL;
+    }
+
+    if (opt_proxy) {
+      options.proxy = Downloader.resolveProxy_(fileUrl, opt_proxy);
+      if (options.url.indexOf('https://') === 0) {
+        options.url = options.url.replace('https://', 'http://');
+      }
+    }
 
     request(options)
         .on('response',
