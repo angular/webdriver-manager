@@ -1,6 +1,33 @@
+# 10.2.3
+
+## Bug Fixes
+
+- ([fa48354](https://github.com/angular/webdriver-manager/commit/fa4835453385d4c79fcbba7bb6d408557c870bae))
+  fix(downloader): fix against working proxy (#87)
+
+- ([d6597e8](https://github.com/angular/webdriver-manager/commit/d6597e8a06004888371cca12b8e803c7d44eaf8d))
+  fix(start): add the correct flags for windows (#83)
+
+  closes #68
+- ([c96090c](https://github.com/angular/webdriver-manager/commit/c96090c0f7cc24209b34f9634699e68669650070))
+  fix(update): download standalone with proxy and ignore ssl (#81)
+
+  closes #79
+
+## Features
+
+- ([7ec082a](https://github.com/angular/webdriver-manager/commit/7ec082a1bcc7f262237a616ec96592c36c28b89a))
+  feat(start): add a gecko driver path to the start command (#86)
+
+## Dependencies
+
+- ([fe85c94](https://github.com/angular/webdriver-manager/commit/fe85c94e8db0680be25461cd3ea1ef59fc4d8fa4))
+  dep(types): update typescript, remove typings in favor of @types (#84)
+
 # 10.2.2
 
 ## Bug Fixes
+
 - ([236a8ec](https://github.com/angular/webdriver-manager/commit/236a8ec901133cb21247fc452d7ef7c9d5fed172))
   fix(downloader): increase timeouts and unlink sync on download errors (#75)
 
