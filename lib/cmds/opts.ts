@@ -48,7 +48,7 @@ opts[STANDALONE] = new Option(
     STANDALONE, 'Install or update selenium standalone', 'boolean', StandAlone.isDefault);
 opts[CHROME] =
     new Option(CHROME, 'Install or update chromedriver', 'boolean', ChromeDriver.isDefault);
-opts[GECKO] = new Option(GECKO, 'Install or update geckodriver', 'string', GeckoDriver.isDefault);
+opts[GECKO] = new Option(GECKO, 'Install or update geckodriver', 'boolean', GeckoDriver.isDefault);
 opts[IE] = new Option(IE, 'Install or update ie driver', 'boolean', IEDriver.isDefault);
 opts[IE32] = new Option(IE32, 'Install or update 32-bit ie driver', 'boolean', IEDriver.isDefault);
 opts[EDGE] = new Option(

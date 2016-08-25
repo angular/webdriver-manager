@@ -11,8 +11,8 @@ export class GeckoDriver extends Binary {
   static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
   static id = 'gecko';
   static versionDefault = Config.binaryVersions().gecko;
-  static isDefault = true;
-  static shortName = ['chrome'];
+  static isDefault = false;
+  static shortName = ['gecko'];
 
   static suffixes: {[key: string]: string} = {
     'Darwin': '-mac.tar.gz',

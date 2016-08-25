@@ -12,6 +12,7 @@ import {FileManager} from '../files';
 
 import * as Opt from './';
 import {Opts} from './opts';
+import {GeckoDriver} from "../binaries/gecko_driver";
 
 let logger = new Logger('start');
 let prog = new Program()
@@ -131,6 +132,11 @@ function start(options: Options) {
     if (chromeLogs != null) {
       args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
     }
+  }
+  if (downloadedBinaries[GeckoDriver.id] != null) {
+    args.push(
+      '-Dwebdriver.gecko.driver=' +
+      path.join(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
     if (options[Opt.IE32]) {
