@@ -6,13 +6,13 @@ import * as os from 'os';
 import * as path from 'path';
 
 import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {GeckoDriver} from '../binaries/gecko_driver';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
 
 import * as Opt from './';
 import {Opts} from './opts';
-import {GeckoDriver} from "../binaries/gecko_driver";
 
 let logger = new Logger('start');
 let prog = new Program()
@@ -135,8 +135,8 @@ function start(options: Options) {
   }
   if (downloadedBinaries[GeckoDriver.id] != null) {
     args.push(
-      '-Dwebdriver.gecko.driver=' +
-      path.join(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
+        '-Dwebdriver.gecko.driver=' +
+        path.join(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
     if (options[Opt.IE32]) {
