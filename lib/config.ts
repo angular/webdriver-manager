@@ -9,6 +9,7 @@ let logger = new Logger('config');
 export interface ConfigFile {
   selenium?: string;
   chrome?: string;
+  gecko?: string;
   ie?: string;
   android?: string;
   appium?: string;
@@ -53,6 +54,7 @@ export class Config {
     let configVersions: ConfigFile = {};
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
+    configVersions.gecko = configFile.webdriverVersions.geckodriver;
     configVersions.ie = configFile.webdriverVersions.iedriver;
     configVersions.android = configFile.webdriverVersions.androidsdk;
     configVersions.appium = configFile.webdriverVersions.appium;
@@ -68,6 +70,7 @@ export class Config {
     let configCdnUrls: ConfigFile = {};
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
+    configCdnUrls.gecko = configFile.cdnUrls.geckodriver;
     configCdnUrls.ie = configFile.cdnUrls.iedriver;
     configCdnUrls.android = configFile.cdnUrls.androidsdk;
     return configCdnUrls;

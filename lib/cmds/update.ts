@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
-import {AndroidSDK, Appium, Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
@@ -30,6 +30,10 @@ let prog = new Program()
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
                .addOption(Opts[Opt.ANDROID_ABIS])
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
+
+if (GeckoDriver.supports(os.type(), os.arch())) {
+  prog.addOption(Opts[Opt.VERSIONS_GECKO]).addOption(Opts[Opt.GECKO])
+}
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
