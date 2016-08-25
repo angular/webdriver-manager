@@ -14,9 +14,11 @@ export class GeckoDriver extends Binary {
   static isDefault = true;
   static shortName = ['chrome'];
 
-  static suffixes:
-      {[key: string]:
-           string} = {'Darwin': '-mac.tar.gz', 'Linux': '-linux64.tar.gz', 'Windows_NT': '-win64.zip'};
+  static suffixes: {[key: string]: string} = {
+    'Darwin': '-mac.tar.gz',
+    'Linux': '-linux64.tar.gz',
+    'Windows_NT': '-win64.zip'
+  };
 
   constructor() {
     super();

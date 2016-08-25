@@ -9,7 +9,7 @@ import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlon
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
-import {GeckoDriver} from "../binaries/gecko_driver";
+import {GeckoDriver} from '../binaries/gecko_driver';
 
 let logger = new Logger('file_manager');
 
