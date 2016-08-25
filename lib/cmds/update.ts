@@ -69,6 +69,7 @@ if (argv._[0] === 'update-run') {
 function update(options: Options): void {
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
+  let gecko = options[Opt.GECKO].getBoolean();
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options[Opt.IE]) {
@@ -104,6 +105,9 @@ function update(options: Options): void {
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
+  if (options[Opt.VERSIONS_GECKO]) {
+    binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
+  }
   binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
   binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
 
@@ -125,6 +129,10 @@ function update(options: Options): void {
   }
   if (chrome) {
     let binary = binaries[ChromeDriver.id];
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
+  }
+  if (gecko) {
+    let binary = binaries[GeckoDriver.id];
     updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie) {

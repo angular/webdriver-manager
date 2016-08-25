@@ -16,13 +16,13 @@ export class GeckoDriver extends Binary {
 
   static suffixes:
       {[key: string]:
-           string} = {'Darwin': 'mac.tar.gz', 'Linux': 'linux64.tar.gz', 'Windows_NT': 'win64.zip'};
+           string} = {'Darwin': '-mac.tar.gz', 'Linux': '-linux64.tar.gz', 'Windows_NT': '-win64.zip'};
 
   constructor() {
     super();
     this.name = 'geckodriver';
     this.versionCustom = GeckoDriver.versionDefault;
-    this.prefixDefault = 'geckodriver';
+    this.prefixDefault = 'geckodriver-';
     this.cdn = Config.cdnUrls().gecko;
   }
 
@@ -44,7 +44,7 @@ export class GeckoDriver extends Binary {
 
   url(ostype: string, arch: string): string {
     let urlBase = this.cdn + this.version() + '/';
-    let filename = [this.prefix(), this.version(), this.suffix(ostype, arch)].join('-');
+    let filename = this.prefix() + this.version() + this.suffix(ostype, arch);
     return urlBase + filename;
   }
 }
