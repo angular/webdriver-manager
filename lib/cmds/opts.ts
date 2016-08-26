@@ -58,7 +58,6 @@ opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', And
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
     VERSIONS_CHROME, 'Optional chrome driver version', 'string', ChromeDriver.versionDefault);
-console.log(GeckoDriver.versionDefault);
 opts[VERSIONS_GECKO] = new Option(
     VERSIONS_GECKO, 'Optional gecko driver version', 'string', GeckoDriver.versionDefault);
 opts[VERSIONS_ANDROID] = new Option(
