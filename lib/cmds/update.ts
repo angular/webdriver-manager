@@ -32,7 +32,7 @@ let prog = new Program()
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
 
 if (GeckoDriver.supports(os.type(), os.arch())) {
-  prog.addOption(Opts[Opt.VERSIONS_GECKO]).addOption(Opts[Opt.GECKO])
+  prog.addOption(Opts[Opt.VERSIONS_GECKO]).addOption(Opts[Opt.GECKO]);
 }
 
 if (os.type() === 'Darwin') {
