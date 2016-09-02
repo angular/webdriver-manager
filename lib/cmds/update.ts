@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
-import {AndroidSDK, Appium, Binary, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
@@ -30,6 +30,10 @@ let prog = new Program()
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
                .addOption(Opts[Opt.ANDROID_ABIS])
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
+
+if (GeckoDriver.supports(os.type(), os.arch())) {
+  prog.addOption(Opts[Opt.VERSIONS_GECKO]).addOption(Opts[Opt.GECKO]);
+}
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -65,6 +69,7 @@ if (argv._[0] === 'update-run') {
 function update(options: Options): void {
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
+  let gecko = options[Opt.GECKO].getBoolean();
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options[Opt.IE]) {
@@ -100,6 +105,9 @@ function update(options: Options): void {
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
+  if (options[Opt.VERSIONS_GECKO]) {
+    binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
+  }
   binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
   binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
 
@@ -121,6 +129,10 @@ function update(options: Options): void {
   }
   if (chrome) {
     let binary = binaries[ChromeDriver.id];
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
+  }
+  if (gecko) {
+    let binary = binaries[GeckoDriver.id];
     updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie) {

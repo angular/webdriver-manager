@@ -1,4 +1,4 @@
-import {AndroidSDK, Appium, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
 import {Cli, Option, Options} from '../cli';
 import {Config} from '../config';
 
@@ -18,6 +18,7 @@ export const GECKO = 'gecko';
 export const ANDROID = 'android';
 export const IOS = 'ios';
 export const VERSIONS_CHROME = 'versions.chrome';
+export const VERSIONS_GECKO = 'versions.gecko';
 export const VERSIONS_STANDALONE = 'versions.standalone';
 export const VERSIONS_IE = 'versions.ie';
 export const VERSIONS_ANDROID = 'versions.android';
@@ -47,16 +48,18 @@ opts[STANDALONE] = new Option(
     STANDALONE, 'Install or update selenium standalone', 'boolean', StandAlone.isDefault);
 opts[CHROME] =
     new Option(CHROME, 'Install or update chromedriver', 'boolean', ChromeDriver.isDefault);
+opts[GECKO] = new Option(GECKO, 'Install or update geckodriver', 'boolean', GeckoDriver.isDefault);
 opts[IE] = new Option(IE, 'Install or update ie driver', 'boolean', IEDriver.isDefault);
 opts[IE32] = new Option(IE32, 'Install or update 32-bit ie driver', 'boolean', IEDriver.isDefault);
 opts[EDGE] = new Option(
     EDGE, 'Use installed Microsoft Edge driver', 'string',
     'C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe');
-opts[GECKO] = new Option(GECKO, 'Use path for gecko driver', 'string');
 opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', AndroidSDK.isDefault);
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
     VERSIONS_CHROME, 'Optional chrome driver version', 'string', ChromeDriver.versionDefault);
+opts[VERSIONS_GECKO] = new Option(
+    VERSIONS_GECKO, 'Optional gecko driver version', 'string', GeckoDriver.versionDefault);
 opts[VERSIONS_ANDROID] = new Option(
     VERSIONS_ANDROID, 'Optional android sdk version', 'string', AndroidSDK.versionDefault);
 opts[VERSIONS_STANDALONE] = new Option(

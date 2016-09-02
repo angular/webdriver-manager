@@ -9,6 +9,7 @@ import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlon
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
+import {GeckoDriver} from '../binaries/gecko_driver';
 
 let logger = new Logger('file_manager');
 
@@ -60,6 +61,9 @@ export class FileManager {
     }
     if (FileManager.checkOS_(osType, ChromeDriver)) {
       binaries[ChromeDriver.id] = new ChromeDriver();
+    }
+    if (FileManager.checkOS_(osType, GeckoDriver)) {
+      binaries[GeckoDriver.id] = new GeckoDriver();
     }
     if (FileManager.checkOS_(osType, IEDriver)) {
       binaries[IEDriver.id] = new IEDriver();

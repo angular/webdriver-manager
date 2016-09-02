@@ -35,7 +35,6 @@ export class IEDriver extends Binary {
         return '_x64_' + this.versionCustom;
       } else {
         return '_Win32_' + this.versionCustom;
-        ;
       }
     }
     return '';

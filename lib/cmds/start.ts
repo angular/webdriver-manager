@@ -6,6 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
+import {GeckoDriver} from '../binaries/gecko_driver';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -26,7 +27,6 @@ let prog = new Program()
                .addOption(Opts[Opt.VERSIONS_ANDROID])
                .addOption(Opts[Opt.VERSIONS_APPIUM])
                .addOption(Opts[Opt.CHROME_LOGS])
-               .addOption(Opts[Opt.GECKO])
                .addOption(Opts[Opt.LOGGING])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.AVDS])
@@ -133,6 +133,11 @@ function start(options: Options) {
       args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
     }
   }
+  if (downloadedBinaries[GeckoDriver.id] != null) {
+    args.push(
+        '-Dwebdriver.gecko.driver=' +
+        path.join(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
+  }
   if (downloadedBinaries[IEDriver.id] != null) {
     if (options[Opt.IE32]) {
       binaries[IEDriver.id].arch = 'Win32';
@@ -151,17 +156,6 @@ function start(options: Options) {
     } catch (err) {
       // Either the default file or user specified location of the edge
       // driver does not exist.
-    }
-  }
-  if (options[Opt.GECKO].getString()) {
-    let gecko = options[Opt.GECKO].getString();
-    try {
-      if (fs.statSync(gecko).isFile()) {
-        args.push('-Dwebdriver.edge.driver=' + gecko);
-      }
-    } catch (err) {
-      // The file does not exist.
-      logger.warn('The absolute path provided for gecko (' + gecko + ') does not exist');
     }
   }
   if (options[Opt.ANDROID].getBoolean()) {
