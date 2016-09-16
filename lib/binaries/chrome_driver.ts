@@ -30,7 +30,13 @@ export class ChromeDriver extends Binary {
 
   suffix(ostype: string, arch: string): string {
     if (ostype === 'Darwin') {
-      return 'mac32' + this.suffixDefault;
+      // after chromedriver version 2.23, the name of the binary changed
+      // They no longer provide a 32 bit binary
+      if (parseFloat(this.version()) >= 2.23) {
+        return 'mac64' + this.suffixDefault;
+      } else {
+        return 'mac32' + this.suffixDefault;
+      }
     } else if (ostype === 'Linux') {
       if (arch === 'x64') {
         return 'linux64' + this.suffixDefault;
