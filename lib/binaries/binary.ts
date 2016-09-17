@@ -31,6 +31,8 @@ export class Binary {
   cdn: string;                    // url protocol and host
   arch: string;
 
+  constructor(public cdn: string) {}
+
   /**
    * @param ostype The operating system.
    * @returns The executable file type.

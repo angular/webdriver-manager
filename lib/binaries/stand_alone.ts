@@ -13,13 +13,13 @@ export class StandAlone extends Binary {
   static isDefault = true;
   static shortName = ['standalone'];
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().selenium);
+
     this.name = 'selenium standalone';
     this.versionCustom = StandAlone.versionDefault;
     this.prefixDefault = 'selenium-server-standalone-';
     this.suffixDefault = '.jar';
-    this.cdn = Config.cdnUrls().selenium;
   }
 
   id(): string { return StandAlone.id; }

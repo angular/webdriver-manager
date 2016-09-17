@@ -99,7 +99,7 @@ function update(options: Options): void {
   let proxy = options[Opt.PROXY].getString();
 
   // setup versions for binaries
-  let binaries = FileManager.setupBinaries();
+  let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
   binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
   if (options[Opt.VERSIONS_IE]) {

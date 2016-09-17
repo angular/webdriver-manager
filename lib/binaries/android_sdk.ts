@@ -20,13 +20,13 @@ export class AndroidSDK extends Binary {
   static DEFAULT_API_LEVELS = '24';
   static DEFAULT_ABIS = 'x86_64';
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().android);
+
     this.name = 'android-sdk';
     this.versionCustom = AndroidSDK.versionDefault;
     this.prefixDefault = 'android-sdk_r';
     this.suffixDefault = '.zip';
-    this.cdn = Config.cdnUrls().android;
   }
 
   id(): string { return AndroidSDK.id; }
