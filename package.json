@@ -35,7 +35,8 @@
     "minimist": "^1.2.0",
     "q": "^1.4.1",
     "request": "^2.69.0",
-    "rimraf": "^2.5.2"
+    "rimraf": "^2.5.2",
+    "semver": "^5.3.0"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.29",
@@ -50,6 +51,7 @@
     "@types/q": "0.0.29",
     "@types/request": "0.0.29",
     "@types/rimraf": "0.0.27",
+    "@types/semver": "^5.3.30",
     "clang-format": "^1.0.35",
     "gulp": "^3.9.1",
     "gulp-clang-format": "^1.0.23",
