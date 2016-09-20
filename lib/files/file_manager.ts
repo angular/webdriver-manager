@@ -52,6 +52,7 @@ export class FileManager {
    * For the operating system, create a list that includes the binaries
    * for selenium standalone, chrome, and internet explorer.
    * @param osType The operating system.
+   * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that are available for the operating system.
    */
   static compileBinaries_(osType: string, alternateCDN?: string): BinaryMap<Binary> {
@@ -80,6 +81,7 @@ export class FileManager {
   /**
    * Look up the operating system and compile a list of binaries that are available
    * for the system.
+   * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that is available for the operating system.
    */
   static setupBinaries(alternateCDN?: string): BinaryMap<Binary> {
