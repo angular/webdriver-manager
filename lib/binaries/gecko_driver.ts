@@ -20,12 +20,12 @@ export class GeckoDriver extends Binary {
     'Windows_NT': '-win64.zip'
   };
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().gecko);
+
     this.name = 'geckodriver';
     this.versionCustom = GeckoDriver.versionDefault;
     this.prefixDefault = 'geckodriver-';
-    this.cdn = Config.cdnUrls().gecko;
   }
 
   id(): string { return GeckoDriver.id; }

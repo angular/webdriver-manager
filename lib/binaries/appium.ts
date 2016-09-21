@@ -18,8 +18,9 @@ export class Appium extends Binary {
   static isDefault = false;
   static shortName = ['appium'];
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().appium);
+
     this.name = 'appium';
     this.versionCustom = Appium.versionDefault;
     this.prefixDefault = 'appium-';

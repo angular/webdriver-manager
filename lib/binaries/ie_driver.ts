@@ -15,13 +15,13 @@ export class IEDriver extends Binary {
   static isDefault = false;
   static shortName = ['ie', 'ie32'];
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().ie);
+
     this.name = 'IEDriverServer';
     this.versionCustom = IEDriver.versionDefault;
     this.prefixDefault = 'IEDriverServer';
     this.suffixDefault = '.zip';
-    this.cdn = Config.cdnUrls().ie;
     this.arch = os.arch();
   }
 

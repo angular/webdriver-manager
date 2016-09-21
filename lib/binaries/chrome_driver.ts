@@ -15,13 +15,13 @@ export class ChromeDriver extends Binary {
   static isDefault = true;
   static shortName = ['chrome'];
 
-  constructor() {
-    super();
+  constructor(alternateCDN?: string) {
+    super(alternateCDN || Config.cdnUrls().chrome);
+
     this.name = 'chromedriver';
     this.versionCustom = ChromeDriver.versionDefault;
     this.prefixDefault = 'chromedriver_';
     this.suffixDefault = '.zip';
-    this.cdn = Config.cdnUrls().chrome;
   }
 
   id(): string { return ChromeDriver.id; }

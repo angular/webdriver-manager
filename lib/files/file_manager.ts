@@ -52,27 +52,28 @@ export class FileManager {
    * For the operating system, create a list that includes the binaries
    * for selenium standalone, chrome, and internet explorer.
    * @param osType The operating system.
+   * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that are available for the operating system.
    */
-  static compileBinaries_(osType: string): BinaryMap<Binary> {
+  static compileBinaries_(osType: string, alternateCDN?: string): BinaryMap<Binary> {
     let binaries: BinaryMap<Binary> = {};
     if (FileManager.checkOS_(osType, StandAlone)) {
-      binaries[StandAlone.id] = new StandAlone();
+      binaries[StandAlone.id] = new StandAlone(alternateCDN);
     }
     if (FileManager.checkOS_(osType, ChromeDriver)) {
-      binaries[ChromeDriver.id] = new ChromeDriver();
+      binaries[ChromeDriver.id] = new ChromeDriver(alternateCDN);
     }
     if (FileManager.checkOS_(osType, GeckoDriver)) {
-      binaries[GeckoDriver.id] = new GeckoDriver();
+      binaries[GeckoDriver.id] = new GeckoDriver(alternateCDN);
     }
     if (FileManager.checkOS_(osType, IEDriver)) {
-      binaries[IEDriver.id] = new IEDriver();
+      binaries[IEDriver.id] = new IEDriver(alternateCDN);
     }
     if (FileManager.checkOS_(osType, AndroidSDK)) {
-      binaries[AndroidSDK.id] = new AndroidSDK();
+      binaries[AndroidSDK.id] = new AndroidSDK(alternateCDN);
     }
     if (FileManager.checkOS_(osType, Appium)) {
-      binaries[Appium.id] = new Appium();
+      binaries[Appium.id] = new Appium(alternateCDN);
     }
     return binaries;
   }
@@ -80,9 +81,12 @@ export class FileManager {
   /**
    * Look up the operating system and compile a list of binaries that are available
    * for the system.
+   * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that is available for the operating system.
    */
-  static setupBinaries(): BinaryMap<Binary> { return FileManager.compileBinaries_(os.type()); }
+  static setupBinaries(alternateCDN?: string): BinaryMap<Binary> {
+    return FileManager.compileBinaries_(os.type(), alternateCDN);
+  }
 
   /**
    * Get the list of existing files from the output directory
