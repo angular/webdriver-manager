@@ -116,7 +116,7 @@ function update(options: Options): void {
   // permissions
   if (standalone) {
     let binary = binaries[StandAlone.id];
-    FileManager.toDownload(binary, outputDir).then((value: boolean) => {
+    FileManager.toDownload(binary, outputDir, proxy, ignoreSSL).then((value: boolean) => {
       if (value) {
         Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL);
       } else {
@@ -165,7 +165,7 @@ function update(options: Options): void {
 
 function updateBinary(
     binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<any> {
-  return FileManager.toDownload(binary, outputDir).then((value: boolean) => {
+  return FileManager.toDownload(binary, outputDir, proxy, ignoreSSL).then((value: boolean) => {
     if (value) {
       let deferred = q.defer();
       Downloader.downloadBinary(
