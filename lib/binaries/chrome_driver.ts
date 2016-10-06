@@ -1,4 +1,5 @@
 import {arch, type} from 'os';
+import * as semver from 'semver';
 
 import {Config} from '../config';
 
@@ -30,7 +31,20 @@ export class ChromeDriver extends Binary {
 
   suffix(ostype: string, arch: string): string {
     if (ostype === 'Darwin') {
-      return 'mac32' + this.suffixDefault;
+      let version: string = this.version();
+
+      if (version.split('.').length === 2) {
+        // we need to make the version valid semver since there is only a major and a minor
+        version = `${version}.0`;
+      }
+
+      if (semver.gt(version, '2.23.0')) {
+        // after chromedriver version 2.23, the name of the binary changed
+        // They no longer provide a 32 bit binary
+        return 'mac64' + this.suffixDefault;
+      } else {
+        return 'mac32' + this.suffixDefault;
+      }
     } else if (ostype === 'Linux') {
       if (arch === 'x64') {
         return 'linux64' + this.suffixDefault;
