@@ -103,7 +103,7 @@ function start(options: Options) {
         'webdriver-manager update --standalone');
     process.exit(1);
   }
-  let args: string[] = ['-jar', path.join(outputDir, binaries[StandAlone.id].filename())];
+  let args: string[] = [];
   if (osType === 'Linux') {
     // selenium server may take a long time to start because /dev/random is BLOCKING if there is not
     // enough entropy the solution is to use /dev/urandom, which is NON-BLOCKING (use /dev/./urandom
@@ -173,6 +173,9 @@ function start(options: Options) {
   }
 
   // log the command to launch selenium server
+  args.push('-jar');
+  args.push(path.join(outputDir, binaries[StandAlone.id].filename()));
+
   let argsToString = '';
   for (let arg in args) {
     argsToString += ' ' + args[arg];
