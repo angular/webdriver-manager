@@ -92,7 +92,10 @@ function setupHardwareAcceleration(sdkPath: string) {
 
 // Get a list of all the SDK download targets for a given set of APIs and ABIs
 function getAndroidSDKTargets(apiLevels: string[], abis: string[]): string[] {
-  return apiLevels.map((level) => { return 'android-' + level; })
+  return apiLevels
+      .map((level) => {
+        return 'android-' + level;
+      })
       .concat(abis.reduce((targets, abi) => {
         let abiParts: string[] = abi.split('/');
         let deviceType: string = 'default';
@@ -106,8 +109,9 @@ function getAndroidSDKTargets(apiLevels: string[], abis: string[]): string[] {
         if (deviceType.toUpperCase() == 'DEFAULT') {
           deviceType = 'android';
         }
-        return targets.concat(apiLevels.map(
-            (level) => { return 'sys-img-' + architecture + '-' + deviceType + '-' + level; }));
+        return targets.concat(apiLevels.map((level) => {
+          return 'sys-img-' + architecture + '-' + deviceType + '-' + level;
+        }));
       }, []));
 }
 
@@ -127,7 +131,9 @@ class AVDDescriptor {
     this.name = [api, deviceType, architecture].join('-');
   }
 
-  avdName(version: string): string { return this.name + '-v' + version + '-wd-manager'; }
+  avdName(version: string): string {
+    return this.name + '-v' + version + '-wd-manager';
+  }
 }
 
 // Gets the descriptors for all AVDs which are possible to make given the
@@ -150,7 +156,11 @@ function getAVDDescriptors(sdkPath: string): q.Promise<AVDDescriptor[]> {
 function sequentialForEach<T>(array: T[], func: (x: T) => q.Promise<any>): q.Promise<any> {
   let ret = q(null);
 
-  array.forEach((x: T) => { ret = ret.then(() => { return func(x); }); });
+  array.forEach((x: T) => {
+    ret = ret.then(() => {
+      return func(x);
+    });
+  });
 
   return ret;
 }
@@ -161,8 +171,12 @@ function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<a
       sdkPath, 'system-images', desc.api, desc.deviceType, desc.architecture, 'hardware.ini');
   return q.nfcall(fs.stat, file)
       .then(
-          (stats: fs.Stats) => { return q.nfcall(fs.readFile, file); },
-          (err: Error) => { return q(''); })
+          (stats: fs.Stats) => {
+            return q.nfcall(fs.readFile, file);
+          },
+          (err: Error) => {
+            return q('');
+          })
       .then((contents: string | Buffer) => {
         let config: any = ini.parse(contents.toString());
         config['hw.keyboard'] = 'yes';
@@ -197,7 +211,9 @@ export function android(
 
   logger.info('android-sdk: Downloading additional SDK updates');
   downloadAndroidUpdates(sdkPath, tools, false, acceptLicenses)
-      .then(() => { return setupHardwareAcceleration(sdkPath); })
+      .then(() => {
+        return setupHardwareAcceleration(sdkPath);
+      })
       .then(() => {
         logger.info(
             'android-sdk: Downloading more additional SDK updates ' +
@@ -206,7 +222,9 @@ export function android(
             sdkPath, ['build-tools-24.0.0'].concat(getAndroidSDKTargets(apiLevels, abis)), true,
             acceptLicenses);
       })
-      .then(() => { return getAVDDescriptors(sdkPath); })
+      .then(() => {
+        return getAVDDescriptors(sdkPath);
+      })
       .then((descriptors: AVDDescriptor[]) => {
         avdDescriptors = descriptors;
         logger.info('android-sdk: Configuring virtual device hardware');
@@ -223,10 +241,13 @@ export function android(
       .then(() => {
         return q.nfcall(
             fs.writeFile, path.join(sdkPath, 'available_avds.json'),
-            JSON.stringify(
-                avdDescriptors.map((descriptor: AVDDescriptor) => { return descriptor.name; })));
+            JSON.stringify(avdDescriptors.map((descriptor: AVDDescriptor) => {
+              return descriptor.name;
+            })));
       })
-      .then(() => { logger.info('android-sdk: Initialization complete'); })
+      .then(() => {
+        logger.info('android-sdk: Initialization complete');
+      })
       .done();
 };
 

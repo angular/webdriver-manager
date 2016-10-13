@@ -31,7 +31,9 @@ export class Binary {
   cdn: string;                    // url protocol and host
   arch: string;
 
-  constructor(public cdn: string) {}
+  constructor(cdn?: string) {
+    this.cdn = cdn;
+  }
 
   /**
    * @param ostype The operating system.
@@ -53,11 +55,17 @@ export class Binary {
     return this.prefix() + this.version() + this.executableSuffix(ostype);
   }
 
-  prefix(): string { return this.prefixDefault; }
+  prefix(): string {
+    return this.prefixDefault;
+  }
 
-  version(): string { return this.versionCustom; }
+  version(): string {
+    return this.versionCustom;
+  }
 
-  suffix(ostype?: string, arch?: string): string { return this.suffixDefault; }
+  suffix(ostype?: string, arch?: string): string {
+    return this.suffixDefault;
+  }
 
   filename(ostype?: string, arch?: string): string {
     return this.prefix() + this.version() + this.suffix(ostype, arch);
@@ -67,27 +75,39 @@ export class Binary {
    * @param ostype The operating system.
    * @returns The file name for the file inside the downloaded zip file
    */
-  zipContentName(ostype: string): string { return this.name + this.executableSuffix(ostype); }
+  zipContentName(ostype: string): string {
+    return this.name + this.executableSuffix(ostype);
+  }
 
-  shortVersion(version: string): string { return version.slice(0, version.lastIndexOf('.')); }
-
-  /**
-   * A base class method that should be overridden.
-   */
-  id(): string { return 'not implemented'; }
-
-  /**
-   * A base class method that should be overridden.
-   */
-  versionDefault(): string { return 'not implemented'; }
+  shortVersion(version: string): string {
+    return version.slice(0, version.lastIndexOf('.'));
+  }
 
   /**
    * A base class method that should be overridden.
    */
-  url(ostype?: string, arch?: string): string { return 'not implemented'; }
+  id(): string {
+    return 'not implemented';
+  }
+
+  /**
+   * A base class method that should be overridden.
+   */
+  versionDefault(): string {
+    return 'not implemented';
+  }
+
+  /**
+   * A base class method that should be overridden.
+   */
+  url(ostype?: string, arch?: string): string {
+    return 'not implemented';
+  }
 
   /**
    * Delete an instance of this binary from the file system
    */
-  remove(filename: string): void { fs.unlinkSync(filename); }
+  remove(filename: string): void {
+    fs.unlinkSync(filename);
+  }
 }

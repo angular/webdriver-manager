@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {Binary, AndroidSDK, ChromeDriver, IEDriver, Appium, StandAlone} from '../../lib/binaries';
-import {DownloadedBinary, FileManager} from '../../lib/files';
-import { BinaryMap } from '../../built/lib/binaries/binary';
+import { Binary, AndroidSDK, ChromeDriver, IEDriver, Appium, StandAlone } from '../../lib/binaries';
+import { DownloadedBinary, FileManager } from '../../lib/files';
+import { BinaryMap } from '../../lib/binaries/binary';
 import { Config } from '../../lib/config';
 import { GeckoDriver } from '../../lib/binaries/gecko_driver';
 

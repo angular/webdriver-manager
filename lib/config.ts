@@ -7,6 +7,7 @@ import {Logger} from './cli';
 let logger = new Logger('config');
 
 export interface ConfigFile {
+  [key: string]: string;
   selenium?: string;
   chrome?: string;
   gecko?: string;
@@ -38,12 +39,20 @@ export class Config {
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
 
-  static getConfigFile_(): string { return path.resolve(Config.dir, '..', Config.configFile); }
+  static getConfigFile_(): string {
+    return path.resolve(Config.dir, '..', Config.configFile);
+  }
 
-  static getPackageFile_(): string { return path.resolve(Config.dir, '..', Config.packageFile) }
+  static getPackageFile_(): string {
+    return path.resolve(Config.dir, '..', Config.packageFile)
+  }
 
-  static getSeleniumDir(): string { return path.resolve(Config.dir, '..', '..', 'selenium/'); }
-  static getBaseDir(): string { return path.resolve(Config.dir, '..', '..'); }
+  static getSeleniumDir(): string {
+    return path.resolve(Config.dir, '..', '..', 'selenium/');
+  }
+  static getBaseDir(): string {
+    return path.resolve(Config.dir, '..', '..');
+  }
 
   /**
    * Get the binary versions from the configuration file.

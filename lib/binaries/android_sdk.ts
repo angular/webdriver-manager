@@ -29,9 +29,13 @@ export class AndroidSDK extends Binary {
     this.suffixDefault = '.zip';
   }
 
-  id(): string { return AndroidSDK.id; }
+  id(): string {
+    return AndroidSDK.id;
+  }
 
-  versionDefault(): string { return AndroidSDK.versionDefault; }
+  versionDefault(): string {
+    return AndroidSDK.versionDefault;
+  }
 
   suffix(ostype: string): string {
     if (ostype === 'Darwin') {
@@ -43,7 +47,9 @@ export class AndroidSDK extends Binary {
     }
   }
 
-  url(ostype: string): string { return this.cdn + this.filename(ostype); }
+  url(ostype: string): string {
+    return this.cdn + this.filename(ostype);
+  }
 
   zipContentName(ostype: string): string {
     if (ostype === 'Darwin') {
@@ -55,7 +61,9 @@ export class AndroidSDK extends Binary {
     }
   }
 
-  executableSuffix(): string { return ''; }
+  executableSuffix(): string {
+    return '';
+  }
 
   remove(sdkPath: string): void {
     try {

@@ -28,9 +28,13 @@ export class GeckoDriver extends Binary {
     this.prefixDefault = 'geckodriver-';
   }
 
-  id(): string { return GeckoDriver.id; }
+  id(): string {
+    return GeckoDriver.id;
+  }
 
-  versionDefault(): string { return GeckoDriver.versionDefault; }
+  versionDefault(): string {
+    return GeckoDriver.versionDefault;
+  }
 
   suffix(ostype: string, arch: string): string {
     if (!GeckoDriver.supports(ostype, arch)) {

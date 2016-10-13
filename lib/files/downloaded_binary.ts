@@ -14,5 +14,7 @@ export class DownloadedBinary extends Binary {
     this.versionCustom = binary.versionCustom;
   }
 
-  id(): string { return this.binary.id(); }
+  id(): string {
+    return this.binary.id();
+  }
 }

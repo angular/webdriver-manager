@@ -166,7 +166,8 @@ export class FileManager {
    * @param outputDir The directory where files are downloaded and stored.
    * @returns If the file should be downloaded.
    */
-  static toDownload<T extends Binary>(binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<boolean> {
+  static toDownload<T extends Binary>(
+      binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<boolean> {
     let osType = os.type();
     let osArch = os.arch();
     let filePath: string;
@@ -185,7 +186,8 @@ export class FileManager {
           readData = fs.readFileSync(filePath);
 
           // we have the version, verify it is the correct file size
-          let contentLength = Downloader.httpHeadContentLength(binary.url(osType, osArch), proxy, ignoreSSL);
+          let contentLength =
+              Downloader.httpHeadContentLength(binary.url(osType, osArch), proxy, ignoreSSL);
           return contentLength.then((value: any): boolean => {
             if (value == readData.length) {
               return false;

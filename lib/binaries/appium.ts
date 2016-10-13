@@ -27,11 +27,19 @@ export class Appium extends Binary {
     this.suffixDefault = '';
   }
 
-  id(): string { return Appium.id; }
+  id(): string {
+    return Appium.id;
+  }
 
-  versionDefault(): string { return Appium.versionDefault; }
+  versionDefault(): string {
+    return Appium.versionDefault;
+  }
 
-  executableSuffix(): string { return ''; }
+  executableSuffix(): string {
+    return '';
+  }
 
-  remove(sdkPath: string): void { rimraf.sync(sdkPath); }
+  remove(sdkPath: string): void {
+    rimraf.sync(sdkPath);
+  }
 }
