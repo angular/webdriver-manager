@@ -181,7 +181,9 @@ export class Program {
     this.printOptions(this.posDescription(), this.posDefault());
   }
 
-  posDescription(): number { return this.lengthOf_('opt') + 2 * Program.MIN_SPACING; }
+  posDescription(): number {
+    return this.lengthOf_('opt') + 2 * Program.MIN_SPACING;
+  }
 
   posDefault(): number {
     return this.posDescription() + this.lengthOf_('description') + Program.MIN_SPACING;

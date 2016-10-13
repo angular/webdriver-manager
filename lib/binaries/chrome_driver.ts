@@ -25,9 +25,13 @@ export class ChromeDriver extends Binary {
     this.suffixDefault = '.zip';
   }
 
-  id(): string { return ChromeDriver.id; }
+  id(): string {
+    return ChromeDriver.id;
+  }
 
-  versionDefault(): string { return ChromeDriver.versionDefault; }
+  versionDefault(): string {
+    return ChromeDriver.versionDefault;
+  }
 
   suffix(ostype: string, arch: string): string {
     if (ostype === 'Darwin') {

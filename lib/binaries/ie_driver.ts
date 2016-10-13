@@ -25,9 +25,13 @@ export class IEDriver extends Binary {
     this.arch = os.arch();
   }
 
-  id(): string { return IEDriver.id; }
+  id(): string {
+    return IEDriver.id;
+  }
 
-  versionDefault(): string { return IEDriver.versionDefault; }
+  versionDefault(): string {
+    return IEDriver.versionDefault;
+  }
 
   version(): string {
     if (os.type() == 'Windows_NT') {

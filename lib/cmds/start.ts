@@ -244,8 +244,9 @@ function startAndroid(
 }
 
 function killAndroid() {
-  androidProcesses.forEach(
-      (androidProcess: childProcess.ChildProcess) => { androidProcess.kill(); });
+  androidProcesses.forEach((androidProcess: childProcess.ChildProcess) => {
+    androidProcess.kill();
+  });
   androidProcesses.length = 0;
 }
 

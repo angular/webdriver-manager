@@ -22,9 +22,13 @@ export class StandAlone extends Binary {
     this.suffixDefault = '.jar';
   }
 
-  id(): string { return StandAlone.id; }
+  id(): string {
+    return StandAlone.id;
+  }
 
-  versionDefault(): string { return StandAlone.versionDefault; }
+  versionDefault(): string {
+    return StandAlone.versionDefault;
+  }
 
   url(): string {
     let urlBase = this.cdn + this.shortVersion(this.version()) + '/';
@@ -32,5 +36,7 @@ export class StandAlone extends Binary {
     return urlBase + filename;
   }
 
-  executableSuffix(ostype?: string): string { return '.jar'; }
+  executableSuffix(ostype?: string): string {
+    return '.jar';
+  }
 }
