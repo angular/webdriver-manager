@@ -7,6 +7,7 @@ import {Logger} from './cli';
 let logger = new Logger('config');
 
 export interface ConfigFile {
+  [key: string]: string;
   selenium?: string;
   chrome?: string;
   gecko?: string;

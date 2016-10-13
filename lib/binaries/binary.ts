@@ -31,7 +31,9 @@ export class Binary {
   cdn: string;                    // url protocol and host
   arch: string;
 
-  constructor(public cdn: string) {}
+  constructor(cdn?: string) {
+    this.cdn = cdn;
+  }
 
   /**
    * @param ostype The operating system.
