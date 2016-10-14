@@ -1,3 +1,37 @@
+# 10.2.4
+
+## Bug Fixes
+
+- ([3984ea4](https://github.com/angular/webdriver-manager/commit/3984ea4e5cfd2edf0401a5e5310aecaaecb63555))
+  fix(filemanager): respect proxy/ignoreSSL options in contentLength HEAD request (#101)
+
+
+- ([946ee00](https://github.com/angular/webdriver-manager/commit/946ee005f7d316fd2d404c4bdbeae9a3802051af))
+  fix(chrome_driver): use the x64 binary if chrome driver version is greater than 2.23 (#95)
+
+  * fix(chrome_driver): use the x64 binary if chrome driver version is greater than 2.23
+  * fix(chrome_driver): add semver to better determine version number
+  * refactor(chrome_driver): check first to see if we have valid semver or not
+
+  closes #93
+- ([b183fad](https://github.com/angular/webdriver-manager/commit/b183fadd4ae0b47b0773d6979d090c74419ee327))
+  fix(filemanager): Binaries can be downloaded from a custom CDN with alternate_cdn(#97)
+
+  closes #96
+
+## Features
+
+- ([5241fc1](https://github.com/angular/webdriver-manager/commit/5241fc14eaf2b5cdf4b35362f260f6973cea0b1e))
+  chore(chromedriver): update chromedriver version to 2.24 (#92)
+
+  Chromedriver < 2.24 has issues with Chrome 54+
+  (https://bugs.chromium.org/p/chromedriver/issues/detail?id=1451).
+
+- ([61af7be](https://github.com/angular/webdriver-manager/commit/61af7be4edbaf070bdcc35dc85f11fb46ab9577e))
+  feat(gecko): Add geckodriver, related config, and flags
+
+  Users will still need 'marionette': true in their capabilities in order to use gecko driver.
+
 # 10.2.3
 
 ## Bug Fixes
