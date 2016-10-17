@@ -122,9 +122,6 @@ function start(options: Options) {
     args.push('-Djava.util.logging.config.file=' + loggingFile);
   }
 
-  if (seleniumPort) {
-    args.push('-port', seleniumPort);
-  }
   if (downloadedBinaries[ChromeDriver.id] != null) {
     args.push(
         '-Dwebdriver.chrome.driver=' +
@@ -175,6 +172,11 @@ function start(options: Options) {
   // log the command to launch selenium server
   args.push('-jar');
   args.push(path.join(outputDir, binaries[StandAlone.id].filename()));
+
+  // Add the port parameter, has to declared after the jar file
+  if (seleniumPort) {
+    args.push('-port', seleniumPort);
+  }
 
   let argsToString = '';
   for (let arg in args) {
