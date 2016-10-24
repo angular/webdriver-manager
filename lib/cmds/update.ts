@@ -69,7 +69,10 @@ if (argv._[0] === 'update-run') {
 function update(options: Options): void {
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
-  let gecko = options[Opt.GECKO].getBoolean();
+  let gecko = false;
+  if (GeckoDriver.supports(os.type(), os.arch())) {
+    gecko = options[Opt.GECKO].getBoolean();
+  }
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options[Opt.IE]) {
