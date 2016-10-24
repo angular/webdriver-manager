@@ -1,3 +1,16 @@
+# 10.2.5
+
+## Bug Fixes
+
+- ([b103850](https://github.com/angular/webdriver-manager/commit/b1038500466fe790cc8e3c2ff82dc3c7eb3796ba))
+  fix(update): fix undefined gecko getBoolean error (#113)
+
+  closes #107
+- ([7fbacf5](https://github.com/angular/webdriver-manager/commit/7fbacf5bc902dd3ccd1c9fbf285c8ca9a1e48ee3))
+  fix(start): set the port when standalone server starts
+
+  closes #106
+
 # 10.2.4
 
 ## Bug Fixes
