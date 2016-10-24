@@ -1,3 +1,7 @@
+# 11.0.0-beta.0
+
+Update to Selenium Standalone version 3.0.1.
+
 # 10.2.5
 
 ## Bug Fixes

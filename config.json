@@ -1,6 +1,6 @@
 {
   "webdriverVersions": {
-    "selenium": "2.53.1",
+    "selenium": "3.0.1",
     "chromedriver": "2.24",
     "geckodriver": "v0.9.0",
     "iedriver": "2.53.1",

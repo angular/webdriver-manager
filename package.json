@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "10.2.5",
+  "version": "11.0.0-beta.0",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "prepublish": "gulp prepublish",
