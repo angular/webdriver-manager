@@ -18,7 +18,8 @@ export class AndroidSDK extends Binary {
   static isDefault = false;
   static shortName = ['android'];
   static DEFAULT_API_LEVELS = '24';
-  static DEFAULT_ABIS = 'x86_64';
+  static DEFAULT_ARCHITECTURES = 'x86_64';
+  static DEFAULT_PLATFORMS = 'google_apis';
 
   constructor(alternateCDN?: string) {
     super(alternateCDN || Config.cdnUrls().android);
