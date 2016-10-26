@@ -1,3 +1,10 @@
+# 10.2.6
+
+## Features
+
+- ([f892ec4](https://github.com/angular/webdriver-manager/commit/f892ec41c09c210527998c966a69edc081cf418e))
+  chore(chromedriver): update chromedriver version to 2.25
+
 # 10.2.5
 
 ## Bug Fixes
