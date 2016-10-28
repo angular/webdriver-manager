@@ -225,6 +225,7 @@ export class Program {
     let minimistBoolean: string[] = [];
     let minimistString: string[] = [];
     let minimistNumber: string[] = [];
+    let minimistDefault: any = {};
     for (let opt in allOptions) {
       let option = allOptions[opt];
       if (option.type === 'boolean') {
@@ -234,10 +235,14 @@ export class Program {
       } else if (option.type === 'number') {
         minimistNumber.push(option.opt);
       }
+      if (typeof option.defaultValue !== 'undefined') {
+        minimistDefault[option.opt] = option.defaultValue;
+      }
     }
     minimistOptions['boolean'] = minimistBoolean;
     minimistOptions['string'] = minimistString;
     minimistOptions['number'] = minimistNumber;
+    minimistOptions['default'] = minimistDefault;
     return minimistOptions;
   }
 }
