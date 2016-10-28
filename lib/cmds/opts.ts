@@ -30,6 +30,7 @@ export const ANDROID_ABIS = 'android-abis';
 export const ANDROID_ACCEPT_LICENSES = 'android-accept-licenses';
 export const AVDS = 'avds';
 export const AVD_USE_SNAPSHOTS = 'avd-use-snapshots';
+export const STARTED_SIGNIFIER = 'started-signifier';
 
 /**
  * The options used by the commands.
@@ -37,7 +38,7 @@ export const AVD_USE_SNAPSHOTS = 'avd-use-snapshots';
 var opts: Options = {};
 opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
 opts[SELENIUM_PORT] =
-    new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string');
+    new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string', '4444');
 opts[APPIUM_PORT] = new Option(APPIUM_PORT, 'Optional port for the appium server', 'string');
 opts[AVD_PORT] = new Option(
     AVD_PORT, 'Optional port for android virtual devices.  See mobile.md for details', 'string');
@@ -87,5 +88,9 @@ opts[AVD_USE_SNAPSHOTS] = new Option(
     AVD_USE_SNAPSHOTS,
     'Rather than booting a new AVD every time, save/load snapshots of the last time it was used',
     'boolean', true);
+opts[STARTED_SIGNIFIER] = new Option(
+    STARTED_SIGNIFIER,
+    'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
+    'string');
 
 export var Opts = opts;

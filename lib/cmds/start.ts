@@ -30,7 +30,8 @@ let prog = new Program()
                .addOption(Opts[Opt.LOGGING])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.AVDS])
-               .addOption(Opts[Opt.AVD_USE_SNAPSHOTS]);
+               .addOption(Opts[Opt.AVD_USE_SNAPSHOTS])
+               .addOption(Opts[Opt.STARTED_SIGNIFIER]);
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -185,6 +186,10 @@ function start(options: Options) {
   logger.info('java' + argsToString);
 
   let seleniumProcess = spawnCommand('java', args);
+  if (options[Opt.STARTED_SIGNIFIER].getString()) {
+    // TODO(sjelin): check android too once it's working
+    signalWhenReady(options[Opt.STARTED_SIGNIFIER].getString(), seleniumPort);
+  }
   logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
     logger.info('Selenium Standalone has exited with code ' + code);
@@ -195,8 +200,8 @@ function start(options: Options) {
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     logger.info('Attempting to shut down selenium nicely');
-    let port = seleniumPort || '4444';
-    http.get('http://localhost:' + port + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
+    http.get(
+        'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
     killAndroid();
     killAppium();
   });
@@ -270,4 +275,38 @@ function killAppium() {
     appiumProcess.kill();
     appiumProcess = null;
   }
+}
+
+function signalWhenReady(signal: string, seleniumPort: string) {
+  function check(callback: (ready: boolean) => void) {
+    http.get(
+            'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=getLogMessages',
+            (res) => {
+              if (res.statusCode !== 200) {
+                return callback(false);
+              }
+              var logs = '';
+              res.on('data', (chunk) => {
+                logs += chunk;
+              });
+              res.on('end', () => {
+                callback(logs.toUpperCase().indexOf('OK') != -1);
+              });
+            })
+        .on('error', () => {
+          callback(false);
+        });
+  }
+
+  (function recursiveCheck(triesRemaining: number) {
+    setTimeout(() => {
+      check((ready: boolean) => {
+        if (ready) {
+          console.log(signal);
+        } else if (triesRemaining) {
+          recursiveCheck(triesRemaining--);
+        }
+      });
+    }, 100);
+  })(100);
 }
