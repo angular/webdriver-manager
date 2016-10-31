@@ -29,7 +29,7 @@ describe('downloader', () => {
     });
   });
 
-  describe('environment varialbes', () => {
+  describe('environment variables', () => {
     beforeEach(() => {
       delete process.env.HTTP_PROXY;
       delete process.env.http_proxy;
