@@ -32,6 +32,8 @@ export const ANDROID_ACCEPT_LICENSES = 'android-accept-licenses';
 export const AVDS = 'avds';
 export const AVD_USE_SNAPSHOTS = 'avd-use-snapshots';
 export const STARTED_SIGNIFIER = 'started-signifier';
+export const SIGNAL_VIA_IPC = 'signal-via-ipc';
+export const DETACH = 'detach';
 
 /**
  * The options used by the commands.
@@ -96,5 +98,13 @@ opts[STARTED_SIGNIFIER] = new Option(
     STARTED_SIGNIFIER,
     'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
     'string');
+opts[SIGNAL_VIA_IPC] = new Option(
+    SIGNAL_VIA_IPC, 'If you are using --' + STARTED_SIGNIFIER +
+        ', this flag will emit the signal string using process.send(), rather than writing it to stdout',
+    'boolean', false);
+opts[DETACH] = new Option(
+    DETACH,
+    'Once the selenium server is up and running, return control to the parent process and continue running the server in the background.',
+    'boolean', false);
 
 export var Opts = opts;
