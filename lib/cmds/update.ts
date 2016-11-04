@@ -28,7 +28,8 @@ let prog = new Program()
                .addOption(Opts[Opt.CHROME])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
-               .addOption(Opts[Opt.ANDROID_ABIS])
+               .addOption(Opts[Opt.ANDROID_ARCHITECTURES])
+               .addOption(Opts[Opt.ANDROID_PLATFORMS])
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
 
 if (GeckoDriver.supports(os.type(), os.arch())) {
@@ -88,7 +89,8 @@ function update(options: Options): void {
   }
   let outputDir = Config.getSeleniumDir();
   let android_api_levels: string[] = options[Opt.ANDROID_API_LEVELS].getString().split(',');
-  let android_abis: string[] = options[Opt.ANDROID_ABIS].getString().split(',');
+  let android_architectures: string[] = options[Opt.ANDROID_ARCHITECTURES].getString().split(',');
+  let android_platforms: string[] = options[Opt.ANDROID_PLATFORMS].getString().split(',');
   let android_accept_licenses: boolean = options[Opt.ANDROID_ACCEPT_LICENSES].getBoolean();
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
@@ -151,12 +153,25 @@ function update(options: Options): void {
   if (android) {
     let binary = binaries[AndroidSDK.id];
     let sdk_path = path.join(outputDir, binary.executableFilename(os.type()));
+    let oldAVDList: string;
 
-    updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      initializeAndroid(
-          path.join(outputDir, binary.executableFilename(os.type())), android_api_levels,
-          android_abis, android_accept_licenses, binaries[AndroidSDK.id].versionCustom, logger);
-    });
+    q.nfcall(fs.readFile, path.join(sdk_path, 'available_avds.json'))
+        .then(
+            (oldAVDs: string) => {
+              oldAVDList = oldAVDs;
+            },
+            () => {
+              oldAVDList = '[]';
+            })
+        .then(() => {
+          return updateBinary(binary, outputDir, proxy, ignoreSSL);
+        })
+        .then(() => {
+          initializeAndroid(
+              path.join(outputDir, binary.executableFilename(os.type())), android_api_levels,
+              android_architectures, android_platforms, android_accept_licenses,
+              binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger);
+        });
   }
   if (ios) {
     checkIOS(logger);

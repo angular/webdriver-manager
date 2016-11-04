@@ -167,7 +167,9 @@ function start(options: Options) {
     }
   }
   if (downloadedBinaries[Appium.id] != null) {
-    startAppium(outputDir, binaries[Appium.id], options[Opt.APPIUM_PORT].getString());
+    startAppium(
+        outputDir, binaries[Appium.id], binaries[AndroidSDK.id],
+        options[Opt.APPIUM_PORT].getString());
   }
 
   // log the command to launch selenium server
@@ -263,8 +265,11 @@ function killAndroid() {
 // Manage appium process
 let appiumProcess: childProcess.ChildProcess;
 
-function startAppium(outputDir: string, binary: Binary, port: string) {
+function startAppium(outputDir: string, binary: Binary, android_sdk: Binary, port: string) {
   logger.info('Starting appium server');
+  if (android_sdk) {
+    process.env.ANDROID_HOME = path.join(outputDir, android_sdk.executableFilename(os.type()));
+  }
   appiumProcess = childProcess.spawn(
       path.join(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
       port ? ['--port', port] : []);

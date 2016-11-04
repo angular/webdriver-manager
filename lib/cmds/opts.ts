@@ -26,7 +26,8 @@ export const VERSIONS_APPIUM = 'versions.appium';
 export const CHROME_LOGS = 'chrome_logs';
 export const LOGGING = 'logging';
 export const ANDROID_API_LEVELS = 'android-api-levels';
-export const ANDROID_ABIS = 'android-abis';
+export const ANDROID_ARCHITECTURES = 'android-architectures';
+export const ANDROID_PLATFORMS = 'android-platorms';
 export const ANDROID_ACCEPT_LICENSES = 'android-accept-licenses';
 export const AVDS = 'avds';
 export const AVD_USE_SNAPSHOTS = 'avd-use-snapshots';
@@ -75,9 +76,12 @@ opts[LOGGING] = new Option(LOGGING, 'File path to logging properties file', 'str
 opts[ANDROID_API_LEVELS] = new Option(
     ANDROID_API_LEVELS, 'Which versions of the android API you want to emulate', 'string',
     AndroidSDK.DEFAULT_API_LEVELS);
-opts[ANDROID_ABIS] = new Option(
-    ANDROID_ABIS, 'Which ABIs you want to use in android emulation', 'string',
-    AndroidSDK.DEFAULT_ABIS);
+opts[ANDROID_ARCHITECTURES] = new Option(
+    ANDROID_ARCHITECTURES, 'Which architectures you want to use in android emulation', 'string',
+    AndroidSDK.DEFAULT_ARCHITECTURES);
+opts[ANDROID_PLATFORMS] = new Option(
+    ANDROID_PLATFORMS, 'Which platforms you want to use in android emulation', 'string',
+    AndroidSDK.DEFAULT_PLATFORMS);
 opts[ANDROID_ACCEPT_LICENSES] =
     new Option(ANDROID_ACCEPT_LICENSES, 'Automatically accept android licenses', 'boolean', false);
 opts[AVDS] = new Option(

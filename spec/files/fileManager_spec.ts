@@ -96,7 +96,7 @@ describe('file manager', () => {
       existingFiles.push(android.prefix() + '24.1.0' + android.executableSuffix());
       existingFiles.push(android.prefix() + '24.1.1' + android.suffix(ostype));
       existingFiles.push(android.prefix() + '24.1.1' + android.executableSuffix());
-      existingFiles.push(appium.prefix() + '1.5.3' + appium.suffix(ostype));
+      existingFiles.push(appium.prefix() + '1.6.0' + appium.suffix(ostype));
       if (ostype == 'Windows_NT') {
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.suffix());
         existingFiles.push(ie.prefix() + '_Win32_2.51.0' + ie.executableSuffix(ostype));
@@ -186,19 +186,19 @@ describe('file manager', () => {
         setup('Windows_NT');
         let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
         expect(downloaded.versions.length).toBe(1);
-        expect(downloaded.versions[0]).toBe('1.5.3');
+        expect(downloaded.versions[0]).toBe('1.6.0');
       });
       it('should find the correct version for mac', () => {
         setup('Darwin');
         let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
         expect(downloaded.versions.length).toBe(1);
-        expect(downloaded.versions[0]).toBe('1.5.3');
+        expect(downloaded.versions[0]).toBe('1.6.0');
       });
       it('should find the correct version for linux', () => {
         setup('Linux');
         let downloaded = FileManager.downloadedVersions_(appium, ostype, arch, existingFiles);
         expect(downloaded.versions.length).toBe(1);
-        expect(downloaded.versions[0]).toBe('1.5.3');
+        expect(downloaded.versions[0]).toBe('1.6.0');
       });
     });
 

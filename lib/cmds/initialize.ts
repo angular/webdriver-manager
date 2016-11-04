@@ -90,45 +90,71 @@ function setupHardwareAcceleration(sdkPath: string) {
   }
 }
 
-// Get a list of all the SDK download targets for a given set of APIs and ABIs
-function getAndroidSDKTargets(apiLevels: string[], abis: string[]): string[] {
-  return apiLevels
-      .map((level) => {
-        return 'android-' + level;
-      })
-      .concat(abis.reduce((targets, abi) => {
-        let abiParts: string[] = abi.split('/');
-        let deviceType: string = 'default';
-        let architecture: string;
-        if (abiParts.length == 1) {
-          architecture = abiParts[0];
-        } else {
-          deviceType = abiParts[0];
-          architecture = abiParts[1];
-        }
-        if (deviceType.toUpperCase() == 'DEFAULT') {
-          deviceType = 'android';
-        }
-        return targets.concat(apiLevels.map((level) => {
-          return 'sys-img-' + architecture + '-' + deviceType + '-' + level;
-        }));
-      }, []));
+// Get a list of all the SDK download targets for a given set of APIs,
+// architectures, and platforms
+function getAndroidSDKTargets(
+    apiLevels: string[], architectures: string[], platforms: string[],
+    oldAVDs: string[]): string[] {
+  function getSysImgTarget(architecture: string, platform: string, level: string) {
+    if (platform.toUpperCase() == 'DEFAULT') {
+      platform = 'android';
+    }
+    return 'sys-img-' + architecture + '-' + platform + '-' + level;
+  }
+
+  let targets = apiLevels
+                    .map((level) => {
+                      return 'android-' + level;
+                    })
+                    .concat(architectures.reduce((targets, architecture) => {
+                      return targets.concat.apply(targets, platforms.map((platform) => {
+                        return apiLevels.map(getSysImgTarget.bind(null, architecture, platform));
+                      }));
+                    }, []));
+
+  oldAVDs.forEach((name) => {
+    let avd = new AVDDescriptor(name);
+    if (targets.indexOf(avd.api) == -1) {
+      targets.push(avd.api);
+    }
+    let sysImgTarget =
+        getSysImgTarget(avd.architecture, avd.platform, avd.api.slice('android-'.length));
+    if (targets.indexOf(sysImgTarget) == -1) {
+      targets.push(sysImgTarget);
+    }
+  });
+
+  return targets;
 }
 
 // All the information about an android virtual device
 class AVDDescriptor {
   api: string;
-  deviceType: string;
+  platform: string;
   architecture: string;
   abi: string;
   name: string;
 
-  constructor(api: string, deviceType: string, architecture: string) {
-    this.api = api;
-    this.deviceType = deviceType;
-    this.architecture = architecture;
-    this.abi = (deviceType.toUpperCase() == 'DEFAULT' ? '' : deviceType + '/') + architecture;
-    this.name = [api, deviceType, architecture].join('-');
+  constructor(api: string, platform?: string, architecture?: string) {
+    if (platform != undefined) {
+      this.api = api;
+      this.platform = platform;
+      this.architecture = architecture;
+      this.name = [api, platform, architecture].join('-');
+    } else {
+      this.name = api;
+      let nameParts = this.name.split('-');
+      this.api = nameParts[0] + '-' + nameParts[1];
+      if (/v[0-9]+[a-z]+/.test(nameParts[nameParts.length - 1]) &&
+          (nameParts[nameParts.length - 2].slice(0, 3) == 'arm')) {
+        this.architecture = nameParts[nameParts.length - 2] + '-' + nameParts[nameParts.length - 1];
+      } else {
+        this.architecture = nameParts[nameParts.length - 1];
+      }
+      this.platform = this.name.slice(this.api.length + 1, -this.architecture.length - 1);
+    }
+    this.abi =
+        (this.platform.toUpperCase() == 'DEFAULT' ? '' : this.platform + '/') + this.architecture;
   }
 
   avdName(version: string): string {
@@ -168,7 +194,7 @@ function sequentialForEach<T>(array: T[], func: (x: T) => q.Promise<any>): q.Pro
 // Configures the hardware.ini file for a system image of a new AVD
 function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<any> {
   let file = path.join(
-      sdkPath, 'system-images', desc.api, desc.deviceType, desc.architecture, 'hardware.ini');
+      sdkPath, 'system-images', desc.api, desc.platform, desc.architecture, 'hardware.ini');
   return q.nfcall(fs.stat, file)
       .then(
           (stats: fs.Stats) => {
@@ -201,8 +227,8 @@ function makeAVD(sdkPath: string, desc: AVDDescriptor, version: string): q.Promi
 
 // Initialize the android SDK
 export function android(
-    sdkPath: string, apiLevels: string[], abis: string[], acceptLicenses: boolean, version: string,
-    logger: Logger): void {
+    sdkPath: string, apiLevels: string[], architectures: string[], platforms: string[],
+    acceptLicenses: boolean, version: string, oldAVDs: string[], logger: Logger): void {
   let avdDescriptors: AVDDescriptor[];
   let tools = ['platform-tool', 'tool'];
   if ((os.type() == 'Darwin') || (os.type() == 'Windows_NT')) {
@@ -219,8 +245,9 @@ export function android(
             'android-sdk: Downloading more additional SDK updates ' +
             '(this may take a while)');
         return downloadAndroidUpdates(
-            sdkPath, ['build-tools-24.0.0'].concat(getAndroidSDKTargets(apiLevels, abis)), true,
-            acceptLicenses);
+            sdkPath, ['build-tools-24.0.0'].concat(
+                         getAndroidSDKTargets(apiLevels, architectures, platforms, oldAVDs)),
+            true, acceptLicenses);
       })
       .then(() => {
         return getAVDDescriptors(sdkPath);
