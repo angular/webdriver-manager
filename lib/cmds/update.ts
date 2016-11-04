@@ -26,15 +26,12 @@ let prog = new Program()
                .addOption(Opts[Opt.ALTERNATE_CDN])
                .addOption(Opts[Opt.STANDALONE])
                .addOption(Opts[Opt.CHROME])
+               .addOption(Opts[Opt.GECKO])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
                .addOption(Opts[Opt.ANDROID_ARCHITECTURES])
                .addOption(Opts[Opt.ANDROID_PLATFORMS])
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
-
-if (GeckoDriver.supports(os.type(), os.arch())) {
-  prog.addOption(Opts[Opt.VERSIONS_GECKO]).addOption(Opts[Opt.GECKO]);
-}
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -47,7 +44,8 @@ if (os.type() === 'Windows_NT') {
 prog.addOption(Opts[Opt.VERSIONS_STANDALONE])
     .addOption(Opts[Opt.VERSIONS_CHROME])
     .addOption(Opts[Opt.VERSIONS_APPIUM])
-    .addOption(Opts[Opt.VERSIONS_ANDROID]);
+    .addOption(Opts[Opt.VERSIONS_ANDROID])
+    .addOption(Opts[Opt.VERSIONS_GECKO]);
 
 if (os.type() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
@@ -70,10 +68,7 @@ if (argv._[0] === 'update-run') {
 function update(options: Options): void {
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
-  let gecko = false;
-  if (GeckoDriver.supports(os.type(), os.arch())) {
-    gecko = options[Opt.GECKO].getBoolean();
-  }
+  let gecko = options[Opt.GECKO].getBoolean();
   let ie: boolean = false;
   let ie32: boolean = false;
   if (options[Opt.IE]) {
