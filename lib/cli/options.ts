@@ -22,7 +22,7 @@ export class Option {
   }
 
   getValue_(): number|string|boolean {
-    if (this.value) {
+    if (typeof this.value !== 'undefined') {
       return this.value;
     } else {
       return this.defaultValue;
@@ -42,11 +42,11 @@ export class Option {
     if (value && typeof value === 'string') {
       return '' + value;
     }
-    return null;
+    return '';
   }
 
   getBoolean(): boolean {
     let value = this.getValue_();
-    return value ? true : false;
+    return Boolean(value);
   }
 }
