@@ -7,16 +7,18 @@ import * as path from 'path';
 
 import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
 import {GeckoDriver} from '../binaries/gecko_driver';
-import {Logger, Options, Program} from '../cli';
+import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
 
 import * as Opt from './';
 import {Opts} from './opts';
 
+const commandName = 'start';
+
 let logger = new Logger('start');
 let prog = new Program()
-               .command('start', 'start up the selenium server')
+               .command(commandName, 'start up the selenium server')
                .action(start)
                .addOption(Opts[Opt.OUT_DIR])
                .addOption(Opts[Opt.SELENIUM_PORT])
@@ -31,7 +33,9 @@ let prog = new Program()
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.AVDS])
                .addOption(Opts[Opt.AVD_USE_SNAPSHOTS])
-               .addOption(Opts[Opt.STARTED_SIGNIFIER]);
+               .addOption(Opts[Opt.STARTED_SIGNIFIER])
+               .addOption(Opts[Opt.SIGNAL_VIA_IPC])
+               .addOption(Opts[Opt.DETACH]);
 
 if (os.type() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
@@ -59,6 +63,10 @@ if (argv._[0] === 'start-run') {
  * @param options
  */
 function start(options: Options) {
+  if (options[Opt.DETACH].getBoolean()) {
+    return detachedRun(options);
+  }
+
   let osType = os.type();
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
@@ -189,26 +197,25 @@ function start(options: Options) {
 
   let seleniumProcess = spawnCommand('java', args);
   if (options[Opt.STARTED_SIGNIFIER].getString()) {
-    // TODO(sjelin): check android too once it's working
-    signalWhenReady(options[Opt.STARTED_SIGNIFIER].getString(), seleniumPort);
+    // TODO(sjelin): check android too once it's working signalWhenReady(
+    signalWhenReady(
+        options[Opt.STARTED_SIGNIFIER].getString(), options[Opt.SIGNAL_VIA_IPC].getBoolean(),
+        seleniumPort);
   }
   logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
     logger.info('Selenium Standalone has exited with code ' + code);
-    killAndroid();
-    killAppium();
+    shutdownEverything();
     process.exit(code);
   });
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
     logger.info('Attempting to shut down selenium nicely');
-    http.get(
-        'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
-    killAndroid();
-    killAppium();
+    shutdownEverything(seleniumPort);
   });
   process.on('SIGINT', () => {
     logger.info('Staying alive until the Selenium Standalone process exits');
+    shutdownEverything(seleniumPort);
   });
 }
 
@@ -282,7 +289,7 @@ function killAppium() {
   }
 }
 
-function signalWhenReady(signal: string, seleniumPort: string) {
+function signalWhenReady(signal: string, viaIPC: boolean, seleniumPort: string) {
   function check(callback: (ready: boolean) => void) {
     http.get(
             'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=getLogMessages',
@@ -307,11 +314,66 @@ function signalWhenReady(signal: string, seleniumPort: string) {
     setTimeout(() => {
       check((ready: boolean) => {
         if (ready) {
-          console.log(signal);
+          sendStartedSignal(signal, viaIPC);
         } else if (triesRemaining) {
           recursiveCheck(triesRemaining--);
         }
       });
     }, 100);
   })(100);
+}
+
+function sendStartedSignal(signal: string, viaIPC: boolean) {
+  if (viaIPC) {
+    if (process.send) {
+      return process.send(signal);
+    } else {
+      logger.warn('No IPC channel, sending signal via stdout');
+    }
+  }
+}
+
+function shutdownEverything(seleniumPort?: string) {
+  if (seleniumPort) {
+    http.get(
+        'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
+  }
+  killAndroid();
+  killAppium();
+}
+
+function detachedRun(options: Options) {
+  var file = path.resolve(__dirname, '..', 'webdriver.js');
+  var oldSignal = options[Opt.STARTED_SIGNIFIER].getString();
+  var oldViaIPC = options[Opt.SIGNAL_VIA_IPC].getBoolean();
+  options[Opt.DETACH].value = false;
+  options[Opt.STARTED_SIGNIFIER].value = 'server started';
+  options[Opt.SIGNAL_VIA_IPC].value = true;
+  let args: string[] = [file, commandName].concat(unparseOptions(options));
+
+  var unreffed = false;
+  let child = childProcess.spawn(process.execPath, args, ({stdio: ['ignore', 1, 2, 'ipc']} as any));
+
+  child.on('message', (message: string) => {
+    if (message == options[Opt.STARTED_SIGNIFIER].getString()) {
+      if (oldSignal) {
+        sendStartedSignal(oldSignal, oldViaIPC);
+      }
+      logger.info('Detached pid: ' + child.pid);
+      child.disconnect();
+      child.unref();
+      unreffed = true;
+    }
+  });
+
+  child.on('exit', (code: number) => {
+    if (!unreffed) {
+      if (code == 0) {
+        logger.warn('Server never seemed to start, and has now exited');
+      } else {
+        logger.error('Server never seemed to start, and has probably crashed');
+      }
+      process.exit(code);
+    }
+  });
 }

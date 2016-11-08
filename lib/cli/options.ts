@@ -50,3 +50,14 @@ export class Option {
     return Boolean(value);
   }
 }
+
+export function unparseOptions(options: Options) {
+  var args: string[] = [];
+  for (let name in options) {
+    let value = options[name].getValue_();
+    if (value !== options[name].defaultValue) {
+      args.push('--' + name, '' + value);
+    }
+  }
+  return args;
+};
