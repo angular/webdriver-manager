@@ -78,19 +78,19 @@ export class Program {
     this.runMethod(this.options);
   }
 
-  private getValue_(key: string, json: JSON): string {
+  private getValue_(key: string, json: JSON): number|boolean|string {
     let keyList: string[] = key.split('.');
     let tempJson: any = json;
     while (keyList.length > 0) {
       let keyItem = keyList[0];
-      if (tempJson[keyItem]) {
+      if (tempJson[keyItem] != null) {
         tempJson = tempJson[keyItem];
         keyList = keyList.slice(1);
       } else {
         return undefined;
       }
     }
-    return tempJson.toString();
+    return tempJson;
   }
 
   /**
