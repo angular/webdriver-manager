@@ -43,7 +43,7 @@ gulp.task('format', () => {
 });
 
 gulp.task('tsc', function(done) {
-  runSpawn(done, 'node', ['node_modules/typescript/bin/tsc']);
+  runSpawn(done, process.execPath, ['node_modules/typescript/bin/tsc']);
 });
 
 gulp.task('prepublish', function(done) {
@@ -56,5 +56,5 @@ gulp.task('build',['prepublish']);
 gulp.task('test', ['build'], function(done) {
   var opt_arg = [];
   opt_arg.push('node_modules/jasmine/bin/jasmine.js');
-  runSpawn(done, 'node', opt_arg);
+  runSpawn(done, process.execPath, opt_arg);
 });

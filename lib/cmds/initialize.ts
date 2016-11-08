@@ -1,4 +1,4 @@
-import * as child_process from 'child_process';
+import {ChildProcess, spawnSync} from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as ini from 'ini';
@@ -7,13 +7,15 @@ import * as path from 'path';
 import * as q from 'q';
 
 import {Logger} from '../cli';
+import {spawn} from '../utils';
+
 
 const noop = () => {};
 
 // Make a function which configures a child process to automatically respond
 // to a certain question
 function respondFactory(question: string, answer: string): Function {
-  return (child: child_process.ChildProcess) => {
+  return (child: ChildProcess) => {
     (<any>child.stdin).setDefaultEncoding('utf-8');
     child.stdout.on('data', (data: Buffer | String) => {
       if (data != null) {
@@ -27,10 +29,9 @@ function respondFactory(question: string, answer: string): Function {
 
 // Run a command on the android SDK
 function runAndroidSDKCommand(
-    sdkPath: string, cmd: string, args: string[], spawnOptions: Object,
+    sdkPath: string, cmd: string, args: string[], stdio?: string,
     config_fun?: Function): q.Promise<any> {
-  let child =
-      child_process.spawn(path.join(sdkPath, 'tools', 'android'), [cmd].concat(args), spawnOptions);
+  let child = spawn(path.join(sdkPath, 'tools', 'android'), [cmd].concat(args), stdio);
 
   if (config_fun) {
     config_fun(child);
@@ -62,7 +63,7 @@ function downloadAndroidUpdates(
   return runAndroidSDKCommand(
       sdkPath, 'update',
       ['sdk', '-u'].concat(search_all ? ['-a'] : []).concat(['-t', targets.join(',')]),
-      {stdio: auto_accept ? 'pipe' : 'inherit'},
+      auto_accept ? 'pipe' : 'inherit',
       auto_accept ? respondFactory('Do you accept the license', 'y') : noop);
 }
 
@@ -71,17 +72,19 @@ function setupHardwareAcceleration(sdkPath: string) {
   // TODO(sjelin): check that the BIOS option is set properly on linux
   if (os.type() == 'Darwin') {
     console.log('Enabling hardware acceleration (requires root access)');
-    child_process.spawnSync(
+    // We don't need the wrapped spawnSync because we know we're on OSX
+    spawnSync(
         'sudo', [path.join(
                     sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
                     'silent_install.sh')],
         {stdio: 'inherit'});
   } else if (os.type() == 'Windows_NT') {
     console.log('Enabling hardware acceleration (requires admin access)');
-    child_process.spawnSync(
-        'runas',
+    // We don't need the wrapped spawnSync because we know we're on Windows
+    spawnSync(
+        'cmd',
         [
-          '/noprofile', '/user:Administrator',
+          '/c', 'runas', '/noprofile', '/user:Administrator',
           path.join(
               sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
               'silent_install.bat')
@@ -214,14 +217,13 @@ function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<a
 
 // Make an android virtual device
 function makeAVD(sdkPath: string, desc: AVDDescriptor, version: string): q.Promise<any> {
-  return runAndroidSDKCommand(sdkPath, 'delete', ['avd', '--name', desc.avdName(version)], {})
+  return runAndroidSDKCommand(sdkPath, 'delete', ['avd', '--name', desc.avdName(version)])
       .then(noop, noop)
       .then(() => {
         return runAndroidSDKCommand(
             sdkPath, 'create',
             ['avd', '--name', desc.avdName(version), '--target', desc.api, '--abi', desc.abi],
-            {stdio: 'pipe'},
-            respondFactory('Do you wish to create a custom hardware profile', 'no'));
+            'pipe', respondFactory('Do you wish to create a custom hardware profile', 'no'));
       });
 }
 
