@@ -5,6 +5,7 @@ import * as clean from './cmds/clean';
 import * as start from './cmds/start';
 import * as status from './cmds/status';
 import * as update from './cmds/update';
+import * as version from './cmds/version';
 import {Config} from './config';
 
 let commandline = new Cli()
@@ -12,7 +13,8 @@ let commandline = new Cli()
                       .program(clean.program)
                       .program(start.program)
                       .program(status.program)
-                      .program(update.program);
+                      .program(update.program)
+                      .program(version.program);
 
 let minimistOptions = commandline.getMinimistOptions();
 let argv = minimist(process.argv.slice(2), minimistOptions);
