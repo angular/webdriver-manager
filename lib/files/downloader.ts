@@ -89,17 +89,21 @@ export class Downloader {
     }
 
     let options = {
-      method: 'HEAD',
+      method: 'GET',
       url: fileUrl,
       strictSSL: !opt_ignoreSSL,
       rejectUnauthorized: !opt_ignoreSSL,
       proxy: Downloader.resolveProxy_(fileUrl, opt_proxy)
     };
 
-    let contentLength = 0;
     request(options).on('response', (response) => {
-      contentLength = response.headers['content-length'];
-      deferred.resolve(contentLength);
+      if (response.headers['Location']) {
+        let urlLocation = response.headers['Location'];
+        deferred.resolve(Downloader.httpHeadContentLength(urlLocation, opt_proxy, opt_ignoreSSL));
+      } else if (response.headers['content-length']) {
+        let contentLength = response.headers['content-length'];
+        deferred.resolve(contentLength);
+      }
     });
     return deferred.promise;
   }
