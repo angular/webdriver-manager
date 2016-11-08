@@ -1,6 +1,7 @@
 lib/
 selenium/
 spec/
+built/spec/
 
 .clang-format
 .gitattributes
