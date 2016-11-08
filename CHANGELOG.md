@@ -1,3 +1,36 @@
+# 10.2.7
+
+## Features
+
+- ([66776a0](https://github.com/angular/webdriver-manager/commit/66776a0edc97e0b2718f2fdf4eeb2c2c8b40df73))
+  feat(start): add way to programmatically detect when the selenium server is running (#120)
+
+## Bug fixes
+
+- ([dc2f9f9](https://github.com/angular/webdriver-manager/commit/dc2f9f99ebd9675b02addf06732a4d8d348046bc))
+  fix(cli): fix default option values, boolean and string handling (#110) (#122)
+
+  - default option values initialize properly for `minimist`
+  - user-supplied boolean-type option values respected
+  - string-type option values are always strings
+  - simplify boolean-type option value access
+
+- ([88d6105](https://github.com/angular/webdriver-manager/commit/88d6105f538f075968c152935131bf19bf289532))
+  fix(gecko): Update geckodriver to 0.11.0 and fix suffixes. (#128)
+
+  Fixes #111
+
+- ([707e015](https://github.com/angular/webdriver-manager/commit/707e015737ee3ca4b26b6d89979251f8d8c2d11d))
+  fix(android): fixed four things for android: (#116)
+
+  - Make appium default to 1.6.0 (Android N didn't work on 1.5.x)
+  - Make virtual devices default to `google_apis`
+  - Don't delete old virtual devices on update
+  - Update documentation
+
+- ([9fe4b22](https://github.com/angular/webdriver-manager/commit/9fe4b226d58fbbce2e9cf49df58f45dee7f13cf2))
+  fix typo in webdriver-manager/spec/files (#125)
+
 # 10.2.6
 
 ## Features
