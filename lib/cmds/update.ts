@@ -11,6 +11,7 @@ import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, StandAl
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
+import {spawn} from '../utils';
 
 import * as Opt from './';
 import {android as initializeAndroid, iOS as checkIOS} from './initialize';
@@ -249,5 +250,5 @@ function installAppium(binary: Binary, outputDir: string): void {
 
   fs.mkdirSync(folder);
   fs.writeFileSync(path.join(folder, 'package.json'), '{}');
-  child_process.spawn('npm', ['install', 'appium@' + binary.version()], {cwd: folder});
+  spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});
 }

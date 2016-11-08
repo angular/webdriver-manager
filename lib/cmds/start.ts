@@ -1,4 +1,4 @@
-import * as childProcess from 'child_process';
+import {ChildProcess} from 'child_process';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as minimist from 'minimist';
@@ -10,6 +10,7 @@ import {GeckoDriver} from '../binaries/gecko_driver';
 import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
+import {spawn} from '../utils';
 
 import * as Opt from './';
 import {Opts} from './opts';
@@ -195,7 +196,7 @@ function start(options: Options) {
   }
   logger.info('java' + argsToString);
 
-  let seleniumProcess = spawnCommand('java', args);
+  let seleniumProcess = spawn('java', args, 'inherit');
   if (options[Opt.STARTED_SIGNIFIER].getString()) {
     // TODO(sjelin): check android too once it's working signalWhenReady(
     signalWhenReady(
@@ -219,17 +220,8 @@ function start(options: Options) {
   });
 }
 
-function spawnCommand(command: string, args?: string[]) {
-  let osType = os.type();
-  let windows: boolean = osType === 'Windows_NT';
-  let winCommand = windows ? 'cmd' : command;
-  let finalArgs: string[] = windows ? ['/c'].concat([command], args) : args;
-
-  return childProcess.spawn(winCommand, finalArgs, {stdio: 'inherit'});
-}
-
 // Manage processes used in android emulation
-let androidProcesses: childProcess.ChildProcess[] = [];
+let androidProcesses: ChildProcess[] = [];
 
 function startAndroid(
     outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: string): void {
@@ -257,27 +249,26 @@ function startAndroid(
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
     }
-    androidProcesses.push(
-        childProcess.spawn(path.join(sdkPath, 'tools', emuBin), emuArgs, {stdio: 'inherit'}));
+    androidProcesses.push(spawn(path.join(sdkPath, 'tools', emuBin), emuArgs, 'inherit'));
   });
 }
 
 function killAndroid() {
-  androidProcesses.forEach((androidProcess: childProcess.ChildProcess) => {
+  androidProcesses.forEach((androidProcess: ChildProcess) => {
     androidProcess.kill();
   });
   androidProcesses.length = 0;
 }
 
 // Manage appium process
-let appiumProcess: childProcess.ChildProcess;
+let appiumProcess: ChildProcess;
 
 function startAppium(outputDir: string, binary: Binary, android_sdk: Binary, port: string) {
   logger.info('Starting appium server');
   if (android_sdk) {
     process.env.ANDROID_HOME = path.join(outputDir, android_sdk.executableFilename(os.type()));
   }
-  appiumProcess = childProcess.spawn(
+  appiumProcess = spawn(
       path.join(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
       port ? ['--port', port] : []);
 }

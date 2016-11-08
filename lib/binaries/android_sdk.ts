@@ -1,9 +1,9 @@
-import * as child_process from 'child_process';
 import {arch, type} from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 
 import {Config} from '../config';
+import {spawnSync} from '../utils';
 
 import {Binary, OS} from './binary';
 
@@ -71,7 +71,7 @@ export class AndroidSDK extends Binary {
       let avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
       let version = path.basename(sdkPath).slice(this.prefixDefault.length);
       avds.forEach((avd: string) => {
-        child_process.spawnSync(
+        spawnSync(
             path.join(sdkPath, 'tools', 'android'),
             ['delete', 'avd', '-n', avd + '-v' + version + '-wd-manager']);
       });
