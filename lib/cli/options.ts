@@ -16,7 +16,7 @@ export class Option {
     this.opt = opt;
     this.description = description;
     this.type = type;
-    if (defaultValue) {
+    if (defaultValue != null) {
       this.defaultValue = defaultValue;
     }
   }
@@ -31,23 +31,34 @@ export class Option {
 
   getNumber(): number {
     let value = this.getValue_();
-    if (value && typeof value === 'number') {
+    if (value != null && (typeof value === 'number' || typeof value === 'string')) {
       return +value;
+    } else {
+      return null;
     }
-    return null;
   }
 
   getString(): string {
     let value = this.getValue_();
-    if (value && typeof value === 'string') {
-      return '' + value;
+    if (value != null) {
+      return '' + this.getValue_();
+    } else {
+      return '';
     }
-    return '';
   }
 
   getBoolean(): boolean {
     let value = this.getValue_();
-    return Boolean(value);
+    if (value != null) {
+      if (typeof value === 'string') {
+        return !(value === '0' || value === 'false');
+      } else if (typeof value === 'number') {
+        return value !== 0;
+      } else {
+        return value;
+      }
+    }
+    return false;
   }
 }
 

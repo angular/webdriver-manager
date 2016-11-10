@@ -14,7 +14,7 @@ describe('cli', () => {
       let lines = runSpawn('node', ['built/lib/webdriver.js', 'help']);
 
       // very specific to make sure the
-      let index = 0
+      let index = 0;
       expect(lines[index++].indexOf('Usage:')).toBe(0);
       index++;
       expect(lines[index++].indexOf('Commands:')).toBe(0);
