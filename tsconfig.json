@@ -7,7 +7,11 @@
     "declaration": true,
     "removeComments": false,
     "noImplicitAny": true,
-    "outDir": "built/"
+    "outDir": "built/",
+    "types": [
+      "adm-zip", "chalk", "glob", "jasmine", "minimist",
+      "node", "q", "request", "rimraf", "semver"
+    ]
   },
   "exclude": [
     "built",
