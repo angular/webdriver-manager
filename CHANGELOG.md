@@ -1,3 +1,28 @@
+# 10.2.8
+
+## Features
+
+- ([1f9713a](https://github.com/angular/webdriver-manager/commit/1f9713aff1e7d44de900ed3c74abac532d3e25ff))
+  feat(start and shutdown): Added `--detach` option for `start` command and new `shutdown` command
+  (#130)
+
+- ([88cf46b](https://github.com/angular/webdriver-manager/commit/88cf46b715250559ba8a726370a83c5c2f4daed1))
+  feat(version): have a way to get the package version (#136)
+
+  closes #119
+
+## Bug fixes
+- ([5966b6a](https://github.com/angular/webdriver-manager/commit/5966b6ac7329878e9e16f5b1b88261c5b7f7e438))
+  fix(cli): fix setting flag to false (#135)
+
+  - This fixes `webdriver-manager update --gecko=false`
+  - This does not fix `webdriver-manager update --gecko=0`. Minimist interprets 0 as true.
+  - Add options and programs unit tests
+   closes #110
+
+- ([35676ee](https://github.com/angular/webdriver-manager/commit/35676ee70c816d43f045fa33d02e41bf502a3a14))
+  fix(gecko): follow redirects for content-length (#133)
+
 # 10.2.7
 
 ## Features
