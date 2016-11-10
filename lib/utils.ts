@@ -4,10 +4,10 @@ import * as os from 'os';
 
 
 function spawnFactory(sync: false):
-    (cmd: string, args: string[], stdio?: string, opts?: child_process.SpawnOptions) =>
+    (cmd: string, args: string[], stdio?: any, opts?: child_process.SpawnOptions) =>
         child_process.ChildProcess;
 function spawnFactory(sync: true):
-    (cmd: string, args: string[], stdio?: string, opts?: child_process.SpawnSyncOptions) =>
+    (cmd: string, args: string[], stdio?: any, opts?: child_process.SpawnSyncOptions) =>
         child_process.SpawnSyncReturns<any>;
 function spawnFactory(sync: boolean):
     (cmd: string, args: string[], stdio?: string,
