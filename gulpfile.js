@@ -47,13 +47,13 @@ gulp.task('tsc', function(done) {
 });
 
 gulp.task('prepublish', function(done) {
-  runSequence('format', 'tsc', 'copy', done);
+  runSequence('tsc', 'copy', done);
 });
 
 gulp.task('default',['prepublish']);
 gulp.task('build',['prepublish']);
 
-gulp.task('test', ['build'], function(done) {
+gulp.task('test', ['format', 'build'], function(done) {
   var opt_arg = [];
   opt_arg.push('node_modules/jasmine/bin/jasmine.js');
   runSpawn(done, process.execPath, opt_arg);
