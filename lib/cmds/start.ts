@@ -343,7 +343,7 @@ function detachedRun(options: Options) {
   let args: string[] = [file, commandName].concat(unparseOptions(options));
 
   var unreffed = false;
-  let child = childProcess.spawn(process.execPath, args, ({stdio: ['ignore', 1, 2, 'ipc']} as any));
+  let child = spawn(process.execPath, args, ['ignore', 1, 2, 'ipc']);
 
   child.on('message', (message: string) => {
     if (message == options[Opt.STARTED_SIGNIFIER].getString()) {

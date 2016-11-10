@@ -8,7 +8,7 @@ describe('downloader', () => {
   let envHttpProxy = 'http://foobar.env';
   let envHttpsProxy = 'https://foobar.env';
 
-  it ('should return undefined when proxy arg is not used', () => {
+  it('should return undefined when proxy arg is not used', () => {
     let proxy = Downloader.resolveProxy_(fileUrlHttp);
     expect(proxy).toBeUndefined();
   });

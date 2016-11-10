@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Binary, AndroidSDK, ChromeDriver, IEDriver, Appium, StandAlone } from '../../lib/binaries';
-import { DownloadedBinary, FileManager } from '../../lib/files';
-import { BinaryMap } from '../../lib/binaries/binary';
-import { Config } from '../../lib/config';
-import { GeckoDriver } from '../../lib/binaries/gecko_driver';
+
+import {AndroidSDK, Appium, Binary, ChromeDriver, IEDriver, StandAlone} from '../../lib/binaries';
+import {BinaryMap} from '../../lib/binaries/binary';
+import {GeckoDriver} from '../../lib/binaries/gecko_driver';
+import {Config} from '../../lib/config';
+import {DownloadedBinary, FileManager} from '../../lib/files';
 
 
 describe('file manager', () => {
@@ -87,7 +88,8 @@ describe('file manager', () => {
       arch = 'x64';
       existingFiles = [
         selenium.prefix() + '2.51.0' + selenium.executableSuffix(),
-        selenium.prefix() + '2.52.0' + selenium.executableSuffix()];
+        selenium.prefix() + '2.52.0' + selenium.executableSuffix()
+      ];
       existingFiles.push(chrome.prefix() + '2.20' + chrome.suffix(ostype, arch));
       existingFiles.push(chrome.prefix() + '2.20' + chrome.executableSuffix(ostype));
       existingFiles.push(chrome.prefix() + '2.21' + chrome.suffix(ostype, arch));
@@ -251,7 +253,7 @@ describe('file manager', () => {
 
       it('should configure the CDN for each binary', () => {
         let customCDN = 'https://my.corporate.cdn/';
-        let binaries  = FileManager.compileBinaries_('Windows_NT', customCDN);
+        let binaries = FileManager.compileBinaries_('Windows_NT', customCDN);
 
         forEachOf(binaries, binary => expect(binary.cdn).toEqual(customCDN, binary.name));
       });

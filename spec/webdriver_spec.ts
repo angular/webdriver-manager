@@ -1,17 +1,14 @@
-import * as child_process from 'child_process';
 import * as path from 'path';
-import {cli} from '../lib/webdriver';
-
-function runSpawn(task: string, opt_arg: string[]): string[] {
-  opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
-  let child = child_process.spawnSync(task, opt_arg, {stdio: 'pipe'});
-  return child.output[1].toString().split('\n');
-};
+import {cli} from '../lib/cli_instance';
+import {spawnSync} from '../lib/utils';
 
 describe('cli', () => {
   describe('help', () => {
-    it ('should have usage and commands', () => {
-      let lines = runSpawn('node', ['built/lib/webdriver.js', 'help']);
+    it('should have usage and commands', () => {
+      let lines = spawnSync(process.execPath, ['built/lib/webdriver.js', 'help'], 'pipe')
+                      .output[1]
+                      .toString()
+                      .split('\n');
 
       // very specific to make sure the
       let index = 0;

@@ -1,22 +1,6 @@
 import * as minimist from 'minimist';
 
-import {Cli} from './cli';
-import * as clean from './cmds/clean';
-import * as shutdown from './cmds/shutdown';
-import * as start from './cmds/start';
-import * as status from './cmds/status';
-import * as update from './cmds/update';
-import * as version from './cmds/version';
-import {Config} from './config';
-
-let commandline = new Cli()
-                      .usage('webdriver-manager <command> [options]')
-                      .program(clean.program)
-                      .program(start.program)
-                      .program(shutdown.program)
-                      .program(status.program)
-                      .program(update.program)
-                      .program(version.program);
+import {cli as commandline} from './cli_instance';
 
 let minimistOptions = commandline.getMinimistOptions();
 let argv = minimist(process.argv.slice(2), minimistOptions);
@@ -32,5 +16,3 @@ if (commandline.programs[cmd[0]]) {
 } else {
   commandline.printHelp();
 }
-
-export var cli = commandline;

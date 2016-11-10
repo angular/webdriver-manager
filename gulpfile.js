@@ -28,17 +28,19 @@ gulp.task('copy', function() {
       .pipe(gulp.dest('built/'));
 });
 
+var tsGlobs = ['lib/**/*.ts', 'spec/**/*.ts'];
+
 gulp.task('format:enforce', () => {
   const format = require('gulp-clang-format');
   const clangFormat = require('clang-format');
-  return gulp.src(['lib/**/*.ts']).pipe(
+  return gulp.src(tsGlobs).pipe(
     format.checkFormat('file', clangFormat, {verbose: true, fail: true}));
 });
 
 gulp.task('format', () => {
   const format = require('gulp-clang-format');
   const clangFormat = require('clang-format');
-  return gulp.src(['lib/**/*.ts'], { base: '.' }).pipe(
+  return gulp.src(tsGlobs, { base: '.' }).pipe(
     format.format('file', clangFormat)).pipe(gulp.dest('.'));
 });
 
