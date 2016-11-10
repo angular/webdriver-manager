@@ -29,6 +29,7 @@
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@types/es6-promise": "0.0.32",
     "adm-zip": "^0.4.7",
     "chalk": "^1.1.1",
     "del": "^2.2.0",
