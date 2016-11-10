@@ -5,7 +5,6 @@ import * as path from 'path';
 
 import {Config} from './config';
 
-
 function spawnFactory(sync: false):
     (cmd: string, args: string[], stdio?: any, opts?: child_process.SpawnOptions) =>
         child_process.ChildProcess;

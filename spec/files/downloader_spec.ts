@@ -82,9 +82,22 @@ describe('downloader', () => {
     let fileUrl =
         'https://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.0.jar';
     let fileName = 'foobar.jar';
-    let outputDir = Config.getSeleniumDir();
+    let outputDir = path.resolve(process.cwd(), 'selenium_test');
     let actualContentLength = 22138949;
     let contentLength: number;
+
+    beforeEach(() => {
+      outputDir = path.resolve(process.cwd(), 'selenium_test');
+      try {
+        // if the folder does not exist, it will throw an error on statSync
+        if (fs.statSync(outputDir).isDirectory()) {
+          rimraf.sync(outputDir);
+        }
+      } catch (err) {
+        // do nothing, the directory does not exist
+      }
+      fs.mkdirSync(outputDir);
+    });
 
     it('should download a file with mismatch content length', (done) => {
       contentLength = 0;

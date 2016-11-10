@@ -70,8 +70,6 @@ export class Downloader {
   static getFile(
       binary: Binary, fileUrl: string, fileName: string, outputDir: string, contentLength: number,
       opt_proxy?: string, opt_ignoreSSL?: boolean, callback?: Function): Promise<any> {
-    // logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
-    // let contentLength = 0;
     let filePath = path.resolve(outputDir, fileName);
     let file: any;
 
@@ -90,8 +88,8 @@ export class Downloader {
 
     if (opt_proxy) {
       options.proxy = Downloader.resolveProxy_(fileUrl, opt_proxy);
-      if (options.url.indexOf('https://') === 0) {
-        options.url = options.url.replace('https://', 'http://');
+      if (url.parse(options.url).protocol === 'https:') {
+        options.url = options.url.replace('https:', 'http:');
       }
     }
 
@@ -108,6 +106,17 @@ export class Downloader {
                    response.destroy();
                    resolve(false);
                  } else {
+                   if (opt_proxy) {
+                     let pathUrl = url.parse(options.url).path;
+                     let host = url.parse(options.url).host;
+                     let newFileUrl = url.resolve(opt_proxy, pathUrl);
+                     logger.info(
+                         'curl -o ' + outputDir + '/' + fileName + ' \'' + newFileUrl +
+                         '\' -H \'host:' + host + '\'');
+                   } else {
+                     logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
+                   }
+
                    // only pipe if the headers are different length
                    file = fs.createWriteStream(filePath);
                    req.pipe(file);
