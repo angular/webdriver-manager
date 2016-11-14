@@ -104,6 +104,7 @@ export class Downloader {
         let contentLength = response.headers['content-length'];
         deferred.resolve(contentLength);
       }
+      response.destroy();
     });
     return deferred.promise;
   }
