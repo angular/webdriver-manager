@@ -6,6 +6,7 @@ built/spec/
 .clang-format
 .gitattributes
 .github/
+.idea/
 .gitignore
 .npmignore
 .travis.yml
