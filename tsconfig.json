@@ -10,7 +10,7 @@
     "outDir": "built/",
     "types": [
       "adm-zip", "chalk", "glob", "jasmine", "minimist",
-      "node", "q", "request", "rimraf", "semver"
+      "node", "q", "request", "rimraf", "semver", "es6-promise"
     ]
   },
   "exclude": [

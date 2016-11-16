@@ -59,6 +59,9 @@ if (argv._[0] === 'start-run') {
   prog.printHelp();
 }
 
+// Manage processes used in android emulation
+let androidProcesses: ChildProcess[] = [];
+
 /**
  * Parses the options and starts the selenium standalone server.
  * @param options
@@ -71,6 +74,9 @@ function start(options: Options) {
   let osType = os.type();
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
+  let appiumPort = options[Opt.APPIUM_PORT].getString();
+  let avdPort = options[Opt.AVD_PORT].getNumber();
+  let android = options[Opt.ANDROID].getBoolean();
   let outputDir = Config.getSeleniumDir();
   if (options[Opt.OUT_DIR].getString()) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
@@ -165,20 +171,18 @@ function start(options: Options) {
       // driver does not exist.
     }
   }
-  if (options[Opt.ANDROID].getBoolean()) {
+  if (android) {
     if (downloadedBinaries[AndroidSDK.id] != null) {
       let avds = options[Opt.AVDS].getString();
       startAndroid(
           outputDir, binaries[AndroidSDK.id], avds.split(','),
-          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), options[Opt.AVD_PORT].getString());
+          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), avdPort);
     } else {
       logger.warn('Not starting android because it is not installed');
     }
   }
   if (downloadedBinaries[Appium.id] != null) {
-    startAppium(
-        outputDir, binaries[Appium.id], binaries[AndroidSDK.id],
-        options[Opt.APPIUM_PORT].getString());
+    startAppium(outputDir, binaries[Appium.id], binaries[AndroidSDK.id], appiumPort);
   }
 
   // log the command to launch selenium server
@@ -198,10 +202,10 @@ function start(options: Options) {
 
   let seleniumProcess = spawn('java', args, 'inherit');
   if (options[Opt.STARTED_SIGNIFIER].getString()) {
-    // TODO(sjelin): check android too once it's working signalWhenReady(
     signalWhenReady(
         options[Opt.STARTED_SIGNIFIER].getString(), options[Opt.SIGNAL_VIA_IPC].getBoolean(),
-        seleniumPort);
+        outputDir, seleniumPort, downloadedBinaries[Appium.id] ? appiumPort : '',
+        binaries[AndroidSDK.id], avdPort, androidProcesses.length);
   }
   logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
@@ -220,16 +224,20 @@ function start(options: Options) {
   });
 }
 
-// Manage processes used in android emulation
-let androidProcesses: ChildProcess[] = [];
-
 function startAndroid(
-    outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: string): void {
+    outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number): void {
   let sdkPath = path.join(outputDir, sdk.executableFilename(os.type()));
   if (avds[0] == 'all') {
     avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
   } else if (avds[0] == 'none') {
     avds.length = 0;
+  }
+  const minAVDPort = 5554;
+  const maxAVDPort = 5586 - 2 * avds.length;
+  if (avds.length && ((port < minAVDPort) || (port > maxAVDPort))) {
+    throw new RangeError(
+        'AVD Port must be between ' + minAVDPort + ' and ' + maxAVDPort + ' to emulate ' +
+        avds.length + ' android devices');
   }
   avds.forEach((avd: string, i: number) => {
     logger.info('Booting up AVD ' + avd);
@@ -244,7 +252,7 @@ function startAndroid(
       emuArgs = emuArgs.concat(['-no-snapshot-load', '-no-snapshot-save']);
     }
     if (port) {
-      emuArgs = emuArgs.concat(['-ports', (port + 2 * i) + ',' + (port + 2 * i + 1)]);
+      emuArgs = emuArgs.concat(['-port', '' + (port + 2 * i)]);
     }
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
@@ -263,10 +271,10 @@ function killAndroid() {
 // Manage appium process
 let appiumProcess: ChildProcess;
 
-function startAppium(outputDir: string, binary: Binary, android_sdk: Binary, port: string) {
+function startAppium(outputDir: string, binary: Binary, androidSDK: Binary, port: string) {
   logger.info('Starting appium server');
-  if (android_sdk) {
-    process.env.ANDROID_HOME = path.join(outputDir, android_sdk.executableFilename(os.type()));
+  if (androidSDK) {
+    process.env.ANDROID_HOME = path.join(outputDir, androidSDK.executableFilename(os.type()));
   }
   appiumProcess = spawn(
       path.join(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
@@ -280,38 +288,112 @@ function killAppium() {
   }
 }
 
-function signalWhenReady(signal: string, viaIPC: boolean, seleniumPort: string) {
-  function check(callback: (ready: boolean) => void) {
-    http.get(
-            'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=getLogMessages',
-            (res) => {
-              if (res.statusCode !== 200) {
-                return callback(false);
-              }
-              var logs = '';
-              res.on('data', (chunk) => {
-                logs += chunk;
-              });
-              res.on('end', () => {
-                callback(logs.toUpperCase().indexOf('OK') != -1);
-              });
-            })
-        .on('error', () => {
-          callback(false);
-        });
-  }
 
-  (function recursiveCheck(triesRemaining: number) {
-    setTimeout(() => {
-      check((ready: boolean) => {
-        if (ready) {
-          sendStartedSignal(signal, viaIPC);
-        } else if (triesRemaining) {
-          recursiveCheck(triesRemaining--);
+function signalWhenReady(
+    signal: string, viaIPC: boolean, outputDir: string, seleniumPort: string, appiumPort: string,
+    androidSDK: Binary, avdPort: number, avdCount: number) {
+  const checkInterval = 100;
+  const maxWait = 10000;
+  function waitFor(isReady: () => Promise<void>) {
+    return new Promise<void>((resolve, reject) => {
+      let waited = 0;
+      (function recursiveCheck() {
+        setTimeout(() => {
+          isReady().then(
+              () => {
+                resolve();
+              },
+              (reason) => {
+                waited += checkInterval;
+                if (waited < maxWait) {
+                  recursiveCheck();
+                } else {
+                  reject('Timed out.  Final rejection reason: ' + reason);
+                }
+              });
+        }, checkInterval);
+      })();
+    });
+  };
+  function serverChecker(url: string, test: (data: string) => boolean): () => Promise<void> {
+    return () => {
+      return new Promise<void>((resolve, reject) => {
+        http.get(url, (res) => {
+              if (res.statusCode !== 200) {
+                reject(
+                    'Could not check ' + url + ' for server status (' + res.statusCode + ': ' +
+                    res.statusMessage + ')');
+              } else {
+                let data = '';
+                res.on('data', (chunk) => {
+                  data += chunk;
+                });
+                res.on('end', () => {
+                  if (test(data)) {
+                    resolve();
+                  } else {
+                    reject('Bad server status: ' + data);
+                  }
+                });
+              }
+            }).on('error', () => {
+          reject();
+        });
+      });
+    };
+  }
+  function waitForAndroid(port: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let child = spawn(
+          path.join(outputDir, androidSDK.executableFilename(os.type()), 'platform-tools', 'adb'),
+          ['-s', 'emulator-' + port, 'wait-for-device'], 'ignore');
+      let done = false;
+      child.on('error', (err: Error) => {
+        if (!done) {
+          done = true;
+          reject('Error while waiting for for emulator-' + port + ': ' + err);
         }
       });
-    }, 100);
-  })(100);
+      child.on('exit', (code: number, signal: string) => {
+        if (!done) {
+          done = true;
+          resolve();
+        }
+      });
+      setTimeout(() => {
+        if (!done) {
+          done = true;
+          child.kill();
+          reject('Timed out waiting for emulator-' + port);
+        }
+      }, maxWait);
+    });
+  }
+  let pending = [waitFor(serverChecker(
+      'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=getLogMessages',
+      (logs) => {
+        return logs.toUpperCase().indexOf('OK') != -1;
+      }))];
+  if (appiumPort) {
+    pending.push(
+        waitFor(serverChecker('http://localhost:' + appiumPort + '/wd/hub/status', (status) => {
+          return JSON.parse(status).status == 0;
+        })));
+  }
+  if (androidSDK && avdPort && avdCount) {
+    for (let i = 0; i < avdCount; i++) {
+      pending.push(waitForAndroid(avdPort + 2 * i));
+    }
+  }
+  Promise.all(pending).then(
+      () => {
+        sendStartedSignal(signal, viaIPC);
+      },
+      (error) => {
+        logger.error(error);
+        shutdownEverything(seleniumPort);
+        process.exitCode = 1;
+      });
 }
 
 function sendStartedSignal(signal: string, viaIPC: boolean) {
