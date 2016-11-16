@@ -42,9 +42,11 @@ var opts: Options = {};
 opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
 opts[SELENIUM_PORT] =
     new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string', '4444');
-opts[APPIUM_PORT] = new Option(APPIUM_PORT, 'Optional port for the appium server', 'string');
+opts[APPIUM_PORT] =
+    new Option(APPIUM_PORT, 'Optional port for the appium server', 'string', '4723');
 opts[AVD_PORT] = new Option(
-    AVD_PORT, 'Optional port for android virtual devices.  See mobile.md for details', 'string');
+    AVD_PORT, 'Optional port for android virtual devices.  See mobile.md for details', 'number',
+    5554);
 opts[IGNORE_SSL] = new Option(IGNORE_SSL, 'Ignore SSL certificates', 'boolean', false);
 opts[PROXY] = new Option(PROXY, 'Proxy to use for the install or update command', 'string');
 opts[ALTERNATE_CDN] = new Option(ALTERNATE_CDN, 'Alternate CDN to binaries', 'string');
@@ -99,7 +101,8 @@ opts[STARTED_SIGNIFIER] = new Option(
     'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
     'string');
 opts[SIGNAL_VIA_IPC] = new Option(
-    SIGNAL_VIA_IPC, 'If you are using --' + STARTED_SIGNIFIER +
+    SIGNAL_VIA_IPC,
+    'If you are using --' + STARTED_SIGNIFIER +
         ', this flag will emit the signal string using process.send(), rather than writing it to stdout',
     'boolean', false);
 opts[DETACH] = new Option(
