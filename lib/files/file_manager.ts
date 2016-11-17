@@ -229,7 +229,7 @@ export class FileManager {
       for (let binPos in binaries) {
         let bin: Binary = binaries[binPos];
         if (file.indexOf(bin.prefix()) !== -1) {
-          bin.remove(path.join(outputDir, file));
+          bin.remove(path.resolve(outputDir, file));
           logger.info('removed ' + file);
         }
       }

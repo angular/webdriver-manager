@@ -68,11 +68,11 @@ export class AndroidSDK extends Binary {
 
   remove(sdkPath: string): void {
     try {
-      let avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
+      let avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
       let version = path.basename(sdkPath).slice(this.prefixDefault.length);
       avds.forEach((avd: string) => {
         spawnSync(
-            path.join(sdkPath, 'tools', 'android'),
+            path.resolve(sdkPath, 'tools', 'android'),
             ['delete', 'avd', '-n', avd + '-v' + version + '-wd-manager']);
       });
     } catch (e) {
