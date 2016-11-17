@@ -148,10 +148,10 @@ function update(options: Options): void {
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
-    let sdk_path = path.join(outputDir, binary.executableFilename(os.type()));
+    let sdk_path = path.resolve(outputDir, binary.executableFilename(os.type()));
     let oldAVDList: string;
 
-    q.nfcall(fs.readFile, path.join(sdk_path, 'available_avds.json'))
+    q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
         .then(
             (oldAVDs: string) => {
               oldAVDList = oldAVDs;
@@ -164,7 +164,7 @@ function update(options: Options): void {
         })
         .then(() => {
           initializeAndroid(
-              path.join(outputDir, binary.executableFilename(os.type())), android_api_levels,
+              path.resolve(outputDir, binary.executableFilename(os.type())), android_api_levels,
               android_architectures, android_platforms, android_accept_licenses,
               binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger);
         });
@@ -203,7 +203,7 @@ function updateBinary(
 function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string): void {
   // remove the previously saved file and unzip it
   let osType = os.type();
-  let mv = path.join(outputDir, binary.executableFilename(osType));
+  let mv = path.resolve(outputDir, binary.executableFilename(osType));
   try {
     fs.unlinkSync(mv);
   } catch (err) {
@@ -224,7 +224,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   }
 
   // rename
-  fs.renameSync(path.join(outputDir, binary.zipContentName(osType)), mv);
+  fs.renameSync(path.resolve(outputDir, binary.zipContentName(osType)), mv);
 
   // set permissions
   if (osType !== 'Windows_NT') {
@@ -232,8 +232,8 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
     if (binary.id() !== AndroidSDK.id) {
       fs.chmodSync(mv, '0755');
     } else {
-      fs.chmodSync(path.join(mv, 'tools', 'android'), '0755');
-      fs.chmodSync(path.join(mv, 'tools', 'emulator'), '0755');
+      fs.chmodSync(path.resolve(mv, 'tools', 'android'), '0755');
+      fs.chmodSync(path.resolve(mv, 'tools', 'emulator'), '0755');
       // TODO(sjelin): get 64 bit versions working
     }
   }
@@ -242,13 +242,13 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
 function installAppium(binary: Binary, outputDir: string): void {
   logger.info('appium: installing appium');
 
-  let folder = path.join(outputDir, binary.filename());
+  let folder = path.resolve(outputDir, binary.filename());
   try {
     rimraf.sync(folder);
   } catch (err) {
   }
 
   fs.mkdirSync(folder);
-  fs.writeFileSync(path.join(folder, 'package.json'), '{}');
+  fs.writeFileSync(path.resolve(folder, 'package.json'), '{}');
   spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});
 }

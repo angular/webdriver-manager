@@ -141,7 +141,7 @@ function start(options: Options) {
   if (downloadedBinaries[ChromeDriver.id] != null) {
     args.push(
         '-Dwebdriver.chrome.driver=' +
-        path.join(outputDir, binaries[ChromeDriver.id].executableFilename(osType)));
+        path.resolve(outputDir, binaries[ChromeDriver.id].executableFilename(osType)));
     if (chromeLogs != null) {
       args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
     }
@@ -149,7 +149,7 @@ function start(options: Options) {
   if (downloadedBinaries[GeckoDriver.id] != null) {
     args.push(
         '-Dwebdriver.gecko.driver=' +
-        path.join(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
+        path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
     if (options[Opt.IE32]) {
@@ -157,7 +157,7 @@ function start(options: Options) {
     }
     args.push(
         '-Dwebdriver.ie.driver=' +
-        path.join(outputDir, binaries[IEDriver.id].executableFilename(osType)));
+        path.resolve(outputDir, binaries[IEDriver.id].executableFilename(osType)));
   }
   if (options[Opt.EDGE]) {
     // validate that the file exists prior to adding it to args
@@ -187,7 +187,7 @@ function start(options: Options) {
 
   // log the command to launch selenium server
   args.push('-jar');
-  args.push(path.join(outputDir, binaries[StandAlone.id].filename()));
+  args.push(path.resolve(outputDir, binaries[StandAlone.id].filename()));
 
   // Add the port parameter, has to declared after the jar file
   if (seleniumPort) {
@@ -226,9 +226,9 @@ function start(options: Options) {
 
 function startAndroid(
     outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number): void {
-  let sdkPath = path.join(outputDir, sdk.executableFilename(os.type()));
+  let sdkPath = path.resolve(outputDir, sdk.executableFilename(os.type()));
   if (avds[0] == 'all') {
-    avds = <string[]>require(path.join(sdkPath, 'available_avds.json'));
+    avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
   } else if (avds[0] == 'none') {
     avds.length = 0;
   }
@@ -257,7 +257,7 @@ function startAndroid(
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
     }
-    androidProcesses.push(spawn(path.join(sdkPath, 'tools', emuBin), emuArgs, 'inherit'));
+    androidProcesses.push(spawn(path.resolve(sdkPath, 'tools', emuBin), emuArgs, 'inherit'));
   });
 }
 
@@ -274,10 +274,10 @@ let appiumProcess: ChildProcess;
 function startAppium(outputDir: string, binary: Binary, androidSDK: Binary, port: string) {
   logger.info('Starting appium server');
   if (androidSDK) {
-    process.env.ANDROID_HOME = path.join(outputDir, androidSDK.executableFilename(os.type()));
+    process.env.ANDROID_HOME = path.resolve(outputDir, androidSDK.executableFilename(os.type()));
   }
   appiumProcess = spawn(
-      path.join(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
+      path.resolve(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
       port ? ['--port', port] : []);
 }
 
@@ -345,7 +345,8 @@ function signalWhenReady(
   function waitForAndroid(port: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let child = spawn(
-          path.join(outputDir, androidSDK.executableFilename(os.type()), 'platform-tools', 'adb'),
+          path.resolve(
+              outputDir, androidSDK.executableFilename(os.type()), 'platform-tools', 'adb'),
           ['-s', 'emulator-' + port, 'wait-for-device'], 'ignore');
       let done = false;
       child.on('error', (err: Error) => {
