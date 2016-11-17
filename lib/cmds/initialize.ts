@@ -31,7 +31,7 @@ function respondFactory(question: string, answer: string): Function {
 function runAndroidSDKCommand(
     sdkPath: string, cmd: string, args: string[], stdio?: string,
     config_fun?: Function): q.Promise<any> {
-  let child = spawn(path.join(sdkPath, 'tools', 'android'), [cmd].concat(args), stdio);
+  let child = spawn(path.resolve(sdkPath, 'tools', 'android'), [cmd].concat(args), stdio);
 
   if (config_fun) {
     config_fun(child);
@@ -74,7 +74,7 @@ function setupHardwareAcceleration(sdkPath: string) {
     console.log('Enabling hardware acceleration (requires root access)');
     // We don't need the wrapped spawnSync because we know we're on OSX
     spawnSync(
-        'sudo', [path.join(
+        'sudo', [path.resolve(
                     sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
                     'silent_install.sh')],
         {stdio: 'inherit'});
@@ -85,7 +85,7 @@ function setupHardwareAcceleration(sdkPath: string) {
         'cmd',
         [
           '/c', 'runas', '/noprofile', '/user:Administrator',
-          path.join(
+          path.resolve(
               sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
               'silent_install.bat')
         ],
@@ -169,7 +169,7 @@ class AVDDescriptor {
 // SDKs which were downloaded
 function getAVDDescriptors(sdkPath: string): q.Promise<AVDDescriptor[]> {
   let deferred = q.defer<AVDDescriptor[]>();
-  glob(path.join(sdkPath, 'system-images', '*', '*', '*'), (err: Error, files: string[]) => {
+  glob(path.resolve(sdkPath, 'system-images', '*', '*', '*'), (err: Error, files: string[]) => {
     if (err) {
       deferred.reject(err);
     } else {
@@ -196,7 +196,7 @@ function sequentialForEach<T>(array: T[], func: (x: T) => q.Promise<any>): q.Pro
 
 // Configures the hardware.ini file for a system image of a new AVD
 function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<any> {
-  let file = path.join(
+  let file = path.resolve(
       sdkPath, 'system-images', desc.api, desc.platform, desc.architecture, 'hardware.ini');
   return q.nfcall(fs.stat, file)
       .then(
@@ -269,7 +269,7 @@ export function android(
       })
       .then(() => {
         return q.nfcall(
-            fs.writeFile, path.join(sdkPath, 'available_avds.json'),
+            fs.writeFile, path.resolve(sdkPath, 'available_avds.json'),
             JSON.stringify(avdDescriptors.map((descriptor: AVDDescriptor) => {
               return descriptor.name;
             })));

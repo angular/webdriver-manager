@@ -120,7 +120,7 @@ export class Downloader {
       fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string,
       opt_ignoreSSL?: boolean, callback?: Function): void {
     logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
-    let filePath = path.join(outputDir, fileName);
+    let filePath = path.resolve(outputDir, fileName);
     let file = fs.createWriteStream(filePath);
     let contentLength = 0;
 
