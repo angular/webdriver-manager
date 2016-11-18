@@ -249,6 +249,7 @@ function installAppium(binary: Binary, outputDir: string): void {
   }
 
   fs.mkdirSync(folder);
-  fs.writeFileSync(path.resolve(folder, 'package.json'), '{}');
+  fs.writeFileSync(
+      path.resolve(folder, 'package.json'), JSON.stringify({scripts: {appium: 'appium'}}));
   spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});
 }
