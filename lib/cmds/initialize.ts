@@ -69,27 +69,16 @@ function downloadAndroidUpdates(
 
 // Setup hardware acceleration for x86-64 emulation
 function setupHardwareAcceleration(sdkPath: string) {
-  // TODO(sjelin): check that the BIOS option is set properly on linux
+  // TODO(sjelin): linux setup
+  let toolDir = path.resolve(sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager');
   if (os.type() == 'Darwin') {
     console.log('Enabling hardware acceleration (requires root access)');
     // We don't need the wrapped spawnSync because we know we're on OSX
-    spawnSync(
-        'sudo', [path.resolve(
-                    sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
-                    'silent_install.sh')],
-        {stdio: 'inherit'});
+    spawnSync('sudo', ['silent_install.sh'], {stdio: 'inherit', cwd: toolDir});
   } else if (os.type() == 'Windows_NT') {
     console.log('Enabling hardware acceleration (requires admin access)');
-    // We don't need the wrapped spawnSync because we know we're on Windows
-    spawnSync(
-        'cmd',
-        [
-          '/c', 'runas', '/noprofile', '/user:Administrator',
-          path.resolve(
-              sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager',
-              'silent_install.bat')
-        ],
-        {stdio: 'inherit'});
+    // We don't need the wrapped spawnSync because we know we're on windows
+    spawnSync('silent_install.bat', [], {stdio: 'inherit', cwd: toolDir});
   }
 }
 
@@ -169,12 +158,14 @@ class AVDDescriptor {
 // SDKs which were downloaded
 function getAVDDescriptors(sdkPath: string): q.Promise<AVDDescriptor[]> {
   let deferred = q.defer<AVDDescriptor[]>();
-  glob(path.resolve(sdkPath, 'system-images', '*', '*', '*'), (err: Error, files: string[]) => {
+  // `glob` package always prefers patterns to use `/`
+  glob('system-images/*/*/*', {cwd: sdkPath}, (err: Error, files: string[]) => {
     if (err) {
       deferred.reject(err);
     } else {
       deferred.resolve(files.map((file: string) => {
-        let info = file.split(path.sep).slice(-3);
+        // `file` could use `/` or `\`, so we use `path.normalize`
+        let info = path.normalize(file).split(path.sep).slice(-3);
         return new AVDDescriptor(info[0], info[1], info[2]);
       }));
     }

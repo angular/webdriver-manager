@@ -277,8 +277,8 @@ function startAppium(outputDir: string, binary: Binary, androidSDK: Binary, port
     process.env.ANDROID_HOME = path.resolve(outputDir, androidSDK.executableFilename(os.type()));
   }
   appiumProcess = spawn(
-      path.resolve(outputDir, binary.filename(), 'node_modules', '.bin', 'appium'),
-      port ? ['--port', port] : []);
+      'npm', ['run', 'appium'].concat(port ? ['--', '--port', port] : []), null,
+      {cwd: path.resolve(outputDir, binary.filename())});
 }
 
 function killAppium() {
