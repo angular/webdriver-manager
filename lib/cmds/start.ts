@@ -36,6 +36,7 @@ let prog = new Program()
                .addOption(Opts[Opt.AVD_USE_SNAPSHOTS])
                .addOption(Opts[Opt.STARTED_SIGNIFIER])
                .addOption(Opts[Opt.SIGNAL_VIA_IPC])
+               .addOption(Opts[Opt.QUIET])
                .addOption(Opts[Opt.DETACH]);
 
 if (os.type() === 'Darwin') {
@@ -72,6 +73,7 @@ function start(options: Options) {
   }
 
   let osType = os.type();
+  let stdio = options[Opt.QUIET].getBoolean() ? 'pipe' : 'inherit';
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
   let appiumPort = options[Opt.APPIUM_PORT].getString();
@@ -176,13 +178,13 @@ function start(options: Options) {
       let avds = options[Opt.AVDS].getString();
       startAndroid(
           outputDir, binaries[AndroidSDK.id], avds.split(','),
-          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), avdPort);
+          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), avdPort, stdio);
     } else {
       logger.warn('Not starting android because it is not installed');
     }
   }
   if (downloadedBinaries[Appium.id] != null) {
-    startAppium(outputDir, binaries[Appium.id], binaries[AndroidSDK.id], appiumPort);
+    startAppium(outputDir, binaries[Appium.id], binaries[AndroidSDK.id], appiumPort, stdio);
   }
 
   // log the command to launch selenium server
@@ -200,7 +202,7 @@ function start(options: Options) {
   }
   logger.info('java' + argsToString);
 
-  let seleniumProcess = spawn('java', args, 'inherit');
+  let seleniumProcess = spawn('java', args, stdio);
   if (options[Opt.STARTED_SIGNIFIER].getString()) {
     signalWhenReady(
         options[Opt.STARTED_SIGNIFIER].getString(), options[Opt.SIGNAL_VIA_IPC].getBoolean(),
@@ -225,7 +227,8 @@ function start(options: Options) {
 }
 
 function startAndroid(
-    outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number): void {
+    outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number,
+    stdio: string): void {
   let sdkPath = path.resolve(outputDir, sdk.executableFilename(os.type()));
   if (avds[0] == 'all') {
     avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
@@ -257,7 +260,7 @@ function startAndroid(
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
     }
-    androidProcesses.push(spawn(path.resolve(sdkPath, 'tools', emuBin), emuArgs, 'inherit'));
+    androidProcesses.push(spawn(path.resolve(sdkPath, 'tools', emuBin), emuArgs, stdio));
   });
 }
 
@@ -271,13 +274,14 @@ function killAndroid() {
 // Manage appium process
 let appiumProcess: ChildProcess;
 
-function startAppium(outputDir: string, binary: Binary, androidSDK: Binary, port: string) {
+function startAppium(
+    outputDir: string, binary: Binary, androidSDK: Binary, port: string, stdio: string) {
   logger.info('Starting appium server');
   if (androidSDK) {
     process.env.ANDROID_HOME = path.resolve(outputDir, androidSDK.executableFilename(os.type()));
   }
   appiumProcess = spawn(
-      'npm', ['run', 'appium'].concat(port ? ['--', '--port', port] : []), null,
+      'npm', ['run', 'appium'].concat(port ? ['--', '--port', port] : []), stdio,
       {cwd: path.resolve(outputDir, binary.filename())});
 }
 

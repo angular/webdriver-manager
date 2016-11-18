@@ -14,11 +14,14 @@ const noop = () => {};
 
 // Make a function which configures a child process to automatically respond
 // to a certain question
-function respondFactory(question: string, answer: string): Function {
+function respondFactory(question: string, answer: string, verbose: boolean): Function {
   return (child: ChildProcess) => {
     (<any>child.stdin).setDefaultEncoding('utf-8');
     child.stdout.on('data', (data: Buffer | String) => {
       if (data != null) {
+        if (verbose) {
+          process.stdout.write(data as string);
+        }
         if (data.toString().indexOf(question) != -1) {
           child.stdin.write(answer + '\n');
         }
@@ -59,12 +62,13 @@ function runAndroidSDKCommand(
 
 // Download updates via the android SDK
 function downloadAndroidUpdates(
-    sdkPath: string, targets: string[], search_all: boolean, auto_accept: boolean): q.Promise<any> {
+    sdkPath: string, targets: string[], search_all: boolean, auto_accept: boolean,
+    verbose: boolean): q.Promise<any> {
   return runAndroidSDKCommand(
       sdkPath, 'update',
       ['sdk', '-u'].concat(search_all ? ['-a'] : []).concat(['-t', targets.join(',')]),
       auto_accept ? 'pipe' : 'inherit',
-      auto_accept ? respondFactory('Do you accept the license', 'y') : noop);
+      auto_accept ? respondFactory('Do you accept the license', 'y', verbose) : noop);
 }
 
 // Setup hardware acceleration for x86-64 emulation
@@ -207,21 +211,24 @@ function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<a
 }
 
 // Make an android virtual device
-function makeAVD(sdkPath: string, desc: AVDDescriptor, version: string): q.Promise<any> {
+function makeAVD(
+    sdkPath: string, desc: AVDDescriptor, version: string, verbose: boolean): q.Promise<any> {
   return runAndroidSDKCommand(sdkPath, 'delete', ['avd', '--name', desc.avdName(version)])
       .then(noop, noop)
       .then(() => {
         return runAndroidSDKCommand(
             sdkPath, 'create',
             ['avd', '--name', desc.avdName(version), '--target', desc.api, '--abi', desc.abi],
-            'pipe', respondFactory('Do you wish to create a custom hardware profile', 'no'));
+            'pipe',
+            respondFactory('Do you wish to create a custom hardware profile', 'no', verbose));
       });
 }
 
 // Initialize the android SDK
 export function android(
     sdkPath: string, apiLevels: string[], architectures: string[], platforms: string[],
-    acceptLicenses: boolean, version: string, oldAVDs: string[], logger: Logger): void {
+    acceptLicenses: boolean, version: string, oldAVDs: string[], logger: Logger,
+    verbose: boolean): void {
   let avdDescriptors: AVDDescriptor[];
   let tools = ['platform-tool', 'tool'];
   if ((os.type() == 'Darwin') || (os.type() == 'Windows_NT')) {
@@ -229,7 +236,7 @@ export function android(
   }
 
   logger.info('android-sdk: Downloading additional SDK updates');
-  downloadAndroidUpdates(sdkPath, tools, false, acceptLicenses)
+  downloadAndroidUpdates(sdkPath, tools, false, acceptLicenses, verbose)
       .then(() => {
         return setupHardwareAcceleration(sdkPath);
       })
@@ -240,7 +247,7 @@ export function android(
         return downloadAndroidUpdates(
             sdkPath, ['build-tools-24.0.0'].concat(
                          getAndroidSDKTargets(apiLevels, architectures, platforms, oldAVDs)),
-            true, acceptLicenses);
+            true, acceptLicenses, verbose);
       })
       .then(() => {
         return getAVDDescriptors(sdkPath);
@@ -255,7 +262,7 @@ export function android(
       .then(() => {
         return sequentialForEach(avdDescriptors, (descriptor: AVDDescriptor) => {
           logger.info('android-sdk: Setting up virtual device "' + descriptor.name + '"');
-          return makeAVD(sdkPath, descriptor, version);
+          return makeAVD(sdkPath, descriptor, version, verbose);
         });
       })
       .then(() => {
