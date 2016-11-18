@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as http from 'http';
 import * as path from 'path';
 import * as q from 'q';
 import * as request from 'request';
@@ -15,32 +14,6 @@ let logger = new Logger('downloader');
  * The file downloader.
  */
 export class Downloader {
-  /**
-   * Download the binary file.
-   * @param binary The binary of interest.
-   * @param outputDir The directory where files are downloaded and stored.
-   * @param opt_proxy The proxy for downloading files.
-   * @param opt_ignoreSSL To ignore SSL.
-   * @param opt_callback Callback method to be executed after the file is downloaded.
-   */
-  static downloadBinary(
-      binary: Binary, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
-      opt_callback?: Function): void {
-    logger.info(binary.name + ': downloading version ' + binary.version());
-    var url = binary.url(Config.osType(), Config.osArch());
-    if (!url) {
-      logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
-      return;
-    }
-    Downloader.httpGetFile_(
-        url, binary.filename(Config.osType(), Config.osArch()), outputDir, opt_proxy, opt_ignoreSSL,
-        (filePath: string) => {
-          if (opt_callback) {
-            opt_callback(binary, outputDir, filePath);
-          }
-        });
-  }
-
   /**
    * Resolves proxy based on values set
    * @param fileUrl The url to download the file.
@@ -80,60 +53,29 @@ export class Downloader {
     return undefined;
   }
 
-  static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean):
-      q.Promise<any> {
-    let deferred = q.defer();
-    if (opt_ignoreSSL) {
-      logger.info('ignoring SSL certificate');
-    }
-
-    let options = {
-      method: 'GET',
-      url: fileUrl,
-      strictSSL: !opt_ignoreSSL,
-      rejectUnauthorized: !opt_ignoreSSL,
-      proxy: Downloader.resolveProxy_(fileUrl, opt_proxy)
-    };
-
-    request(options).on('response', (response) => {
-      if (response.headers['Location']) {
-        let urlLocation = response.headers['Location'];
-        deferred.resolve(Downloader.httpHeadContentLength(urlLocation, opt_proxy, opt_ignoreSSL));
-      } else if (response.headers['content-length']) {
-        let contentLength = response.headers['content-length'];
-        deferred.resolve(contentLength);
-      }
-      response.destroy();
-    });
-    return deferred.promise;
-  }
-
   /**
-   * Ceates the GET request for the file name.
-   * @param fileUrl The url to download the file.
-   * @param fileName The name of the file to download.
-   * @param opt_proxy The proxy to connect to to download files.
-   * @param opt_ignoreSSL To ignore SSL.
+   * Http get the file. Check the content length of the file before writing the file.
+   * If the content length does not match, remove it and download the file.
+   *
+   * @param binary The binary of interest.
+   * @param fileName The file name.
+   * @param outputDir The directory where files are downloaded and stored.
+   * @param contentLength The content length of the existing file.
+   * @param opt_proxy The proxy for downloading files.
+   * @param opt_ignoreSSL Should the downloader ignore SSL.
+   * @param opt_callback Callback method to be executed after the file is downloaded.
+   * @returns Promise<any> Resolves true = downloaded. Resolves false = not downloaded.
+   *          Rejected with an error.
    */
-  static httpGetFile_(
-      fileUrl: string, fileName: string, outputDir: string, opt_proxy?: string,
-      opt_ignoreSSL?: boolean, callback?: Function): void {
-    logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
+  static getFile(
+      binary: Binary, fileUrl: string, fileName: string, outputDir: string, contentLength: number,
+      opt_proxy?: string, opt_ignoreSSL?: boolean, callback?: Function): Promise<any> {
+    // logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
+    // let contentLength = 0;
     let filePath = path.resolve(outputDir, fileName);
-    let file = fs.createWriteStream(filePath);
-    let contentLength = 0;
+    let file: any;
 
-    interface Options {
-      url: string;
-      timeout: number;
-      strictSSL?: boolean;
-      rejectUnauthorized?: boolean;
-      proxy?: string;
-      headers?: {[key: string]: any};
-      [key: string]: any;
-    }
-
-    let options: Options = {
+    let options: IOptions = {
       url: fileUrl,
       // default Linux can be anywhere from 20-120 seconds
       // increasing this arbitrarily to 4 minutes
@@ -153,46 +95,72 @@ export class Downloader {
       }
     }
 
-    request(options)
-        .on('response',
-            (response) => {
-              if (response.statusCode !== 200) {
-                fs.unlinkSync(filePath);
-                logger.error('Error: Got code ' + response.statusCode + ' from ' + fileUrl);
-              }
-              contentLength = response.headers['content-length'];
-            })
-        .on('error',
-            (error) => {
-              if ((error as any).code === 'ETIMEDOUT') {
-                logger.error('Connection timeout downloading: ' + fileUrl);
-                logger.error('Default timeout is 4 minutes.');
+    let req: request.Request = null;
+    let resContentLength: number;
 
-              } else if ((error as any).connect) {
-                logger.error('Could not connect to the server to download: ' + fileUrl);
-              }
-              logger.error(error);
-              fs.unlinkSync(filePath);
-            })
-        .pipe(file);
+    return new Promise<boolean>((resolve, reject) => {
+             req = request(options);
+             req.on('response', response => {
+               if (response.statusCode === 200) {
+                 resContentLength = +response.headers['content-length'];
+                 if (contentLength === resContentLength) {
+                   // if the size is the same, do not download and stop here
+                   response.destroy();
+                   resolve(false);
+                 } else {
+                   // only pipe if the headers are different length
+                   file = fs.createWriteStream(filePath);
+                   req.pipe(file);
+                   file.on('close', () => {
+                     fs.stat(filePath, (error, stats) => {
+                       if (error) {
+                         (error as any).msg = 'Error: Got error ' + error + ' from ' + fileUrl;
+                         reject(error);
+                       }
+                       if (stats.size != resContentLength) {
+                         (error as any).msg = 'Error: corrupt download for ' + fileName +
+                             '. Please re-run webdriver-manager update';
+                         fs.unlinkSync(filePath);
+                         reject(error);
+                       }
+                       if (callback) {
+                         callback(binary, outputDir, fileName);
+                       }
+                     });
+                     resolve(true);
+                   });
+                 }
 
-    file.on('close', function() {
-      fs.stat(filePath, function(err, stats) {
-        if (err) {
-          logger.error('Error: Got error ' + err + ' from ' + fileUrl);
-          return;
-        }
-        if (stats.size != contentLength) {
-          logger.error(
-              'Error: corrupt download for ' + fileName +
-              '. Please re-run webdriver-manager update');
-          fs.unlinkSync(filePath);
-          return;
-        }
-        if (callback) {
-          callback(filePath);
-        }
-      });
-    });
+               } else {
+                 let error = new Error();
+                 (error as any).msg =
+                     'Expected response code 200, received: ' + response.statusCode;
+                 reject(error);
+               }
+             });
+             req.on('error', error => {
+               if ((error as any).code === 'ETIMEDOUT') {
+                 (error as any).msg = 'Connection timeout downloading: ' + fileUrl +
+                     '. Default timeout is 4 minutes.';
+               } else if ((error as any).connect) {
+                 (error as any).msg = 'Could not connect to the server to download: ' + fileUrl;
+               }
+               reject(error);
+             });
+           })
+        .catch(error => {
+          logger.error((error as any).msg);
+        });
   }
+}
+
+interface IOptions {
+  method?: string;
+  url: string;
+  timeout: number;
+  strictSSL?: boolean;
+  rejectUnauthorized?: boolean;
+  proxy?: string;
+  headers?: {[key: string]: any};
+  [key: string]: any;
 }

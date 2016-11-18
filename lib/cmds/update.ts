@@ -118,10 +118,8 @@ function update(options: Options): void {
   // permissions
   if (standalone) {
     let binary = binaries[StandAlone.id];
-    FileManager.toDownload(binary, outputDir, proxy, ignoreSSL).then((value: boolean) => {
-      if (value) {
-        Downloader.downloadBinary(binary, outputDir, proxy, ignoreSSL);
-      } else {
+    FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL).then((downloaded: boolean) => {
+      if (!downloaded) {
         logger.info(
             binary.name + ': file exists ' +
             path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
@@ -131,21 +129,21 @@ function update(options: Options): void {
   }
   if (chrome) {
     let binary = binaries[ChromeDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (gecko) {
     let binary = binaries[GeckoDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie) {
     let binary = binaries[IEDriver.id];
     binary.arch = Config.osArch();  // Win32 or x64
-    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (ie32) {
     let binary = binaries[IEDriver.id];
     binary.arch = 'Win32';
-    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
+    updateBinary(binary, outputDir, proxy, ignoreSSL);
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
@@ -179,27 +177,24 @@ function update(options: Options): void {
   }
 }
 
-function updateBinary(
-    binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<any> {
-  return FileManager.toDownload(binary, outputDir, proxy, ignoreSSL).then((value: boolean) => {
-    if (value) {
-      let deferred = q.defer();
-      Downloader.downloadBinary(
+function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean) {
+  FileManager
+      .downloadFile(
           binary, outputDir, proxy, ignoreSSL,
           (binary: Binary, outputDir: string, fileName: string) => {
             unzip(binary, outputDir, fileName);
-            deferred.resolve();
-          });
-      return deferred.promise;
-    } else {
-      logger.info(
-          binary.name + ': file exists ' +
-          path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
-      let fileName = binary.filename(Config.osType(), Config.osArch());
-      unzip(binary, outputDir, fileName);
-      logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
-    }
-  });
+          })
+      .then(downloaded => {
+        if (!downloaded) {
+          // The file did not have to download, we should unzip it.
+          logger.info(
+              binary.name + ': file exists ' +
+              path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
+          let fileName = binary.filename(Config.osType(), Config.osArch());
+          unzip(binary, outputDir, fileName);
+          logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
+        }
+      });
 }
 
 function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string): void {
