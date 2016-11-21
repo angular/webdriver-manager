@@ -2,7 +2,6 @@ import * as AdmZip from 'adm-zip';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as minimist from 'minimist';
-import * as os from 'os';
 import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
@@ -35,11 +34,11 @@ let prog = new Program()
                .addOption(Opts[Opt.ANDROID_PLATFORMS])
                .addOption(Opts[Opt.ANDROID_ACCEPT_LICENSES]);
 
-if (os.type() === 'Darwin') {
+if (Config.osType() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
 }
 
-if (os.type() === 'Windows_NT') {
+if (Config.osType() === 'Windows_NT') {
   prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
 }
 
@@ -49,7 +48,7 @@ prog.addOption(Opts[Opt.VERSIONS_STANDALONE])
     .addOption(Opts[Opt.VERSIONS_ANDROID])
     .addOption(Opts[Opt.VERSIONS_GECKO]);
 
-if (os.type() === 'Windows_NT') {
+if (Config.osType() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE]);
 }
 export let program = prog;
@@ -125,7 +124,7 @@ function update(options: Options): void {
       } else {
         logger.info(
             binary.name + ': file exists ' +
-            path.resolve(outputDir, binary.filename(os.type(), os.arch())));
+            path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
         logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
       }
     });
@@ -140,7 +139,7 @@ function update(options: Options): void {
   }
   if (ie) {
     let binary = binaries[IEDriver.id];
-    binary.arch = os.arch();  // Win32 or x64
+    binary.arch = Config.osArch();  // Win32 or x64
     updateBinary(binary, outputDir, proxy, ignoreSSL).done();
   }
   if (ie32) {
@@ -150,7 +149,7 @@ function update(options: Options): void {
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
-    let sdk_path = path.resolve(outputDir, binary.executableFilename(os.type()));
+    let sdk_path = path.resolve(outputDir, binary.executableFilename(Config.osType()));
     let oldAVDList: string;
 
     q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
@@ -166,8 +165,8 @@ function update(options: Options): void {
         })
         .then(() => {
           initializeAndroid(
-              path.resolve(outputDir, binary.executableFilename(os.type())), android_api_levels,
-              android_architectures, android_platforms, android_accept_licenses,
+              path.resolve(outputDir, binary.executableFilename(Config.osType())),
+              android_api_levels, android_architectures, android_platforms, android_accept_licenses,
               binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger, verbose);
         })
         .done();
@@ -195,8 +194,8 @@ function updateBinary(
     } else {
       logger.info(
           binary.name + ': file exists ' +
-          path.resolve(outputDir, binary.filename(os.type(), os.arch())));
-      let fileName = binary.filename(os.type(), os.arch());
+          path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
+      let fileName = binary.filename(Config.osType(), Config.osArch());
       unzip(binary, outputDir, fileName);
       logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
     }
@@ -205,7 +204,7 @@ function updateBinary(
 
 function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string): void {
   // remove the previously saved file and unzip it
-  let osType = os.type();
+  let osType = Config.osType();
   let mv = path.resolve(outputDir, binary.executableFilename(osType));
   try {
     fs.unlinkSync(mv);

@@ -1,4 +1,3 @@
-import {arch, type} from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 

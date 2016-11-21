@@ -1,3 +1,4 @@
+import {Config} from '../../lib/config';
 import {Downloader} from '../../lib/files';
 
 describe('downloader', () => {
@@ -21,9 +22,9 @@ describe('downloader', () => {
     });
 
     it('should always return the proxy arg with env var set', () => {
-      process.env.HTTP_PROXY = envHttpProxy;
-      process.env.HTTPS_PROXY = envHttpsProxy;
-      process.env.NO_PROXY = envNoProxy;
+      Config.httpProxy_ = envHttpProxy;
+      Config.httpsProxy_ = envHttpsProxy;
+      Config.noProxy_ = envNoProxy;
       let proxy = Downloader.resolveProxy_(fileUrlHttp, opt_proxy);
       expect(proxy).toBe(opt_proxy);
     });
@@ -31,64 +32,42 @@ describe('downloader', () => {
 
   describe('environment variables', () => {
     beforeEach(() => {
-      delete process.env.HTTP_PROXY;
-      delete process.env.http_proxy;
-      delete process.env.HTTPS_PROXY;
-      delete process.env.https_proxy;
-      delete process.env.NO_PROXY;
-      delete process.env.no_proxy;
+      Config.httpProxy_ = undefined;
+      Config.httpsProxy_ = undefined;
+      Config.noProxy_ = undefined;
     });
 
     it('should return the HTTP env variable', () => {
-      process.env.HTTP_PROXY = envHttpProxy;
-      let proxy = Downloader.resolveProxy_(fileUrlHttp);
-      expect(proxy).toBe(envHttpProxy);
-    });
-
-    it('should return the http env variable', () => {
-      process.env.http_proxy = envHttpProxy;
+      Config.httpProxy_ = envHttpProxy;
       let proxy = Downloader.resolveProxy_(fileUrlHttp);
       expect(proxy).toBe(envHttpProxy);
     });
 
     it('should return the HTTPS env variable for https protocol', () => {
-      process.env.HTTPS_PROXY = envHttpsProxy;
-      let proxy = Downloader.resolveProxy_(fileUrlHttps);
-      expect(proxy).toBe(envHttpsProxy);
-    });
-
-    it('should return the https env variable for https protocol', () => {
-      process.env.https_proxy = envHttpsProxy;
+      Config.httpProxy_ = envHttpsProxy;
       let proxy = Downloader.resolveProxy_(fileUrlHttps);
       expect(proxy).toBe(envHttpsProxy);
     });
 
     it('should return the HTTP env variable for https protocol', () => {
-      process.env.HTTP_PROXY = envHttpProxy;
-      let proxy = Downloader.resolveProxy_(fileUrlHttps);
-      expect(proxy).toBe(envHttpProxy);
-    });
-
-    it('should return the https env variable for https protocol', () => {
-      process.env.http_proxy = envHttpProxy;
+      Config.httpProxy_ = envHttpProxy;
       let proxy = Downloader.resolveProxy_(fileUrlHttps);
       expect(proxy).toBe(envHttpProxy);
     });
 
     describe('NO_PROXY environment variable', () => {
       beforeEach(() => {
-        delete process.env.NO_PROXY;
-        delete process.env.no_proxy;
+        Config.noProxy_ = undefined;
       });
 
-      it('should return null when the NO_PROXY matches the fileUrl', () => {
-        process.env.NO_PROXY = envNoProxy;
+      it('should return undefined when the NO_PROXY matches the fileUrl', () => {
+        Config.noProxy_ = envNoProxy;
         let proxy = Downloader.resolveProxy_(fileUrlHttp);
         expect(proxy).toBeUndefined();
       });
 
-      it('should return null when the no_proxy matches the fileUrl', () => {
-        process.env.no_proxy = envNoProxy;
+      it('should return undefined when the no_proxy matches the fileUrl', () => {
+        Config.noProxy_ = envNoProxy;
         let proxy = Downloader.resolveProxy_(fileUrlHttp);
         expect(proxy).toBeUndefined();
       });

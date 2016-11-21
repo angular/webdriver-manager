@@ -1,6 +1,7 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
-import * as os from 'os';
+
+import {Config} from './config';
 
 
 function spawnFactory(sync: false):
@@ -15,7 +16,7 @@ function spawnFactory(sync: boolean):
         child_process.ChildProcess | child_process.SpawnSyncReturns<any> {
   return (cmd: string, args: string[], stdio?: string,
           opts?: child_process.SpawnOptions | child_process.SpawnSyncOptions) => {
-    if ((os.type() === 'Windows_NT') && (cmd.slice(-4) !== '.exe')) {
+    if ((Config.osType() === 'Windows_NT') && (cmd.slice(-4) !== '.exe')) {
       if (fs.existsSync(cmd + '.exe')) {
         cmd += '.exe';
       } else {
