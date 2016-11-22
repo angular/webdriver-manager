@@ -22,6 +22,7 @@ let prog = new Program()
                .command('update', 'install or update selected binaries')
                .action(update)
                .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.VERBOSE])
                .addOption(Opts[Opt.IGNORE_SSL])
                .addOption(Opts[Opt.PROXY])
                .addOption(Opts[Opt.ALTERNATE_CDN])
@@ -98,6 +99,7 @@ function update(options: Options): void {
   }
   let ignoreSSL = options[Opt.IGNORE_SSL].getBoolean();
   let proxy = options[Opt.PROXY].getString();
+  let verbose = options[Opt.VERBOSE].getBoolean();
 
   // setup versions for binaries
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
@@ -166,7 +168,7 @@ function update(options: Options): void {
           initializeAndroid(
               path.resolve(outputDir, binary.executableFilename(os.type())), android_api_levels,
               android_architectures, android_platforms, android_accept_licenses,
-              binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger);
+              binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger, verbose);
         })
         .done();
   }

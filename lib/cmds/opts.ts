@@ -34,6 +34,8 @@ export const AVD_USE_SNAPSHOTS = 'avd-use-snapshots';
 export const STARTED_SIGNIFIER = 'started-signifier';
 export const SIGNAL_VIA_IPC = 'signal-via-ipc';
 export const DETACH = 'detach';
+export const QUIET = 'quiet';
+export const VERBOSE = 'verbose';
 
 /**
  * The options used by the commands.
@@ -108,5 +110,7 @@ opts[DETACH] = new Option(
     DETACH,
     'Once the selenium server is up and running, return control to the parent process and continue running the server in the background.',
     'boolean', false);
+opts[VERBOSE] = new Option(VERBOSE, 'Extra console output', 'boolean', false);
+opts[QUIET] = new Option(QUIET, 'Minimal console output', 'boolean', false);
 
 export var Opts = opts;
