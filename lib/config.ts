@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 
 import {Logger} from './cli';
@@ -29,8 +30,6 @@ export class Config {
   static nodeModuleName = 'webdriver-manager';
 
   static cwd = process.cwd();
-
-
   static localInstall: string;
   static parentPath = path.resolve(Config.cwd, '..');
   static dir = __dirname;
@@ -38,6 +37,32 @@ export class Config {
 
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
+
+  static osArch_ = os.arch();
+  static osType_ = os.type();
+  static noProxy_ = process.env.NO_PROXY || process.env.no_proxy;
+  static httpsProxy_ = process.env.HTTPS_PROXY || process.env.https_proxy;
+  static httpProxy_ = process.env.HTTP_PROXY || process.env.http_proxy;
+
+  static osArch(): string {
+    return Config.osArch_;
+  }
+
+  static osType(): string {
+    return Config.osType_;
+  }
+
+  static noProxy(): string {
+    return Config.noProxy_;
+  }
+
+  static httpProxy(): string {
+    return Config.httpProxy_;
+  }
+
+  static httpsProxy(): string {
+    return Config.httpsProxy_;
+  }
 
   static getConfigFile_(): string {
     return path.resolve(Config.dir, '..', Config.configFile);

@@ -2,7 +2,6 @@ import {ChildProcess} from 'child_process';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as minimist from 'minimist';
-import * as os from 'os';
 import * as path from 'path';
 import * as q from 'q';
 
@@ -40,11 +39,11 @@ let prog = new Program()
                .addOption(Opts[Opt.QUIET])
                .addOption(Opts[Opt.DETACH]);
 
-if (os.type() === 'Darwin') {
+if (Config.osType() === 'Darwin') {
   prog.addOption(Opts[Opt.IOS]);
 }
 
-if (os.type() === 'Windows_NT') {
+if (Config.osType() === 'Windows_NT') {
   prog.addOption(Opts[Opt.VERSIONS_IE])
       .addOption(Opts[Opt.IE32])
       .addOption(Opts[Opt.IE])
@@ -73,7 +72,7 @@ function start(options: Options) {
     return detachedRun(options);
   }
 
-  let osType = os.type();
+  let osType = Config.osType();
   let stdio = options[Opt.QUIET].getBoolean() ? 'pipe' : 'inherit';
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
@@ -230,7 +229,7 @@ function start(options: Options) {
 function startAndroid(
     outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number,
     stdio: string): void {
-  let sdkPath = path.resolve(outputDir, sdk.executableFilename(os.type()));
+  let sdkPath = path.resolve(outputDir, sdk.executableFilename(Config.osType()));
   if (avds[0] == 'all') {
     avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
   } else if (avds[0] == 'none') {
@@ -279,7 +278,8 @@ function startAppium(
     outputDir: string, binary: Binary, androidSDK: Binary, port: string, stdio: string) {
   logger.info('Starting appium server');
   if (androidSDK) {
-    process.env.ANDROID_HOME = path.resolve(outputDir, androidSDK.executableFilename(os.type()));
+    process.env.ANDROID_HOME =
+        path.resolve(outputDir, androidSDK.executableFilename(Config.osType()));
   }
   appiumProcess = spawn(
       'npm', ['run', 'appium'].concat(port ? ['--', '--port', port] : []), stdio,
@@ -351,7 +351,7 @@ function signalWhenReady(
     return q.Promise<void>((resolve, reject) => {
       let child = spawn(
           path.resolve(
-              outputDir, androidSDK.executableFilename(os.type()), 'platform-tools', 'adb'),
+              outputDir, androidSDK.executableFilename(Config.osType()), 'platform-tools', 'adb'),
           ['-s', 'emulator-' + port, 'wait-for-device'], 'ignore');
       let done = false;
       child.on('error', (err: Error) => {

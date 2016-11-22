@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as http from 'http';
-import * as os from 'os';
 import * as path from 'path';
 import * as q from 'q';
 import * as request from 'request';
@@ -8,6 +7,7 @@ import * as url from 'url';
 
 import {Binary} from '../binaries/binary';
 import {Logger} from '../cli';
+import {Config} from '../config';
 
 let logger = new Logger('downloader');
 
@@ -27,13 +27,13 @@ export class Downloader {
       binary: Binary, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
       opt_callback?: Function): void {
     logger.info(binary.name + ': downloading version ' + binary.version());
-    var url = binary.url(os.type(), os.arch());
+    var url = binary.url(Config.osType(), Config.osArch());
     if (!url) {
       logger.error(binary.name + ' v' + binary.version() + ' is not available for your system.');
       return;
     }
     Downloader.httpGetFile_(
-        url, binary.filename(os.type(), os.arch()), outputDir, opt_proxy, opt_ignoreSSL,
+        url, binary.filename(Config.osType(), Config.osArch()), outputDir, opt_proxy, opt_ignoreSSL,
         (filePath: string) => {
           if (opt_callback) {
             opt_callback(binary, outputDir, filePath);
@@ -57,7 +57,7 @@ export class Downloader {
       // If the NO_PROXY environment variable exists and matches the host name,
       // to ignore the resolve proxy.
       // the checks to see if it exists and equal to empty string is to help with testing
-      let noProxy: string = process.env.NO_PROXY || process.env.no_proxy;
+      let noProxy: string = Config.noProxy();
       if (noProxy) {
         // array of hostnames/domain names listed in the NO_PROXY environment variable
         let noProxyTokens = noProxy.split(',');
@@ -72,13 +72,12 @@ export class Downloader {
 
       // If the HTTPS_PROXY and HTTP_PROXY environment variable is set, use that as the proxy
       if (protocol === 'https:') {
-        return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY ||
-            process.env.http_proxy;
+        return Config.httpsProxy() || Config.httpProxy();
       } else if (protocol === 'http:') {
-        return process.env.HTTP_PROXY || process.env.http_proxy;
+        return Config.httpProxy();
       }
     }
-    return null;
+    return undefined;
   }
 
   static httpHeadContentLength(fileUrl: string, opt_proxy?: string, opt_ignoreSSL?: boolean):
