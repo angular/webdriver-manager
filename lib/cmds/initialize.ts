@@ -2,11 +2,11 @@ import {ChildProcess, spawnSync} from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as ini from 'ini';
-import * as os from 'os';
 import * as path from 'path';
 import * as q from 'q';
 
 import {Logger} from '../cli';
+import {Config} from '../config';
 import {spawn} from '../utils';
 
 
@@ -75,11 +75,11 @@ function downloadAndroidUpdates(
 function setupHardwareAcceleration(sdkPath: string) {
   // TODO(sjelin): linux setup
   let toolDir = path.resolve(sdkPath, 'extras', 'intel', 'Hardware_Accelerated_Execution_Manager');
-  if (os.type() == 'Darwin') {
+  if (Config.osType() == 'Darwin') {
     console.log('Enabling hardware acceleration (requires root access)');
     // We don't need the wrapped spawnSync because we know we're on OSX
     spawnSync('sudo', ['silent_install.sh'], {stdio: 'inherit', cwd: toolDir});
-  } else if (os.type() == 'Windows_NT') {
+  } else if (Config.osType() == 'Windows_NT') {
     console.log('Enabling hardware acceleration (requires admin access)');
     // We don't need the wrapped spawnSync because we know we're on windows
     spawnSync('silent_install.bat', [], {stdio: 'inherit', cwd: toolDir});
@@ -231,7 +231,7 @@ export function android(
     verbose: boolean): void {
   let avdDescriptors: AVDDescriptor[];
   let tools = ['platform-tool', 'tool'];
-  if ((os.type() == 'Darwin') || (os.type() == 'Windows_NT')) {
+  if ((Config.osType() == 'Darwin') || (Config.osType() == 'Windows_NT')) {
     tools.push('extra-intel-Hardware_Accelerated_Execution_Manager');
   }
 
@@ -279,7 +279,7 @@ export function android(
 };
 
 export function iOS(logger: Logger) {
-  if (os.type() != 'Darwin') {
+  if (Config.osType() != 'Darwin') {
     throw new Error('Must be on a Mac to simulate iOS devices.');
   }
   try {

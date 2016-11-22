@@ -1,11 +1,11 @@
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone, OS} from
 '../binaries';
+import {Config} from '../config';
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
 import {Logger} from '../cli';
@@ -85,7 +85,7 @@ export class FileManager {
    * @returns A binary map that is available for the operating system.
    */
   static setupBinaries(alternateCDN?: string): BinaryMap<Binary> {
-    return FileManager.compileBinaries_(os.type(), alternateCDN);
+    return FileManager.compileBinaries_(Config.osType(), alternateCDN);
   }
 
   /**
@@ -146,8 +146,8 @@ export class FileManager {
    * @returns An dictionary map of all the downloaded binaries found in the output folder.
    */
   static downloadedBinaries(outputDir: string): BinaryMap<DownloadedBinary> {
-    let ostype = os.type();
-    let arch = os.arch();
+    let ostype = Config.osType();
+    let arch = Config.osArch();
     let binaries = FileManager.setupBinaries();
     let existingFiles = FileManager.getExistingFiles(outputDir);
     let downloaded: BinaryMap<DownloadedBinary> = {};
@@ -168,8 +168,8 @@ export class FileManager {
    */
   static toDownload<T extends Binary>(
       binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<boolean> {
-    let osType = os.type();
-    let osArch = os.arch();
+    let osType = Config.osType();
+    let osArch = Config.osArch();
     let filePath: string;
     let readData: Buffer;
     let deferred = q.defer<boolean>();
