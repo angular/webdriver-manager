@@ -130,21 +130,21 @@ function update(options: Options): void {
   }
   if (chrome) {
     let binary = binaries[ChromeDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
   }
   if (gecko) {
     let binary = binaries[GeckoDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
   }
   if (ie) {
     let binary = binaries[IEDriver.id];
     binary.arch = os.arch();  // Win32 or x64
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
   }
   if (ie32) {
     let binary = binaries[IEDriver.id];
     binary.arch = 'Win32';
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBinary(binary, outputDir, proxy, ignoreSSL).done();
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
@@ -167,7 +167,8 @@ function update(options: Options): void {
               path.resolve(outputDir, binary.executableFilename(os.type())), android_api_levels,
               android_architectures, android_platforms, android_accept_licenses,
               binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger);
-        });
+        })
+        .done();
   }
   if (ios) {
     checkIOS(logger);
