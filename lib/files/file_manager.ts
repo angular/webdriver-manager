@@ -161,49 +161,54 @@ export class FileManager {
   }
 
   /**
-   * Check to see if the binary version should be downloaded.
+   * Try to download the binary version.
    * @param binary The binary of interest.
    * @param outputDir The directory where files are downloaded and stored.
-   * @returns If the file should be downloaded.
+   * @returns Promise resolved to true for files downloaded, resolved to false for files not
+   *          downloaded because they exist, rejected if there is an error.
    */
-  static toDownload<T extends Binary>(
-      binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): q.Promise<boolean> {
-    let osType = Config.osType();
-    let osArch = Config.osArch();
-    let filePath: string;
-    let readData: Buffer;
-    let deferred = q.defer<boolean>();
-    let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
+  static downloadFile<T extends Binary>(
+      binary: T, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
+      callback?: Function): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      let filePath = path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch()));
+      let fileUrl = binary.url(Config.osType(), Config.osArch());
+      let fileName = binary.filename(Config.osType(), Config.osArch());
+      let outDir = Config.getSeleniumDir();
+      let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
+      let contentLength = 0;
 
-    if (downloaded[binary.id()]) {
-      let downloadedBinary = downloaded[binary.id()];
-      let versions = downloadedBinary.versions;
-      let version = binary.version();
-      for (let index in versions) {
-        let v = versions[index];
-        if (v === version) {
-          filePath = path.resolve(outputDir, binary.filename(osType, osArch));
-          readData = fs.readFileSync(filePath);
+      // If we have downloaded the file before, check the content length
+      if (downloaded[binary.id()]) {
+        let downloadedBinary = downloaded[binary.id()];
+        let versions = downloadedBinary.versions;
+        let version = binary.version();
 
-          // we have the version, verify it is the correct file size
-          let contentLength =
-              Downloader.httpHeadContentLength(binary.url(osType, osArch), proxy, ignoreSSL);
-          return contentLength.then((value: any): boolean => {
-            if (value == readData.length) {
-              return false;
-            } else {
-              logger.warn(
-                  path.basename(filePath) + ' expected length ' + value + ', found ' +
-                  readData.length);
-              logger.warn('removing file: ' + filePath);
-              return true;
-            }
-          });
+        for (let index in versions) {
+          let v = versions[index];
+          if (v === version) {
+            contentLength = fs.statSync(filePath).size;
+            Downloader
+                .getFile(
+                    binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
+                    callback)
+                .then(downloaded => {
+                  resolve(downloaded);
+                });
+          }
         }
+      } else {
+        // We have not downloaded it before, or the version does not exist. Use the default content
+        // length of zero and download the file.
+        Downloader
+            .getFile(
+                binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
+                callback)
+            .then(downloaded => {
+              resolve(downloaded);
+            });
       }
-    }
-    deferred.resolve(true);
-    return deferred.promise;
+    });
   }
 
   /**

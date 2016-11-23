@@ -265,4 +265,6 @@ describe('file manager', () => {
       }
     }
   });
+
+  // TODO(cnishina): download binaries for each os type / arch combination
 });
