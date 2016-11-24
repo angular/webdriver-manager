@@ -126,8 +126,8 @@ export class Downloader {
                        if (callback) {
                          callback(binary, outputDir, fileName);
                        }
+                       resolve(true);
                      });
-                     resolve(true);
                    });
                  }
 

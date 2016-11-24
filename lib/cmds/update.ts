@@ -177,14 +177,15 @@ function update(options: Options): void {
   }
 }
 
-function updateBinary(binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean) {
-  FileManager
+function updateBinary(
+    binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): Promise<void> {
+  return FileManager
       .downloadFile(
           binary, outputDir, proxy, ignoreSSL,
           (binary: Binary, outputDir: string, fileName: string) => {
             unzip(binary, outputDir, fileName);
           })
-      .then(downloaded => {
+      .then<void>(downloaded => {
         if (!downloaded) {
           // The file did not have to download, we should unzip it.
           logger.info(
