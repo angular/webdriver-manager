@@ -11,7 +11,8 @@ let logger = new Logger('shutdown');
 let prog = new Program()
                .command('shutdown', 'shut down the selenium server')
                .action(shutdown)
-               .addOption(Opts[Opt.SELENIUM_PORT]);
+               .addOption(Opts[Opt.SELENIUM_PORT])
+               .addOption(Opts[Opt.ALREADY_OFF_ERROR]);
 
 export var program = prog;
 
@@ -30,6 +31,18 @@ if (argv._[0] === 'shutdown-run') {
 function shutdown(options: Options) {
   logger.info('Attempting to shut down selenium nicely');
   http.get(
-      'http://localhost:' + options[Opt.SELENIUM_PORT].getString() +
-      '/selenium-server/driver/?cmd=shutDownSeleniumServer');
+          'http://localhost:' + options[Opt.SELENIUM_PORT].getString() +
+          '/selenium-server/driver/?cmd=shutDownSeleniumServer')
+      .on('error', (e: NodeJS.ErrnoException) => {
+        if ((e.code == 'ECONNREFUSED') && (e.syscall == 'connect')) {
+          if (!options[Opt.ALREADY_OFF_ERROR].getBoolean()) {
+            logger.warn('Server does not appear to be on');
+          } else {
+            logger.error('Server unreachable, probably not running');
+            throw e;
+          }
+        } else {
+          throw e;
+        }
+      });
 }
