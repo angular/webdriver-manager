@@ -16,13 +16,13 @@ android device running version 24 on x86-64.  If you need a different device, yo
 `--android-api-levels` and `--android-abis` flags.  So you might run a command like this:
 
 ```
-webdriver-manager update --android --android-api-levels 24 --android-abis armeabi-v7a
+webdriver-manager update --android --android-api-levels 24 --android-archs armeabi-v7a
 ```
 
 Valid values for the `--android-api-levels` flag are: `24` and `25`.  You *can* specify a lower
 API level, but the virtual device create will not have Chrome installed.
 
-Valid values for the `--android-architectures` flag are: 
+Valid values for the `--android-archs` flag are: 
 
 * `x86`
 * `x86_64`
@@ -31,9 +31,9 @@ Valid values for the `--android-architectures` flag are:
 * `mips`
 
 Note that we always use the `google_apis/*` ABIs, since only those versions comes with chrome.  So
-if you specify `--android-architectures x86_64`, this tool will use the ABI `google_apis/x86_64`.
-If you wish to use a different platform (i.e. `android-wear`, `android-tv` or `default`), you can
-do so with the `--android-platforms` flag.  But only the `google_apis` version comes with Chrome.
+if you specify `--android-archs x86_64`, this tool will use the ABI `google_apis/x86_64`.  If you
+wish to use a different platform (i.e. `android-wear`, `android-tv` or `default`), you can do so
+with the `--android-platforms` flag.  But only the `google_apis` version comes with Chrome.
 
 
 As a practical matter, if you don't want to manually accept the license agreements, you can use

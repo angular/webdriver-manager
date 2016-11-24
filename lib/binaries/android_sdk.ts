@@ -6,6 +6,26 @@ import {spawnSync} from '../utils';
 
 import {Binary, OS} from './binary';
 
+function getAndroidArch(): string {
+  switch (Config.osArch()) {
+    case 'arm':
+      return 'armeabi-v7a';
+    case 'arm64':
+      return 'arm64-v8a';
+    case 'x86':
+    case 'x32':
+    case 'ia32':
+    case 'ppc':
+      return 'x86';
+    case 'x86-64':
+    case 'x64':
+    case 'ia64':
+    case 'ppc64':
+      return 'x86_64';
+    default:
+      return Config.osArch();
+  }
+}
 
 /**
  * The android sdk binary.
@@ -17,7 +37,7 @@ export class AndroidSDK extends Binary {
   static isDefault = false;
   static shortName = ['android'];
   static DEFAULT_API_LEVELS = '24';
-  static DEFAULT_ARCHITECTURES = 'x86_64';
+  static DEFAULT_ARCHITECTURES = getAndroidArch();
   static DEFAULT_PLATFORMS = 'google_apis';
 
   constructor(alternateCDN?: string) {
