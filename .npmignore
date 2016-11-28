@@ -2,6 +2,8 @@ lib/
 selenium/
 spec/
 built/spec/
+e2e_spec/
+built/e2e_spec/
 
 .clang-format
 .gitattributes

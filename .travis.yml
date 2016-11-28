@@ -20,4 +20,4 @@ before_install:
 
 script:
   - npm run check_format
-  - npm test
+  - npm run test_travis
