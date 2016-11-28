@@ -9,7 +9,7 @@ import {GeckoDriver} from '../binaries/gecko_driver';
 import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
-import {spawn} from '../utils';
+import {adb, request, spawn} from '../utils';
 
 import * as Opt from './';
 import {Opts} from './opts';
@@ -207,7 +207,7 @@ function start(options: Options) {
     signalWhenReady(
         options[Opt.STARTED_SIGNIFIER].getString(), options[Opt.SIGNAL_VIA_IPC].getBoolean(),
         outputDir, seleniumPort, downloadedBinaries[Appium.id] ? appiumPort : '',
-        binaries[AndroidSDK.id], avdPort, androidProcesses.length);
+        binaries[AndroidSDK.id], avdPort, androidActiveAVDs);
   }
   logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
   seleniumProcess.on('exit', (code: number) => {
@@ -308,103 +308,119 @@ function killAppium() {
 
 function signalWhenReady(
     signal: string, viaIPC: boolean, outputDir: string, seleniumPort: string, appiumPort: string,
-    androidSDK: Binary, avdPort: number, avdCount: number) {
-  const checkInterval = 100;
-  const maxWait = 10000;
-  function waitFor(isReady: () => Promise<void>) {
+    androidSDK: Binary, avdPort: number, avdNames: string[]) {
+  const maxWait = 60 * 1000;
+  function waitFor(
+      getStatus: () => Promise<string>, testStatus: (status: string) => boolean, desc?: string) {
+    const checkInterval = 100;
     return new Promise<void>((resolve, reject) => {
       let waited = 0;
       (function recursiveCheck() {
         setTimeout(() => {
-          isReady().then(
-              () => {
-                resolve();
-              },
-              (reason) => {
-                waited += checkInterval;
-                if (waited < maxWait) {
-                  recursiveCheck();
-                } else {
-                  reject('Timed out.  Final rejection reason: ' + reason);
+          getStatus()
+              .then<void>((status: string) => {
+                if (!testStatus(status)) {
+                  return Promise.reject(
+                      'Invalid status' + (desc ? ' for ' + desc : '') + ': ' + status);
                 }
-              });
+              })
+              .then(
+                  () => {
+                    resolve();
+                  },
+                  (error: any) => {
+                    waited += checkInterval;
+                    if (waited < maxWait) {
+                      recursiveCheck();
+                    } else {
+                      reject(
+                          'Timed out' + (desc ? ' wating for' + desc : '') +
+                          '.  Final rejection reason: ' + JSON.stringify(error));
+                    }
+                  });
         }, checkInterval);
       })();
     });
   };
-  function serverChecker(url: string, test: (data: string) => boolean): () => Promise<void> {
-    return () => {
-      return new Promise<void>((resolve, reject) => {
-        http.get(url, (res) => {
-              if (res.statusCode !== 200) {
-                reject(
-                    'Could not check ' + url + ' for server status (' + res.statusCode + ': ' +
-                    res.statusMessage + ')');
-              } else {
-                let data = '';
-                res.on('data', (chunk) => {
-                  data += chunk;
-                });
-                res.on('end', () => {
-                  if (test(data)) {
-                    resolve();
-                  } else {
-                    reject('Bad server status: ' + data);
-                  }
-                });
-              }
-            }).on('error', () => {
-          reject();
+  function waitForAndroid(avdPort: number, avdName: string, appiumPort: string): Promise<void> {
+    let sdkPath = path.resolve(outputDir, androidSDK.executableFilename(Config.osType()));
+    logger.info('Waiting for ' + avdName + '\'s emulator to start');
+    return adb(sdkPath, avdPort, 'wait-for-device', maxWait)
+        .then<void>(
+            () => {
+              logger.info('Waiting for ' + avdName + '\'s OS to boot up');
+              return waitFor(
+                  () => {
+                    return adb(
+                        sdkPath, avdPort, 'shell', maxWait, ['getprop', 'sys.boot_completed']);
+                  },
+                  (status: string) => {
+                    return status.trim() == '1';
+                  },
+                  avdName + '\'s OS');
+            },
+            (error: {code: string | number, message: string}) => {
+              return Promise.reject(
+                  'Failed to wait for ' + avdName + '\'s emulator to start (' + error.code + ': ' +
+                  error.message + ')');
+            })
+        .then<string>(() => {
+          logger.info('Waiting for ' + avdName + ' to be ready to launch chrome');
+          let version = AndroidSDK.VERSIONS[parseInt(avdName.slice('android-'.length))];
+          return request('POST', appiumPort, '/wd/hub/session', maxWait, {
+                   desiredCapabilities: {
+                     browserName: 'chrome',
+                     platformName: 'Android',
+                     platformVersion: version,
+                     deviceName: 'Android Emulator'
+                   }
+                 })
+              .then(
+                  (data) => {
+                    return JSON.parse(data)['sessionId'];
+                  },
+                  (error: {code: string | number, message: string}) => {
+                    return Promise.reject(
+                        'Could not start chrome on ' + avdName + ' (' + error.code + ': ' +
+                        error.message + ')');
+                  });
+        })
+        .then<void>((sessionId: string) => {
+          logger.info('Shutting down dummy chrome instance for ' + avdName);
+          return request('DELETE', appiumPort, '/wd/hub/session/' + sessionId)
+              .then<void>(() => {}, (error: {code: string | number, message: string}) => {
+                return Promise.reject(
+                    'Could not close chrome on ' + avdName + ' (' + error.code + ': ' +
+                    error.message + ')');
+              });
         });
-      });
-    };
   }
-  function waitForAndroid(port: number): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      let child = spawn(
-          path.resolve(
-              outputDir, androidSDK.executableFilename(Config.osType()), 'platform-tools', 'adb'),
-          ['-s', 'emulator-' + port, 'wait-for-device'], 'ignore');
-      let done = false;
-      child.on('error', (err: Error) => {
-        if (!done) {
-          done = true;
-          reject('Error while waiting for for emulator-' + port + ': ' + err);
-        }
-      });
-      child.on('exit', (code: number, signal: string) => {
-        if (!done) {
-          done = true;
-          resolve();
-        }
-      });
-      setTimeout(() => {
-        if (!done) {
-          done = true;
-          child.kill();
-          reject('Timed out waiting for emulator-' + port);
-        }
-      }, maxWait);
-    });
-  }
-  let pending = [waitFor(serverChecker(
-      'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=getLogMessages',
+  let pending = [waitFor(
+      () => {
+        return request('GET', seleniumPort, '/selenium-server/driver/?cmd=getLogMessages', maxWait);
+      },
       (logs) => {
         return logs.toUpperCase().indexOf('OK') != -1;
-      }))];
+      },
+      'selenium server')];
   if (appiumPort) {
-    pending.push(
-        waitFor(serverChecker('http://localhost:' + appiumPort + '/wd/hub/status', (status) => {
+    pending.push(waitFor(
+        () => {
+          return request('GET', appiumPort, '/wd/hub/status', maxWait);
+        },
+        (status) => {
           return JSON.parse(status).status == 0;
-        })));
+        },
+        'appium server'));
   }
-  if (androidSDK && avdPort && avdCount) {
-    for (let i = 0; i < avdCount; i++) {
-      pending.push(waitForAndroid(avdPort + 2 * i));
+  if (androidSDK && avdPort) {
+    for (let i = 0; i < avdNames.length; i++) {
+      pending.push(waitForAndroid(avdPort + 2 * i, avdNames[i], appiumPort));
     }
   }
   Promise.all(pending).then(
       () => {
+        logger.info('Everything started');
         sendStartedSignal(signal, viaIPC);
       },
       (error) => {
@@ -422,6 +438,7 @@ function sendStartedSignal(signal: string, viaIPC: boolean) {
       logger.warn('No IPC channel, sending signal via stdout');
     }
   }
+  console.log(signal);
 }
 
 function shutdownEverything(seleniumPort?: string) {
