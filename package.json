@@ -8,7 +8,7 @@
     "prepublish": "gulp prepublish",
     "test": "gulp test",
     "test_unit": "gulp test:unit",
-    "test_travis": "gulp test:headless"
+    "test_circle_e2e": "gulp test:e2e:no_kvm"
   },
   "keywords": [
     "angular",
@@ -64,5 +64,8 @@
     "run-sequence": "^1.1.5",
     "selenium-webdriver": "2.53.1",
     "typescript": "^2.1.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }

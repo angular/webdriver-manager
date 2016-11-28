@@ -124,7 +124,7 @@ export class Downloader {
                      fs.stat(filePath, (error, stats) => {
                        if (error) {
                          (error as any).msg = 'Error: Got error ' + error + ' from ' + fileUrl;
-                         reject(error);
+                         return reject(error);
                        }
                        if (stats.size != resContentLength) {
                          (error as any).msg = 'Error: corrupt download for ' + fileName +

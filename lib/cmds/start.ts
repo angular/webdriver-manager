@@ -308,7 +308,7 @@ function killAppium() {
 function signalWhenReady(
     signal: string, viaIPC: boolean, outputDir: string, seleniumPort: string, appiumPort: string,
     androidSDK: Binary, avdPort: number, avdNames: string[]) {
-  const maxWait = 60 * 1000;
+  const maxWait = 10 * 60 * 1000;  // Ten minutes
   function waitFor(
       getStatus: () => Promise<string>, testStatus: (status: string) => boolean, desc?: string) {
     const checkInterval = 100;
