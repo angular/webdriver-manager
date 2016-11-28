@@ -6,7 +6,8 @@
     "check_format": "gulp format:enforce",
     "format": "gulp format",
     "prepublish": "gulp prepublish",
-    "test": "gulp test"
+    "test": "gulp test",
+    "test_travis": "gulp test:headless"
   },
   "keywords": [
     "angular",
@@ -53,12 +54,14 @@
     "@types/q": "^0.0.32",
     "@types/request": "^0.0.33",
     "@types/rimraf": "^0.0.28",
+    "@types/selenium-webdriver": "^2.53.35",
     "@types/semver": "^5.3.30",
     "clang-format": "^1.0.35",
     "gulp": "^3.9.1",
     "gulp-clang-format": "^1.0.23",
     "jasmine": "^2.4.1",
     "run-sequence": "^1.1.5",
+    "selenium-webdriver": "2.53.1",
     "typescript": "^2.1.1"
   }
 }
