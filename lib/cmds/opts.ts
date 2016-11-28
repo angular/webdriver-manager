@@ -36,6 +36,7 @@ export const SIGNAL_VIA_IPC = 'signal-via-ipc';
 export const DETACH = 'detach';
 export const QUIET = 'quiet';
 export const VERBOSE = 'verbose';
+export const ALREADY_OFF_ERROR = 'already-off-error';
 
 /**
  * The options used by the commands.
@@ -113,5 +114,9 @@ opts[DETACH] = new Option(
     'boolean', false);
 opts[VERBOSE] = new Option(VERBOSE, 'Extra console output', 'boolean', false);
 opts[QUIET] = new Option(QUIET, 'Minimal console output', 'boolean', false);
+opts[ALREADY_OFF_ERROR] = new Option(
+    ALREADY_OFF_ERROR,
+    'Normally if you try to shut down a selenium which is not running, you will get a warning.  This turns it into an error',
+    'boolean', false);
 
 export var Opts = opts;
