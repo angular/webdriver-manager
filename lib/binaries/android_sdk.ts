@@ -39,6 +39,11 @@ export class AndroidSDK extends Binary {
   static DEFAULT_API_LEVELS = '24';
   static DEFAULT_ARCHITECTURES = getAndroidArch();
   static DEFAULT_PLATFORMS = 'google_apis';
+  static VERSIONS: {[api_level: number]: string} = {
+    // Before 24 is not supported
+    24: '7.0',
+    25: '7.1'
+  }
 
   constructor(alternateCDN?: string) {
     super(alternateCDN || Config.cdnUrls().android);
