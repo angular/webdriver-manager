@@ -62,6 +62,7 @@ if (argv._[0] === 'start-run') {
 
 // Manage processes used in android emulation
 let androidProcesses: ChildProcess[] = [];
+let androidActiveAVDs: string[] = [];
 
 /**
  * Parses the options and starts the selenium standalone server.
@@ -213,7 +214,10 @@ function start(options: Options) {
   seleniumProcess.on('exit', (code: number) => {
     logger.info('Selenium Standalone has exited with code ' + code);
     shutdownEverything();
-    process.exit(code);
+    process.exit(process.exitCode || code);
+  });
+  seleniumProcess.on('error', (error: Error) => {
+    logger.warn('Selenium Standalone server encountered an error: ' + error);
   });
   process.stdin.resume();
   process.stdin.on('data', (chunk: Buffer) => {
@@ -243,7 +247,6 @@ function startAndroid(
         avds.length + ' android devices');
   }
   avds.forEach((avd: string, i: number) => {
-    logger.info('Booting up AVD ' + avd);
     // Credit to appium-ci, which this code was adapted from
     let emuBin = 'emulator';  // TODO(sjelin): get the 64bit linux version working
     let emuArgs = [
@@ -251,24 +254,34 @@ function startAndroid(
       avd + '-v' + sdk.versionCustom + '-wd-manager',
       '-netfast',
     ];
+    let portArg = null;
     if (!useSnapshots) {
       emuArgs = emuArgs.concat(['-no-snapshot-load', '-no-snapshot-save']);
     }
     if (port) {
-      emuArgs = emuArgs.concat(['-port', '' + (port + 2 * i)]);
+      portArg = port + i * 2;
+      emuArgs = emuArgs.concat(['-port', '' + portArg]);
     }
     if (emuBin !== 'emulator') {
       emuArgs = emuArgs.concat(['-qemu', '-enable-kvm']);
     }
-    androidProcesses.push(spawn(path.resolve(sdkPath, 'tools', emuBin), emuArgs, stdio));
+    logger.info(
+        'Starting ' + avd + ' on ' + (portArg == null ? 'default port' : 'port ' + portArg));
+    let child = spawn(path.resolve(sdkPath, 'tools', emuBin), emuArgs, stdio);
+    child.on('error', (error: Error) => {
+      logger.warn(avd + ' encountered an error: ' + error);
+    });
+    androidProcesses.push(child);
+    androidActiveAVDs.push(avd);
   });
 }
 
 function killAndroid() {
-  androidProcesses.forEach((androidProcess: ChildProcess) => {
-    androidProcess.kill();
-  });
-  androidProcesses.length = 0;
+  for (var i = 0; i < androidProcesses.length; i++) {
+    logger.info('Shutting down ' + androidActiveAVDs[i]);
+    androidProcesses[i].kill();
+  }
+  androidProcesses.length = androidActiveAVDs.length = 0;
 }
 
 // Manage appium process
