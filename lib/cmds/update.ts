@@ -67,8 +67,8 @@ let browserFile: BrowserFile;
  * Parses the options and downloads binaries if they do not exist.
  * @param options
  */
-function update(options: Options): q.IPromise<void> {
-  let promises: any[] = [];
+function update(options: Options): Promise<void> {
+  let promises: q.IPromise<void>[] = [];
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
   let gecko = options[Opt.GECKO].getBoolean();
