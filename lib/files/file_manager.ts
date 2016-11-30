@@ -187,7 +187,7 @@ export class FileManager {
           let v = versions[index];
           if (v === version) {
             contentLength = fs.statSync(filePath).size;
-            Downloader
+            return Downloader
                 .getFile(
                     binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
                     callback)
