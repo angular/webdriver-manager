@@ -101,6 +101,7 @@ gulp.task('test:e2e:headless', function(done) {
 
 gulp.task('test', ['format', 'test:unit', 'test:e2e']);
 gulp.task('test:no_update', ['format', 'test:unit', 'test:e2e:no_update']);
-gulp.task('test:headless', function(done) {
-  runSequence('format', 'test:unit', 'test:e2e:headless', done);
-});
+gulp.task('test:headless', ['format', 'test:unit', 'test:e2e:headless']);
+// gulp.task('test:headless', function(done) {
+//   runSequence('format', 'test:unit', 'test:e2e:headless', done);
+// });
