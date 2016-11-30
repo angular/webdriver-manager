@@ -76,7 +76,7 @@ gulp.task('shutdown', ['build'], function(done) {
 });
 
 // Test
-gulp.task('test:unit', ['build'], function(done) {
+gulp.task('test:unit', ['format', 'build'], function(done) {
   runSpawn(process.execPath, ['node_modules/jasmine/bin/jasmine.js'], done);
 });
 
@@ -99,6 +99,6 @@ gulp.task('test:e2e:headless', function(done) {
 });
 
 
-gulp.task('test', ['format', 'test:unit', 'test:e2e']);
-gulp.task('test:no_update', ['format', 'test:unit', 'test:e2e:no_update']);
-gulp.task('test:headless', ['format', 'test:unit', 'test:e2e:headless']);
+gulp.task('test', ['test:unit', 'test:e2e']);
+gulp.task('test:no_update', ['test:unit', 'test:e2e:no_update']);
+gulp.task('test:headless', ['test:unit', 'test:e2e:headless']);

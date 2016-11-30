@@ -7,6 +7,7 @@
     "format": "gulp format",
     "prepublish": "gulp prepublish",
     "test": "gulp test",
+    "test_unit": "gulp test:unit",
     "test_travis": "gulp test:headless"
   },
   "keywords": [

@@ -71,11 +71,11 @@ export class Program {
    * method.
    * @param args The arguments that will be parsed to run the method.
    */
-  run(json: JSON): void {
+  run(json: JSON): Promise<void> {
     for (let opt in this.options) {
       this.options[opt].value = this.getValue_(opt, json);
     }
-    this.runMethod(this.options);
+    return Promise.resolve(this.runMethod(this.options));
   }
 
   private getValue_(key: string, json: JSON): number|boolean|string {

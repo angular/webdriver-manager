@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
-import * as rimraf from 'rimraf';
 
 import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone, OS} from
 '../binaries';
@@ -188,7 +187,7 @@ export class FileManager {
           let v = versions[index];
           if (v === version) {
             contentLength = fs.statSync(filePath).size;
-            Downloader
+            return Downloader
                 .getFile(
                     binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
                     callback)
@@ -197,17 +196,17 @@ export class FileManager {
                 });
           }
         }
-      } else {
-        // We have not downloaded it before, or the version does not exist. Use the default content
-        // length of zero and download the file.
-        Downloader
-            .getFile(
-                binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
-                callback)
-            .then(downloaded => {
-              resolve(downloaded);
-            });
       }
+      // We have not downloaded it before, or the version does not exist. Use the default content
+      // length of zero and download the file.
+      Downloader
+          .getFile(
+              binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
+              callback)
+          .then(downloaded => {
+            resolve(downloaded);
+          });
+
     });
   }
 
@@ -238,6 +237,14 @@ export class FileManager {
           logger.info('removed ' + file);
         }
       }
-    })
+    });
+
+    let updateConfig = path.resolve(outputDir, 'update-config.json');
+    try {
+      fs.unlinkSync(updateConfig);
+      logger.info('removed update-config.json');
+    } catch (e) {
+      return;
+    }
   }
 }

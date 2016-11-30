@@ -61,12 +61,14 @@ if (argv._[0] === 'update-run') {
   prog.printHelp();
 }
 
+let browserFile: BrowserFile;
 
 /**
  * Parses the options and downloads binaries if they do not exist.
  * @param options
  */
-function update(options: Options): void {
+function update(options: Options): Promise<void> {
+  let promises: q.IPromise<void>[] = [];
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
   let gecko = options[Opt.GECKO].getBoolean();
@@ -83,7 +85,15 @@ function update(options: Options): void {
   if (options[Opt.IOS]) {
     ios = options[Opt.IOS].getBoolean();
   }
-  let outputDir = Config.getSeleniumDir();
+  let outputDir = options[Opt.OUT_DIR].getString();
+
+  try {
+    browserFile =
+        JSON.parse(fs.readFileSync(path.resolve(outputDir, 'update-config.json')).toString());
+  } catch (err) {
+    browserFile = {};
+  }
+
   let android_api_levels: string[] = options[Opt.ANDROID_API_LEVELS].getString().split(',');
   let android_architectures: string[] = options[Opt.ANDROID_ARCHITECTURES].getString().split(',');
   let android_platforms: string[] = options[Opt.ANDROID_PLATFORMS].getString().split(',');
@@ -118,56 +128,63 @@ function update(options: Options): void {
   // permissions
   if (standalone) {
     let binary = binaries[StandAlone.id];
-    FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL).then((downloaded: boolean) => {
-      if (!downloaded) {
-        logger.info(
-            binary.name + ': file exists ' +
-            path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
-        logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
-      }
-    });
+    updateBrowserFile(binary, outputDir);
+    promises.push(
+        FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL)
+            .then<void>((downloaded: boolean) => {
+              if (!downloaded) {
+                logger.info(
+                    binary.name + ': file exists ' +
+                    path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
+                logger.info(binary.name + ': ' + binary.versionCustom + ' up to date');
+              }
+            }));
   }
   if (chrome) {
     let binary = binaries[ChromeDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBrowserFile(binary, outputDir);
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
   }
   if (gecko) {
     let binary = binaries[GeckoDriver.id];
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBrowserFile(binary, outputDir);
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
   }
   if (ie) {
     let binary = binaries[IEDriver.id];
     binary.arch = Config.osArch();  // Win32 or x64
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBrowserFile(binary, outputDir);
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
   }
   if (ie32) {
     let binary = binaries[IEDriver.id];
     binary.arch = 'Win32';
-    updateBinary(binary, outputDir, proxy, ignoreSSL);
+    updateBrowserFile(binary, outputDir);
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
     let sdk_path = path.resolve(outputDir, binary.executableFilename(Config.osType()));
     let oldAVDList: string;
 
-    q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
-        .then(
-            (oldAVDs: string) => {
-              oldAVDList = oldAVDs;
-            },
-            () => {
-              oldAVDList = '[]';
-            })
-        .then(() => {
-          return updateBinary(binary, outputDir, proxy, ignoreSSL);
-        })
-        .then(() => {
-          initializeAndroid(
-              path.resolve(outputDir, binary.executableFilename(Config.osType())),
-              android_api_levels, android_architectures, android_platforms, android_accept_licenses,
-              binaries[AndroidSDK.id].versionCustom, JSON.parse(oldAVDList), logger, verbose);
-        })
-        .done();
+    promises.push(q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
+                      .then(
+                          (oldAVDs: string) => {
+                            oldAVDList = oldAVDs;
+                          },
+                          () => {
+                            oldAVDList = '[]';
+                          })
+                      .then(() => {
+                        return updateBinary(binary, outputDir, proxy, ignoreSSL);
+                      })
+                      .then<void>(() => {
+                        initializeAndroid(
+                            path.resolve(outputDir, binary.executableFilename(Config.osType())),
+                            android_api_levels, android_architectures, android_platforms,
+                            android_accept_licenses, binaries[AndroidSDK.id].versionCustom,
+                            JSON.parse(oldAVDList), logger, verbose);
+                      }));
   }
   if (ios) {
     checkIOS(logger);
@@ -175,6 +192,10 @@ function update(options: Options): void {
   if (android || ios) {
     installAppium(binaries[Appium.id], outputDir);
   }
+
+  writeBrowserFile(outputDir);
+
+  return Promise.all(promises).then(() => {});
 }
 
 function updateBinary(
@@ -193,7 +214,7 @@ function updateBinary(
               path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
           let fileName = binary.filename(Config.osType(), Config.osArch());
           unzip(binary, outputDir, fileName);
-          logger.info(binary.name + ': v' + binary.versionCustom + ' up to date');
+          logger.info(binary.name + ': ' + binary.versionCustom + ' up to date');
         }
       });
 }
@@ -250,4 +271,47 @@ function installAppium(binary: Binary, outputDir: string): void {
   fs.writeFileSync(
       path.resolve(folder, 'package.json'), JSON.stringify({scripts: {appium: 'appium'}}));
   spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});
+}
+
+interface BinaryPath {
+  last?: string, all?: string[]
+}
+
+interface BrowserFile {
+  chrome?: BinaryPath, standalone?: BinaryPath, gecko?: BinaryPath, iedriver?: BinaryPath
+}
+
+function updateBrowserFile<T extends Binary>(binary: T, outputDir: string) {
+  let currentDownload = path.resolve(outputDir, binary.executableFilename(Config.osType()));
+
+  // if browserFile[id] exists, we should update it
+  if ((browserFile as any)[binary.id()]) {
+    let binaryPath: BinaryPath = (browserFile as any)[binary.id()];
+    if (binaryPath.last === currentDownload) {
+      return;
+    } else {
+      binaryPath.last = currentDownload;
+      for (let bin of binaryPath.all) {
+        if (bin === currentDownload) {
+          return;
+        }
+      }
+      binaryPath.all.push(currentDownload);
+    }
+  } else {
+    // The browserFile[id] does not exist / has not been downloaded previously.
+    // We should create the entry.
+    let binaryPath: BinaryPath = {last: currentDownload, all: [currentDownload]};
+    (browserFile as any)[binary.id()] = binaryPath;
+  }
+}
+
+function writeBrowserFile(outputDir: string) {
+  let filePath = path.resolve(outputDir, 'update-config.json');
+  fs.writeFileSync(filePath, JSON.stringify(browserFile));
+}
+
+// for testing
+export function clearBrowserFile() {
+  browserFile = {};
 }

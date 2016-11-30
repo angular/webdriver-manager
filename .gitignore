@@ -1,5 +1,7 @@
 built/
 node_modules/
 selenium/
+selenium_test/
 typings/
 .idea/
+npm-debug.log
