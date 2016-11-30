@@ -87,7 +87,6 @@ describe('downloader', () => {
     let contentLength: number;
 
     beforeEach(() => {
-      outputDir = path.resolve(process.cwd(), 'selenium_test');
       try {
         // if the folder does not exist, it will throw an error on statSync
         if (fs.statSync(outputDir).isDirectory()) {

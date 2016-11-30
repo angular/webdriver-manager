@@ -101,6 +101,4 @@ gulp.task('test:e2e:headless', function(done) {
 
 gulp.task('test', ['test:unit', 'test:e2e']);
 gulp.task('test:no_update', ['test:unit', 'test:e2e:no_update']);
-gulp.task('test:headless', function(done) {
-  runSequence('test:unit', 'test:e2e:headless', done);
-});
+gulp.task('test:headless', ['test:unit', 'test:e2e:headless']);

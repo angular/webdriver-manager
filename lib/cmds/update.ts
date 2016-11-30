@@ -85,7 +85,7 @@ function update(options: Options): Promise<void> {
   if (options[Opt.IOS]) {
     ios = options[Opt.IOS].getBoolean();
   }
-  let outputDir = Config.getSeleniumDir();
+  let outputDir = options[Opt.OUT_DIR].getString();
 
   try {
     browserFile =
