@@ -17,7 +17,7 @@ describe('update', () => {
     let tmpDir = '';
     beforeEach(() => {
       Logger.writeTo = WriteTo.NONE;
-      tmpDir = path.resolve(process.cwd(), 'selenium_test');
+      tmpDir = path.resolve('selenium_test');
       try {
         // if the folder does not exist, it will throw an error on statSync
         if (fs.statSync(tmpDir).isDirectory()) {

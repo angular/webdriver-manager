@@ -82,7 +82,7 @@ describe('downloader', () => {
     let fileUrl =
         'https://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.0.jar';
     let fileName = 'foobar.jar';
-    let outputDir = path.resolve(process.cwd(), 'selenium_test');
+    let outputDir = path.resolve('selenium_test');
     let actualContentLength = 22138949;
     let contentLength: number;
 
