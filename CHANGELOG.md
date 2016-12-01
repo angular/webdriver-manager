@@ -1,3 +1,108 @@
+# 10.2.9
+
+## Features
+- ([b5638ef](https://github.com/angular/webdriver-manager/commit/b5638ef0861843e1d42220af515adc3e03a2b65a))
+  feat(update): on update, write full binary paths to file (#140)
+
+  - Adding back in curl calls, these were removed on the new
+   `Downloader.getFile`. Add curl call to reflect proxies.
+
+  - Fix output dir to read from update's options instead of Config
+
+  - Feature will help directConnect users for Protractor. The file
+   will keep track of the last binary version as well as all other
+   binaries downloaded.
+
+   The file will be created in the output directory. By default this is
+   `selenium/update-config.json`. On `clean` this file will be removed.
+
+   ```
+   webdriver-manager update --versions.chrome=2.20 --standalone=false
+   --gecko=false
+   ```
+
+   file created:
+   ```
+   {
+     "chrome": {
+       "last": "/opt/src/webdriver-manager/selenium/chromedriver_2.20",
+       "all": ["/opt/src/webdriver-manager/selenium/chromedriver_2.20"]
+     }
+   }
+   ```
+
+   then the user wants to use 2.25:
+
+   ```
+   webdriver-manager update --versions.chrome=2.25 --standalone=false
+   --gecko=false
+
+   ```
+
+   file created:
+   ```
+   {
+     "chrome": {
+       "last": "/opt/src/webdriver-manager/selenium/chromedriver_2.25",
+       "all": ["/opt/src/webdriver-manager/selenium/chromedriver_2.20",
+               "/opt/src/webdriver-manager/selenium/chromedriver_2.25"]
+     }
+   }
+   ```
+
+- ([473ab3e](https://github.com/angular/webdriver-manager/commit/473ab3e40c44468bb79e2a23d7b12753cf6e2b4d))
+  feat(android): match android arch to os.arch (#164)
+
+  The default was x86-64, but x86 cannot be emulated on ARM.  This makes more sense
+- ([c864c9a](https://github.com/angular/webdriver-manager/commit/c864c9af35514a4b5bf8a1d82b4339b39e5ac574))
+  feat(shutdown): do not error if you try to shutdown a server which is already off (#162)
+
+  When scripting, you might want to defensively run a `shutdown` command.  If the shutdown fails
+  because the server is already off, you don't care.  If it fails for another reason, you do care.
+  So I made trying to shutdown a server which is already off just a warning.  I added a flag in case
+  you want the old behavior though.
+
+- ([338fffd](https://github.com/angular/webdriver-manager/commit/338fffddf68ac2767aa5c226ba5374451b9e5308))
+  feat(quiet/verbose): add `--quiet` and `--verbose` flags to control the level of output (#156)
+
+  I added the `--quiet` flag for cases like:
+ where currently the start --detach; ./tests.sh; webdriver-manager shutdown`
+  selenium server output will get mixed in with other output.
+   I also added the `--verbose` flag for `webdriver-manager update` in case you *really* wanted to
+  see all the output which gets eaten by using `--android-accept-licenses`.
+
+- ([91e36a3](https://github.com/angular/webdriver-manager/commit/91e36a3e56e712af2c104eafc45eeeba5997ad6a))
+  feat(android on windows): Support android VMs on windows (#154)
+
+  Closes https://github.com/angular/webdriver-manager/issues/51
+
+- ([d533b03](https://github.com/angular/webdriver-manager/commit/d533b0389ac8a43b815890a644fdb9aa403ec769))
+  feat(start android): extend the --detach flag to wait for appium/android (#141)
+
+## Bug fixes
+
+- ([26586f1](https://github.com/angular/webdriver-manager/commit/26586f1b341e02229d73d40827a9c1af2197ebb3))
+  fix(start): wait for emulated android to really be ready before signaling (#161)
+
+  Before, we were just waiting for the emulator to be running, rather than waiting for the OS to be
+  booted up and ready to instance chrome.
+   While I was doing that I moved some stuff into `lib/utils.ts` since I felt like too much of
+  `lib/cmds/start.ts` was being devoted to this one feature.
+   Also closes https://github.com/angular/webdriver-manager/issues/166
+- ([a7c6eb5](https://github.com/angular/webdriver-manager/commit/a7c6eb5d3d1caed2afea1ef896753d53f4ea14ed))
+  fix(update/android): 2a1505f broke android
+- ([3ee3e1a](https://github.com/angular/webdriver-manager/commit/3ee3e1a328087cb8c5bf869e00a325cfdeb80f6d))
+  fix(fs): path.join does not handle absolute paths as desired (#152)
+- ([deead0f](https://github.com/angular/webdriver-manager/commit/deead0fc55ecd00b282aedc234592181746a307c))
+  fix(downloader): destroy the request after receiving the header (#144)
+
+  Otherwise we’ll won’t terminate until the whole file was downloaded, even though we don’t need it.
+- ([c16bf90](https://github.com/angular/webdriver-manager/commit/c16bf9053fc90e4b5e89ab867c514d0622ab0716))
+  chore(es6): allow to use es6 promises (#160)
+
+  - with node 6 on LTS, we can update the tsconfig to es6
+  - update travis tests to use node 6 and 7
+
 # 10.2.8
 
 ## Features
