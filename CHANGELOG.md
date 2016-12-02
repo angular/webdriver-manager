@@ -1,4 +1,8 @@
-# 10.2.9
+# 11.0.0
+
+## Breaking Change:
+
+- Requires node 6 since node 6 is in long term support. See (node LTS Schedule)[https://github.com/nodejs/LTS#lts-schedule].
 
 ## Features
 - ([b5638ef](https://github.com/angular/webdriver-manager/commit/b5638ef0861843e1d42220af515adc3e03a2b65a))
