@@ -107,6 +107,11 @@
   - with node 6 on LTS, we can update the tsconfig to es6
   - update travis tests to use node 6 and 7
 
+# 10.2.10
+
+- Since 10.2.9 produced breaking changes, released as version 11.0.0
+- Version 10.2.8 is the same as 10.2.10 due to [issue #170](https://github.com/angular/webdriver-manager/issues/170).
+
 # 10.2.8
 
 ## Features
