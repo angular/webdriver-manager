@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 
+import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -49,18 +50,50 @@ function status(options: Options) {
     return;
   }
 
+  // Try to get the update-config.json. This will be used for showing the last binary downloaded.
+  let updateConfig: any = {};
+  try {
+    updateConfig =
+        JSON.parse(fs.readFileSync(path.resolve(outputDir, 'update-config.json')).toString()) || {};
+  } catch (err) {
+    updateConfig = {};
+  }
+
 
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
-  // log which binaries have been downloaded
+  // Log which binaries have been downloaded.
   for (let bin in downloadedBinaries) {
     let downloaded = downloadedBinaries[bin];
     let log = downloaded.name + ' ';
     log += downloaded.versions.length == 1 ? 'version available: ' : 'versions available: ';
+
+    // Get the "last" downloaded binary from the updateConfig.
+    let last: string = null;
+    if (downloaded.binary instanceof Appium && updateConfig[Appium.id]) {
+      last = updateConfig[Appium.id]['last'];
+    } else if (downloaded.binary instanceof AndroidSDK && updateConfig[AndroidSDK.id]) {
+      last = updateConfig[AndroidSDK.id]['last'];
+    } else if (downloaded.binary instanceof ChromeDriver && updateConfig[ChromeDriver.id]) {
+      last = updateConfig[ChromeDriver.id]['last'];
+    } else if (downloaded.binary instanceof GeckoDriver && updateConfig[GeckoDriver.id]) {
+      last = updateConfig[GeckoDriver.id]['last'];
+    } else if (downloaded.binary instanceof IEDriver && updateConfig[IEDriver.id]) {
+      last = updateConfig[IEDriver.id]['last'];
+    } else if (downloaded.binary instanceof StandAlone && updateConfig[StandAlone.id]) {
+      last = updateConfig[StandAlone.id]['last'];
+    }
+
+    // Log the versions:
+    // - default: the file associated with the config.json
+    // - last: the last binary downloaded by webdriver-manager per the update-config.json
     for (let ver in downloaded.versions) {
       let version = downloaded.versions[ver];
       log += version;
       if (downloaded.binary.versionDefault() === version) {
         log += ' [default]';
+      }
+      if (last && last.indexOf(version) >= 0) {
+        log += ' [last]'
       }
       if (+ver != downloaded.versions.length - 1) {
         log += ', ';
