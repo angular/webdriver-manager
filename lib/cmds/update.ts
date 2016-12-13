@@ -167,6 +167,7 @@ function update(options: Options): Promise<void> {
     let sdk_path = path.resolve(outputDir, binary.executableFilename(Config.osType()));
     let oldAVDList: string;
 
+    updateBrowserFile(binary, outputDir);
     promises.push(q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
                       .then(
                           (oldAVDs: string) => {
@@ -190,6 +191,7 @@ function update(options: Options): Promise<void> {
     checkIOS(logger);
   }
   if (android || ios) {
+    updateBrowserFile(binaries[Appium.id], outputDir);
     installAppium(binaries[Appium.id], outputDir);
   }
 

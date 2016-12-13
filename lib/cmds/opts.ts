@@ -105,7 +105,8 @@ opts[STARTED_SIGNIFIER] = new Option(
     'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
     'string');
 opts[SIGNAL_VIA_IPC] = new Option(
-    SIGNAL_VIA_IPC, 'If you are using --' + STARTED_SIGNIFIER +
+    SIGNAL_VIA_IPC,
+    'If you are using --' + STARTED_SIGNIFIER +
         ', this flag will emit the signal string using process.send(), rather than writing it to stdout',
     'boolean', false);
 opts[DETACH] = new Option(
