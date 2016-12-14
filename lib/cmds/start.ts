@@ -131,7 +131,6 @@ function start(options: Options) {
     // https://bugs.openjdk.java.net/browse/JDK-6202721
     args.push('-Djava.security.egd=file:///dev/./urandom');
   }
-
   if (options[Opt.LOGGING].getString()) {
     if (path.isAbsolute(options[Opt.LOGGING].getString())) {
       loggingFile = options[Opt.LOGGING].getString();
@@ -155,14 +154,14 @@ function start(options: Options) {
         path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
-    if (options[Opt.IE32]) {
+    if (options[Opt.IE32].getBoolean()) {
       binaries[IEDriver.id].arch = 'Win32';
     }
     args.push(
         '-Dwebdriver.ie.driver=' +
         path.resolve(outputDir, binaries[IEDriver.id].executableFilename(osType)));
   }
-  if (options[Opt.EDGE]) {
+  if (options[Opt.EDGE] && options[Opt.EDGE].getString()) {
     // validate that the file exists prior to adding it to args
     try {
       let edgeFile = options[Opt.EDGE].getString();
