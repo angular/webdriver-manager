@@ -1,28 +1,29 @@
 import {Config} from '../config';
 
 import {Binary, BinaryUrl, OS} from './binary';
-import {ChromeXml} from './chrome_xml';
+import {IEDriverXml} from './iedriver_xml';
 
-export class ChromeDriver extends Binary {
-  static id = 'chrome';
-  static isDefault = true;
-  static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
-  static versionDefault = Config.binaryVersions().chrome;
+export class IEDriver extends Binary {
+  static id = 'ie';
+  static isDefault32 = false;
+  static isDefault64 = false;
+  static os = [OS.Windows_NT];
+  static versionDefault = Config.binaryVersions().ie;
 
   constructor(opt_alternativeCdn?: string) {
-    super(opt_alternativeCdn || Config.cdnUrls().chrome);
-    this.configSource = new ChromeXml();
-    this.name = 'chromedriver';
-    this.versionDefault = ChromeDriver.versionDefault;
+    super(opt_alternativeCdn || Config.cdnUrls().ie);
+    this.configSource = new IEDriverXml();
+    this.name = 'IEDriverServer';
+    this.versionDefault = IEDriver.versionDefault;
     this.versionCustom = this.versionDefault;
   }
 
   id(): string {
-    return ChromeDriver.id;
+    return IEDriver.id;
   }
 
   prefix(): string {
-    return 'chromedriver_';
+    return 'IEDriverServer';
   }
 
   suffix(): string {
@@ -34,19 +35,18 @@ export class ChromeDriver extends Binary {
       return Promise.resolve({url: '', version: ''});
     } else {
       return this.getVersionList().then(() => {
-        version = version || Config.binaryVersions().chrome;
+        version = version || Config.binaryVersions().ie;
         return this.configSource.getUrl(version).then(binaryUrl => {
           this.versionCustom = binaryUrl.version;
-          return {url: Config.cdnUrls().chrome + binaryUrl.url, version: binaryUrl.version};
+          return {url: Config.cdnUrls().ie + binaryUrl.url, version: binaryUrl.version};
         });
       });
     }
   }
 
   getVersionList(): Promise<string[]> {
-    // If an alternative cdn is set, return an empty list.
     if (this.alternativeDownloadUrl != null) {
-      Promise.resolve([]);
+      return Promise.resolve([]);
     } else {
       return this.configSource.getVersionList();
     }

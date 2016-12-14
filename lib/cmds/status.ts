@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
+import * as semver from 'semver';
 
-import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -79,19 +80,26 @@ function status(options: Options) {
       last = updateConfig[GeckoDriver.id]['last'];
     } else if (downloaded.binary instanceof IEDriver && updateConfig[IEDriver.id]) {
       last = updateConfig[IEDriver.id]['last'];
-    } else if (downloaded.binary instanceof StandAlone && updateConfig[StandAlone.id]) {
-      last = updateConfig[StandAlone.id]['last'];
+    } else if (downloaded.binary instanceof Standalone && updateConfig[Standalone.id]) {
+      last = updateConfig[Standalone.id]['last'];
     }
 
-    // Log the versions:
-    // - default: the file associated with the config.json
+    // Sort the versions then log them:
     // - last: the last binary downloaded by webdriver-manager per the update-config.json
+    downloaded.versions = downloaded.versions.sort((a: string, b: string): number => {
+      if (!semver.valid(a)) {
+        a += '.0';
+        b += '.0';
+      }
+      if (semver.gt(a, b)) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
     for (let ver in downloaded.versions) {
       let version = downloaded.versions[ver];
       log += version;
-      if (downloaded.binary.versionDefault() === version) {
-        log += ' [default]';
-      }
       if (last && last.indexOf(version) >= 0) {
         log += ' [last]'
       }

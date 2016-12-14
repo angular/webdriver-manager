@@ -2,13 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
 
-import {Binary, BinaryMap, ChromeDriver, IEDriver, AndroidSDK, Appium, StandAlone, OS} from
-'../binaries';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, OS, Standalone} from '../binaries';
+import {Logger} from '../cli';
 import {Config} from '../config';
+
 import {DownloadedBinary} from './downloaded_binary';
 import {Downloader} from './downloader';
-import {Logger} from '../cli';
-import {GeckoDriver} from '../binaries/gecko_driver';
 
 let logger = new Logger('file_manager');
 
@@ -56,8 +55,8 @@ export class FileManager {
    */
   static compileBinaries_(osType: string, alternateCDN?: string): BinaryMap<Binary> {
     let binaries: BinaryMap<Binary> = {};
-    if (FileManager.checkOS_(osType, StandAlone)) {
-      binaries[StandAlone.id] = new StandAlone(alternateCDN);
+    if (FileManager.checkOS_(osType, Standalone)) {
+      binaries[Standalone.id] = new Standalone(alternateCDN);
     }
     if (FileManager.checkOS_(osType, ChromeDriver)) {
       binaries[ChromeDriver.id] = new ChromeDriver(alternateCDN);
@@ -108,8 +107,8 @@ export class FileManager {
    * @param existingFiles A list of existing files.
    * @returns The downloaded binary with all the versions found.
    */
-  static downloadedVersions_(binary: Binary, osType: string, arch: string, existingFiles: string[]):
-      DownloadedBinary {
+  static downloadedVersions_<T extends Binary>(
+      binary: T, osType: string, arch: string, existingFiles: string[]): DownloadedBinary {
     let versions: string[] = [];
     for (let existPos in existingFiles) {
       let existFile: string = existingFiles[existPos];
@@ -117,8 +116,8 @@ export class FileManager {
       if (existFile.indexOf(binary.prefix()) === 0) {
         let editExistFile = existFile.replace(binary.prefix(), '');
         // if the suffix matches the executable suffix, add it
-        if (binary.suffix(osType, arch) === binary.executableSuffix(osType)) {
-          versions.push(editExistFile.replace(binary.suffix(osType, arch), ''));
+        if (binary.suffix() === binary.executableSuffix()) {
+          versions.push(editExistFile.replace(binary.suffix(), ''));
         }
         // if the suffix does not match the executable,
         // the binary is something like: .exe and .zip
@@ -126,8 +125,8 @@ export class FileManager {
         // example: chromedriver < 2.23 has a different suffix than 2.23+ (mac32.zip vs mac64.zip).
         else if (
             !existFile.endsWith('.zip') && !existFile.endsWith('.tar.gz') &&
-            existFile.indexOf(binary.suffix(osType, arch)) === -1) {
-          editExistFile = editExistFile.replace(binary.executableSuffix(osType), '');
+            existFile.indexOf(binary.suffix()) === -1) {
+          editExistFile = editExistFile.replace(binary.executableSuffix(), '');
           editExistFile = editExistFile.indexOf('_') === 0 ?
               editExistFile.substring(1, editExistFile.length) :
               editExistFile;
@@ -174,43 +173,47 @@ export class FileManager {
       binary: T, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
       callback?: Function): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      let filePath = path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch()));
-      let fileUrl = binary.url(Config.osType(), Config.osArch());
-      let fileName = binary.filename(Config.osType(), Config.osArch());
+
       let outDir = Config.getSeleniumDir();
       let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
       let contentLength = 0;
 
-      // If we have downloaded the file before, check the content length
-      if (downloaded[binary.id()]) {
-        let downloadedBinary = downloaded[binary.id()];
-        let versions = downloadedBinary.versions;
-        let version = binary.version();
+      binary.getUrl(binary.version()).then(fileUrl => {
+        binary.versionCustom = fileUrl.version;
+        let filePath = path.resolve(outputDir, binary.filename());
+        let fileName = binary.filename();
 
-        for (let index in versions) {
-          let v = versions[index];
-          if (v === version) {
-            contentLength = fs.statSync(filePath).size;
-            return Downloader
-                .getFile(
-                    binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
-                    callback)
-                .then(downloaded => {
-                  resolve(downloaded);
-                });
+        // If we have downloaded the file before, check the content length
+        if (downloaded[binary.id()]) {
+          let downloadedBinary = downloaded[binary.id()];
+          let versions = downloadedBinary.versions;
+          let version = binary.versionCustom;
+
+          for (let index in versions) {
+            let v = versions[index];
+            if (v === version) {
+              contentLength = fs.statSync(filePath).size;
+
+              Downloader
+                  .getFile(
+                      binary, fileUrl.url, fileName, outputDir, contentLength, opt_proxy,
+                      opt_ignoreSSL, callback)
+                  .then(downloaded => {
+                    resolve(downloaded);
+                  });
+            }
           }
         }
-      }
-      // We have not downloaded it before, or the version does not exist. Use the default content
-      // length of zero and download the file.
-      Downloader
-          .getFile(
-              binary, fileUrl, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
-              callback)
-          .then(downloaded => {
-            resolve(downloaded);
-          });
-
+        // We have not downloaded it before, or the version does not exist. Use the default content
+        // length of zero and download the file.
+        Downloader
+            .getFile(
+                binary, fileUrl.url, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
+                callback)
+            .then(downloaded => {
+              resolve(downloaded);
+            });
+      });
     });
   }
 

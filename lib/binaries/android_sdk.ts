@@ -4,7 +4,7 @@ import * as rimraf from 'rimraf';
 import {Config} from '../config';
 import {spawnSync} from '../utils';
 
-import {Binary, OS} from './binary';
+import {Binary, BinaryUrl, OS} from './binary';
 
 function getAndroidArch(): string {
   switch (Config.osArch()) {
@@ -49,38 +49,44 @@ export class AndroidSDK extends Binary {
 
     this.name = 'android-sdk';
     this.versionCustom = AndroidSDK.versionDefault;
-    this.prefixDefault = 'android-sdk_r';
-    this.suffixDefault = '.zip';
   }
 
   id(): string {
     return AndroidSDK.id;
   }
 
-  versionDefault(): string {
-    return AndroidSDK.versionDefault;
+  prefix(): string {
+    return 'android-sdk_r';
   }
 
-  suffix(ostype: string): string {
-    if (ostype === 'Darwin') {
-      return '-macosx' + this.suffixDefault;
-    } else if (ostype === 'Linux') {
+  suffix(): string {
+    if (this.ostype === 'Darwin') {
+      return '-macosx.zip';
+    } else if (this.ostype === 'Linux') {
       return '-linux.tgz';
-    } else if (ostype === 'Windows_NT') {
-      return '-windows' + this.suffixDefault;
+    } else if (this.ostype === 'Windows_NT') {
+      return '-windows.zip';
     }
   }
 
-  url(ostype: string): string {
-    return this.cdn + this.filename(ostype);
+  getUrl(): Promise<BinaryUrl> {
+    return Promise.resolve({url: this.cdn + this.filename(), version: this.versionCustom});
   }
 
-  zipContentName(ostype: string): string {
-    if (ostype === 'Darwin') {
+  getVersionList(): Promise<string[]> {
+    return null;
+  }
+
+  url(ostype: string): string {
+    return this.cdn + this.filename();
+  }
+
+  zipContentName(): string {
+    if (this.ostype === 'Darwin') {
       return this.name + '-macosx';
-    } else if (ostype === 'Linux') {
+    } else if (this.ostype === 'Linux') {
       return this.name + '-linux';
-    } else if (ostype === 'Windows_NT') {
+    } else if (this.ostype === 'Windows_NT') {
       return this.name + '-windows';
     }
   }
@@ -92,7 +98,7 @@ export class AndroidSDK extends Binary {
   remove(sdkPath: string): void {
     try {
       let avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
-      let version = path.basename(sdkPath).slice(this.prefixDefault.length);
+      let version = path.basename(sdkPath).slice(this.prefix().length);
       avds.forEach((avd: string) => {
         spawnSync(
             path.resolve(sdkPath, 'tools', 'android'),

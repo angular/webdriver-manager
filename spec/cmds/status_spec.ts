@@ -15,12 +15,12 @@ describe('status', () => {
   let tmpDir = path.resolve('selenium_test');
 
   // chrome 2.20[last], 2.24
-  // geckodriver {{config version}} [last] [default]
-  // standalone 2.24 [last], {{config version}} [default]
+  // geckodriver {{config version}} [last]
+  // standalone 2.24 [last], {{config version}}
   beforeAll((done) => {
     argv = {
       '_': ['update'],
-      'versions': {'chrome': '2.24', 'standalone': '2.44.0'},
+      'versions': {'chrome': '2.24', 'standalone': '2.44.0', 'gecko': 'v0.13.0'},
       'out_dir': tmpDir
     };
     program.run(JSON.parse(JSON.stringify(argv)))
@@ -62,18 +62,15 @@ describe('status', () => {
       }
     }
     expect(seleniumLine).not.toBeNull();
-    expect(seleniumLine).not.toContain('[default]')
     expect(getVersions(seleniumLine).length).toEqual(1);
     expect(getVersions(seleniumLine)[0]).toContain('2.44.0 [last]');
 
     expect(chromeLine).not.toBeNull();
-    expect(chromeLine).not.toContain('[default]');
     expect(getVersions(chromeLine).length).toEqual(2);
     expect(getVersions(chromeLine)[0]).toContain('2.20 [last]');
     expect(getVersions(chromeLine)[1]).toContain('2.24');
 
     expect(geckodriverLine).not.toBeNull();
-    expect(geckodriverLine).toContain('[default]');
     expect(geckodriverLine).toContain('[last]');
     expect(getVersions(geckodriverLine).length).toEqual(1);
 

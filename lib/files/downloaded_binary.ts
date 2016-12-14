@@ -1,4 +1,4 @@
-import {Binary} from '../binaries/binary';
+import {Binary, BinaryUrl} from '../binaries';
 
 /**
  * The downloaded binary is the binary with the list of versions downloaded.
@@ -16,5 +16,18 @@ export class DownloadedBinary extends Binary {
 
   id(): string {
     return this.binary.id();
+  }
+
+  prefix(): string {
+    return null;
+  }
+  suffix(): string {
+    return null;
+  }
+  getUrl(): Promise<BinaryUrl> {
+    return null;
+  }
+  getVersionList(): Promise<string[]> {
+    return null;
   }
 }

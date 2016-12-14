@@ -67,11 +67,12 @@ gulp.task('test:unit', ['format', 'build'], function(done) {
 var e2e_env = {headless: false, kvm: true};
 gulp.task('update', ['build'], function(done) {
   runSpawn(process.execPath, ['bin/webdriver-manager', 'update', '--android',
-      '--android-accept-licenses'], done);
+      '--android-accept-licenses', '--versions.standalone', '3.0.0-beta4'], done);
 });
 gulp.task('start', ['build', 'shutdown'], function(done) {
   runSpawn(process.execPath, ['bin/webdriver-manager', 'start', '--detach', '--seleniumPort',
-      '4444', '--android', '--appium-port', '4723', '--quiet'].concat(e2e_env.headless ||
+      '4444', '--android', '--appium-port', '4723', '--versions.standalone', '3.0.0-beta4',
+      '--quiet'].concat(e2e_env.headless ||
           !e2e_env.kvm ? ['--avds', 'none'] : []), done);
 });
 gulp.task('shutdown', ['build'], function(done) {
