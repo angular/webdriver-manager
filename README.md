@@ -1,5 +1,5 @@
 
-Webdriver Manager [![Build Status](https://travis-ci.org/angular/webdriver-manager.png?branch=master)](https://travis-ci.org/angular/webdriver-manager) [![Join the chat at https://gitter.im/angular/webdriver-manager](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/webdriver-manager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Webdriver Manager [![Build Status](https://travis-ci.org/angular/webdriver-manager.svg?branch=master)](https://travis-ci.org/angular/webdriver-manager) [![Join the chat at https://gitter.im/angular/webdriver-manager](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/webdriver-manager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 =================
 
 A selenium server and browser driver manager for your end to end tests. This is the same tool as `webdriver-manager` from the [Protractor](https://github.com/angular/protractor) repository.
@@ -47,7 +47,8 @@ Clear out the server and driver files. If `webdriver-manager start` does not wor
 webdriver-manager clean
 ```
 
-Mobile Support
+Other topics:
 --------------
 
-See [`mobile.md`](mobile.md).
+- [mobile browser support](docs/mobile.md)
+- [protractor support](docs/protractor.md)
