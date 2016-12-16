@@ -10,7 +10,7 @@ import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, StandAl
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
-import {spawn} from '../utils';
+import {spawn, spawnSync} from '../utils';
 
 import * as Opt from './';
 import {android as initializeAndroid, iOS as checkIOS} from './initialize';
@@ -250,8 +250,45 @@ function installAppium(binary: Binary, outputDir: string): void {
   } catch (err) {
   }
 
+  let appiumVersion = binary.version();
   fs.mkdirSync(folder);
   fs.writeFileSync(
       path.resolve(folder, 'package.json'), JSON.stringify({scripts: {appium: 'appium'}}));
-  spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});
+  spawn('npm', ['install', 'appium@' + appiumVersion], null, {cwd: folder});
+
+  // Check versions and output warnings/errors
+  function checkVersion(actual_semver: string, minimum_semver: string): boolean {
+    if (actual_semver[0] == 'v') {
+      actual_semver = actual_semver.slice(1);
+    }
+    let actualVersions = actual_semver.toString().split('.');
+    let minimumVersions = minimum_semver.toString().split('.');
+    for (let i = 0; i < minimumVersions.length; i++) {
+      let actual = parseInt(actualVersions[i] || '0');
+      let min = parseInt(minimumVersions[i] || '0');
+      if (!min) {  // 0 or NaN
+        return true;
+      } else if (!actual || (actual < min)) {
+        return false;
+      } else if (actual > min) {
+        return true;
+      }
+    }
+    return true;
+  }
+
+  if (!checkVersion(appiumVersion, '1.6')) {
+    logger.warn('Intalling appium@' + appiumVersion + ', which is not supported');
+    logger.warn(
+        'appium < 1.6 cannot run android >= 7, ' +
+        'which is required to have chrome bundled with the `google_apis` image');
+  } else if (!checkVersion(process.version, '6')) {
+    let npmVersion = spawnSync('npm', ['-v']).stdout;
+    if (!checkVersion(npmVersion, '3')) {
+      logger.error(
+          'Using npm@' + npmVersion + ', which will almost certainly cause the ' +
+          'installation of appium@' + appiumVersion + ' to fail silently.' +
+          'Please upgrade to npm >= 3');
+    }
+  }
 }
