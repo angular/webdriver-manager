@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "10.2.8",
+  "version": "10.3.0",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "check_format": "gulp format:enforce",

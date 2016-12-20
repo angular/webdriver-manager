@@ -1,3 +1,5 @@
+
+
 # 11.0.0
 
 ## Breaking Change:
@@ -106,6 +108,11 @@
 
   - with node 6 on LTS, we can update the tsconfig to es6
   - update travis tests to use node 6 and 7
+
+# 10.3.0
+
+- Rebase some (but not all) of the changes from v11 into a 10.x release  (see
+  https://github.com/angular/webdriver-manager/pull/179)
 
 # 10.2.10
 
