@@ -1,3 +1,31 @@
+# 11.1.0
+
+- Update to set the default chrome driver version to 2.26
+
+## Features
+
+- ([72e3d9f](https://github.com/angular/webdriver-manager/commit/72e3d9f341f1d0ba190036a72938e727d83840c7))
+  feat(status): show the last downloaded version when using status (#177)
+
+  - added a test to run update, then checks status for labels
+
+  closes #172
+
+## Bug Fixes
+
+- ([a3b46c7](https://github.com/angular/webdriver-manager/commit/a3b46c7a2ae59357b00fe5ce81d36964d6b0d45c))
+  fix(iedriver): if downloading x64, use x64 version on start command (#173)
+
+  - clang formatting
+
+  closes #147
+
+# 10.3
+
+- Minor version update so users still on ES5/selenium 2.x can access appium/mobile fixes
+  See https://github.com/angular/webdriver-manager/commits/10.3.0 for details
+
+
 # 11.0.0
 
 ## Breaking Change:
