@@ -245,9 +245,8 @@ export function android(
             'android-sdk: Downloading more additional SDK updates ' +
             '(this may take a while)');
         return downloadAndroidUpdates(
-            sdkPath,
-            ['build-tools-24.0.0'].concat(
-                getAndroidSDKTargets(apiLevels, architectures, platforms, oldAVDs)),
+            sdkPath, ['build-tools-24.0.0'].concat(
+                         getAndroidSDKTargets(apiLevels, architectures, platforms, oldAVDs)),
             true, acceptLicenses, verbose);
       })
       .then(() => {

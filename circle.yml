@@ -1,0 +1,9 @@
+machine:
+  node:
+    version: 6.1.0
+
+test:
+  override:
+    - npm run check_format
+    - npm run test_unit
+    - npm run test_circle_e2e
