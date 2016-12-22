@@ -20,7 +20,6 @@ export class GeckoDriver extends Binary {
   static id = 'gecko';
   static versionDefault = Config.binaryVersions().gecko;
   static isDefault = true;
-  static shortName = ['gecko'];
 
   private static suffixes: SuffixMap = {
     'Darwin': {'x64': '-macos.tar.gz'},

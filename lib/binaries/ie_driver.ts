@@ -10,8 +10,8 @@ export class IEDriver extends Binary {
   static os = [OS.Windows_NT];
   static id = 'ie';
   static versionDefault = Config.binaryVersions().ie;
-  static isDefault = false;
-  static shortName = ['ie', 'ie32'];
+  static isDefault32 = false;
+  static isDefault64 = false;
 
   constructor(alternateCDN?: string) {
     super(alternateCDN || Config.cdnUrls().ie);

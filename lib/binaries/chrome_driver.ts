@@ -13,7 +13,6 @@ export class ChromeDriver extends Binary {
   static id = 'chrome';
   static versionDefault = Config.binaryVersions().chrome;
   static isDefault = true;
-  static shortName = ['chrome'];
 
   constructor(alternateCDN?: string) {
     super(alternateCDN || Config.cdnUrls().chrome);

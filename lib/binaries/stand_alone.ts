@@ -11,7 +11,6 @@ export class StandAlone extends Binary {
   static id = 'standalone';
   static versionDefault = Config.binaryVersions().selenium;
   static isDefault = true;
-  static shortName = ['standalone'];
 
   constructor(alternateCDN?: string) {
     super(alternateCDN || Config.cdnUrls().selenium);
