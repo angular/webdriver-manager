@@ -26,6 +26,7 @@ let prog = new Program()
                .addOption(Opts[Opt.AVD_PORT])
                .addOption(Opts[Opt.VERSIONS_STANDALONE])
                .addOption(Opts[Opt.VERSIONS_CHROME])
+               .addOption(Opts[Opt.VERSIONS_GECKO])
                .addOption(Opts[Opt.VERSIONS_ANDROID])
                .addOption(Opts[Opt.VERSIONS_APPIUM])
                .addOption(Opts[Opt.CHROME_LOGS])
@@ -108,6 +109,7 @@ function start(options: Options) {
   }
   binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
