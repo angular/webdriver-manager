@@ -2,7 +2,7 @@
   "webdriverVersions": {
     "selenium": "2.53.1",
     "chromedriver": "2.26",
-    "geckodriver": "v0.11.1",
+    "geckodriver": "v0.12.0",
     "iedriver": "2.53.1",
     "androidsdk": "24.4.1",
     "appium": "1.6.0"
