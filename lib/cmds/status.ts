@@ -59,8 +59,8 @@ function status(options: Options) {
     updateConfig = {};
   }
 
-
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
+
   // Log which binaries have been downloaded.
   for (let bin in downloadedBinaries) {
     let downloaded = downloadedBinaries[bin];

@@ -122,7 +122,11 @@ export class FileManager {
         }
         // if the suffix does not match the executable,
         // the binary is something like: .exe and .zip
-        else if (existFile.indexOf(binary.suffix(osType, arch)) === -1) {
+        // TODO(cnishina): fix implementation. Suffix method is dependent on the version number
+        // example: chromedriver < 2.23 has a different suffix than 2.23+ (mac32.zip vs mac64.zip).
+        else if (
+            !existFile.endsWith('.zip') && !existFile.endsWith('.tar.gz') &&
+            existFile.indexOf(binary.suffix(osType, arch)) === -1) {
           editExistFile = editExistFile.replace(binary.executableSuffix(osType), '');
           editExistFile = editExistFile.indexOf('_') === 0 ?
               editExistFile.substring(1, editExistFile.length) :

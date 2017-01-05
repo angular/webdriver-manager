@@ -44,10 +44,7 @@ if (Config.osType() === 'Darwin') {
 }
 
 if (Config.osType() === 'Windows_NT') {
-  prog.addOption(Opts[Opt.VERSIONS_IE])
-      .addOption(Opts[Opt.IE32])
-      .addOption(Opts[Opt.IE])
-      .addOption(Opts[Opt.EDGE]);
+  prog.addOption(Opts[Opt.VERSIONS_IE]).addOption(Opts[Opt.IE64]).addOption(Opts[Opt.EDGE]);
 }
 
 export var program = prog;
@@ -155,8 +152,9 @@ function start(options: Options) {
         path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
-    if (options[Opt.IE32].getBoolean()) {
-      binaries[IEDriver.id].arch = 'Win32';
+    binaries[IEDriver.id].arch = 'Win32';  // use Win 32 by default
+    if (options[Opt.IE64].getBoolean()) {
+      binaries[IEDriver.id].arch = Config.osArch();  // use the system architecture
     }
     args.push(
         '-Dwebdriver.ie.driver=' +

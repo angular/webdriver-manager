@@ -35,7 +35,6 @@ export class AndroidSDK extends Binary {
   static id = 'android';
   static versionDefault = Config.binaryVersions().android;
   static isDefault = false;
-  static shortName = ['android'];
   static DEFAULT_API_LEVELS = '24';
   static DEFAULT_ARCHITECTURES = getAndroidArch();
   static DEFAULT_PLATFORMS = 'google_apis';

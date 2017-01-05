@@ -18,8 +18,6 @@ describe('status', () => {
   // geckodriver {{config version}} [last] [default]
   // standalone 2.24 [last], {{config version}} [default]
   beforeAll((done) => {
-    Config.osType_ = 'Linux';
-    Config.osArch_ = 'x64';
     argv = {
       '_': ['update'],
       'versions': {'chrome': '2.24', 'standalone': '2.44.0'},

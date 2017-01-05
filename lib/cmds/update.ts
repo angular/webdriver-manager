@@ -39,7 +39,7 @@ if (Config.osType() === 'Darwin') {
 }
 
 if (Config.osType() === 'Windows_NT') {
-  prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]);
+  prog.addOption(Opts[Opt.IE]).addOption(Opts[Opt.IE32]).addOption(Opts[Opt.IE64]);
 }
 
 prog.addOption(Opts[Opt.VERSIONS_STANDALONE])
@@ -72,13 +72,16 @@ function update(options: Options): Promise<void> {
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
   let gecko = options[Opt.GECKO].getBoolean();
-  let ie: boolean = false;
   let ie32: boolean = false;
+  let ie64: boolean = false;
   if (options[Opt.IE]) {
-    ie = options[Opt.IE].getBoolean();
+    ie32 = ie32 || options[Opt.IE].getBoolean();
   }
   if (options[Opt.IE32]) {
-    ie32 = options[Opt.IE32].getBoolean();
+    ie32 = ie32 || options[Opt.IE32].getBoolean();
+  }
+  if (options[Opt.IE64]) {
+    ie64 = options[Opt.IE64].getBoolean();
   }
   let android: boolean = options[Opt.ANDROID].getBoolean();
   let ios: boolean = false;
@@ -150,7 +153,7 @@ function update(options: Options): Promise<void> {
     updateBrowserFile(binary, outputDir);
     promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
   }
-  if (ie) {
+  if (ie64) {
     let binary = binaries[IEDriver.id];
     binary.arch = Config.osArch();  // Win32 or x64
     updateBrowserFile(binary, outputDir);

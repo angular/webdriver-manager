@@ -13,6 +13,7 @@ export const STANDALONE = 'standalone';
 export const CHROME = 'chrome';
 export const IE = 'ie';
 export const IE32 = 'ie32';
+export const IE64 = 'ie64';
 export const EDGE = 'edge';
 export const GECKO = 'gecko';
 export const ANDROID = 'android';
@@ -58,8 +59,12 @@ opts[STANDALONE] = new Option(
 opts[CHROME] =
     new Option(CHROME, 'Install or update chromedriver', 'boolean', ChromeDriver.isDefault);
 opts[GECKO] = new Option(GECKO, 'Install or update geckodriver', 'boolean', GeckoDriver.isDefault);
-opts[IE] = new Option(IE, 'Install or update ie driver', 'boolean', IEDriver.isDefault);
-opts[IE32] = new Option(IE32, 'Install or update 32-bit ie driver', 'boolean', IEDriver.isDefault);
+opts[IE] = new Option(IE, 'Install or update 32-bit ie driver', 'boolean', IEDriver.isDefault32);
+opts[IE32] =
+    new Option(IE32, 'Install or update 32-bit ie driver', 'boolean', IEDriver.isDefault32);
+opts[IE64] = new Option(
+    IE64, 'Update: install or update 64-bit IE driver. Start: use installed x64 IE driver.',
+    'boolean', IEDriver.isDefault64);
 opts[EDGE] = new Option(
     EDGE, 'Use installed Microsoft Edge driver', 'string',
     'C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe');
@@ -105,7 +110,8 @@ opts[STARTED_SIGNIFIER] = new Option(
     'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
     'string');
 opts[SIGNAL_VIA_IPC] = new Option(
-    SIGNAL_VIA_IPC, 'If you are using --' + STARTED_SIGNIFIER +
+    SIGNAL_VIA_IPC,
+    'If you are using --' + STARTED_SIGNIFIER +
         ', this flag will emit the signal string using process.send(), rather than writing it to stdout',
     'boolean', false);
 opts[DETACH] = new Option(
