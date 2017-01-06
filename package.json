@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "11.1.0",
+  "version": "11.1.1",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "check_format": "gulp format:enforce",
@@ -66,6 +66,6 @@
     "typescript": "^2.1.1"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=6.9.x"
   }
 }

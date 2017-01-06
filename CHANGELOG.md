@@ -1,3 +1,22 @@
+# 11.1.1
+
+## Bug Fixes
+
+- ([70614a2](https://github.com/angular/webdriver-manager/commit/70614a23e289088c852f5c0162a947488ffc77e0))
+  fix(ie): Use 32-bit version by default for IEDriver (#181)
+
+  closes #180
+- ([6f9a2ab](https://github.com/angular/webdriver-manager/commit/6f9a2abbf7d16f35e342f963543706ff3e1c45a1))
+  fix(gecko): Respect versions.gecko in start command. (#184)
+
+  Also bump the geckodriver version to latest.
+
+## Dependencies
+
+- ([5881c5b](https://github.com/angular/webdriver-manager/commit/5881c5bb49f330abd7804e2605df46901e87bf2a))
+  deps(update): update devDependencies (#187)
+
+
 # 11.1.0
 
 - Update to set the default chrome driver version to 2.26

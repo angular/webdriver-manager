@@ -6,12 +6,12 @@ e2e_spec/
 built/e2e_spec/
 
 .clang-format
+.gitignore
 .gitattributes
 .github/
 .idea/
-.gitignore
 .npmignore
-.travis.yml
+circle.yml
 npm-debug.log
 release.md
 tsconfig.json
