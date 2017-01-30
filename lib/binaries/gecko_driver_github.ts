@@ -8,8 +8,7 @@ import {GithubApiConfigSource} from './config_source';
 export class GeckoDriverGithub extends GithubApiConfigSource {
   versionsLookup: Array<{version: string, index: number}> = [];
   constructor() {
-    super('gecko');
-    this.jsonUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
+    super('gecko', 'https://api.github.com/repos/mozilla/geckodriver/releases');
   }
 
   getUrl(version: string): Promise<BinaryUrl> {

@@ -7,8 +7,7 @@ import {XmlConfigSource} from './config_source';
 
 export class IEDriverXml extends XmlConfigSource {
   constructor() {
-    super('iedriver');
-    this.xmlUrl = Config.cdnUrls()['ie'];
+    super('iedriver', Config.cdnUrls()['ie']);
   }
 
   getUrl(version: string): Promise<BinaryUrl> {

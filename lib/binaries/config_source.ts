@@ -20,10 +20,9 @@ export abstract class ConfigSource {
 
 export abstract class XmlConfigSource extends ConfigSource {
   xml: any;
-  xmlUrl: string;
   fileName: string;
 
-  constructor(private name: string) {
+  constructor(public name: string, public xmlUrl: string) {
     super();
   }
 
@@ -101,10 +100,9 @@ export abstract class XmlConfigSource extends ConfigSource {
 
 export abstract class JsonConfigSource extends ConfigSource {
   json: any;
-  jsonUrl: string;
   fileName: string;
 
-  constructor(private name: string) {
+  constructor(public name: string, public jsonUrl: string) {
     super();
   }
 
@@ -122,8 +120,8 @@ export abstract class JsonConfigSource extends ConfigSource {
 }
 
 export abstract class GithubApiConfigSource extends JsonConfigSource {
-  constructor(name: string) {
-    super(name);
+  constructor(name: string, url: string) {
+    super(name, url);
   }
 
   /**

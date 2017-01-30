@@ -7,8 +7,7 @@ import {XmlConfigSource} from './config_source';
 
 export class ChromeXml extends XmlConfigSource {
   constructor() {
-    super('chrome');
-    this.xmlUrl = Config.cdnUrls()['chrome'];
+    super('chrome', Config.cdnUrls()['chrome']);
   }
 
   getUrl(version: string): Promise<BinaryUrl> {

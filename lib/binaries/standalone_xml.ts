@@ -7,8 +7,7 @@ import {XmlConfigSource} from './config_source';
 
 export class StandaloneXml extends XmlConfigSource {
   constructor() {
-    super('standalone');
-    this.xmlUrl = Config.cdnUrls()['selenium'];
+    super('standalone', Config.cdnUrls()['selenium']);
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
