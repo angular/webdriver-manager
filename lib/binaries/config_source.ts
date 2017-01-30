@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as request from 'request';
-import * as semver from 'semver';
 import * as xml2js from 'xml2js';
 
 import {Config} from '../config';

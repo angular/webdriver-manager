@@ -29,14 +29,14 @@ export abstract class Binary {
   ostype: string = Config.osType();
   osarch: string = Config.osArch();
 
-  alternativeDownloadUrl: string;  // override everything
+  // TODO(cnishina): downloading the latest requires parsing XML or JSON that is assumed to be
+  //   published and formatted in a specific way. If this is not available, let the user download
+  //   the file from an alternative download URL.
+  alternativeDownloadUrl: string;
 
-  cdn: string;      // The url host for XML reading or the base path to the url.
-  urlPath: string;  // The url path to download the binary. full url = baseUrl + downloadPath.
+  cdn: string;             // The url host for XML reading or the base path to the url.
   opt_ignoreSSL: boolean;  // An optional ignore ssl.
   opt_proxy: string        // An optional proxy.
-  downloadPath: string;    // The path to the file.
-  downloadFile: string;    // The downloaded file name.
 
   name: string;
   versionDefault: string;

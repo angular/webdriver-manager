@@ -1,5 +1,3 @@
-import * as semver from 'semver';
-
 import {Config} from '../config';
 
 import {Binary, BinaryUrl, OS} from './binary';
