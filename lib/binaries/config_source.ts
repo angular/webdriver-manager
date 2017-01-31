@@ -20,7 +20,6 @@ export abstract class ConfigSource {
 
 export abstract class XmlConfigSource extends ConfigSource {
   xml: any;
-  fileName: string;
 
   constructor(public name: string, public xmlUrl: string) {
     super();
@@ -32,12 +31,11 @@ export abstract class XmlConfigSource extends ConfigSource {
     } catch (e) {
       fs.mkdirSync(this.out_dir);
     }
-    this.fileName = path.resolve(this.out_dir, this.name + '-response.xml');
-    return this.fileName;
+    return path.resolve(this.out_dir, this.name + '-response.xml');
   }
 
   protected getXml(): Promise<any> {
-    this.getFileName();
+    let fileName = this.getFileName();
     let content = this.readResponse();
     if (content != null) {
       this.xml = content;
@@ -45,15 +43,16 @@ export abstract class XmlConfigSource extends ConfigSource {
     }
     return this.requestXml(this.xmlUrl, this.opt_ignoreSSL, this.opt_proxy).then(text => {
       this.xml = this.convertXml2js(text);
-      fs.writeFileSync(this.fileName, text);
+      fs.writeFileSync(fileName, text);
       return this.xml;
     });
   }
 
   private readResponse(): any {
+    let fileName = this.getFileName();
     try {
-      let contents = fs.readFileSync(this.fileName).toString();
-      let timestamp = new Date(fs.statSync(this.fileName).mtime).getTime();
+      let contents = fs.readFileSync(fileName).toString();
+      let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
 
       let now = Date.now();
       if (now - 36000000 < timestamp) {
@@ -100,7 +99,6 @@ export abstract class XmlConfigSource extends ConfigSource {
 
 export abstract class JsonConfigSource extends ConfigSource {
   json: any;
-  fileName: string;
 
   constructor(public name: string, public jsonUrl: string) {
     super();
@@ -112,8 +110,7 @@ export abstract class JsonConfigSource extends ConfigSource {
     } catch (e) {
       fs.mkdirSync(this.out_dir);
     }
-    this.fileName = path.resolve(this.out_dir, this.name + '-response.json');
-    return this.fileName;
+    return path.resolve(this.out_dir, this.name + '-response.json');
   }
 
   protected abstract getJson(): Promise<string>;
@@ -130,14 +127,14 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
    * this request if the file is older than an hour.
    */
   getJson(): Promise<any> {
-    this.getFileName();
+    let fileName = this.getFileName();
     let content = this.readResponse();
     if (content != null) {
       this.json = content;
       return Promise.resolve(this.json);
     }
     return this.requestJson().then(() => {
-      fs.writeFileSync(this.fileName, JSON.stringify(this.json, null, '  '));
+      fs.writeFileSync(fileName, JSON.stringify(this.json, null, '  '));
       return this.json;
     });
   }
@@ -171,9 +168,10 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
   }
 
   private readResponse(): any {
+    let fileName = this.getFileName();
     try {
-      let contents = fs.readFileSync(this.fileName).toString();
-      let timestamp = new Date(fs.statSync(this.fileName).mtime).getTime();
+      let contents = fs.readFileSync(fileName).toString();
+      let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
 
       let now = Date.now();
       if (now - 36000000 < timestamp) {
