@@ -1,3 +1,47 @@
+# 12.0.0
+
+### Changes to update
+
+This release gets the latest release for selenium standalone, chromedriver,
+iedriver, and gecko driver by downloading and parsing either a json or xml file.
+These json or xml files are cached in the selenium directory. This means for
+users that provide an alternative cdn will also be required to provide the proper
+xml or json server response to find these binaries.
+
+Since we are always downloading the latest, the `config.json` versions will no
+longer be a place to override these.
+
+### Changes to start
+
+If a new release is out and you have old binaries, running `webdriver-manager
+start` without specifying any versions should throw an error. The error will
+tell the user that the binary is not present.
+
+### Changes to status
+
+Since we are downloading the latest and not maintaining a default version in
+`config.json`, we are dropping the default tag.
+
+## Features
+
+- ([fe309ef](https://github.com/angular/webdriver-manager/commit/fe309ef0d85081592662164d4a24d79b0f2ed5cf))
+  feat(latest): get the latest version from the cdn (#198)
+
+  This reads the xml from the CDN to get the latest chromedriver, iedriver,
+  or standalone version if the version is 'latest'. If the release is from
+  Github, use the Github API to get the releases. Also store the downloaded
+  information to a cache in the output directory (default: selenium/). If
+  the file is older than one hour it will be rewritten.
+
+  When getting the status, we are no longer showing the default version.
+  Default versions will be deprecated and will be removed from the config.json
+  file.
+
+  When starting the standalone server, use the 'latest' version by default
+  unless specified by --versions.{binary} flag.
+
+  Change the gulp update task to use 3.0.0-beta4 so Firefox tests will pass.
+
 # 11.1.1
 
 ## Bug Fixes
