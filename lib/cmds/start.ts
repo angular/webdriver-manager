@@ -143,7 +143,7 @@ function start(options: Options) {
     let chrome: ChromeDriver = binaries[ChromeDriver.id];
     promises.push(
         chrome.getUrl(chrome.versionCustom)
-            .then(binaryUrl => {
+            .then(() => {
               args.push(
                   '-Dwebdriver.chrome.driver=' +
                   path.resolve(outputDir, binaries[ChromeDriver.id].executableFilename()));
@@ -158,7 +158,7 @@ function start(options: Options) {
   if (downloadedBinaries[GeckoDriver.id] != null) {
     let gecko: GeckoDriver = binaries[GeckoDriver.id];
     promises.push(gecko.getUrl(gecko.versionCustom)
-                      .then(binaryUrl => {
+                      .then(() => {
                         args.push(
                             '-Dwebdriver.gecko.driver=' +
                             path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename()));
@@ -170,7 +170,7 @@ function start(options: Options) {
   if (downloadedBinaries[IEDriver.id] != null) {
     let ie: IEDriver = binaries[IEDriver.id];
     promises.push(ie.getUrl(ie.versionCustom)
-                      .then(binaryUrl => {
+                      .then(() => {
                         binaries[IEDriver.id].osarch = 'Win32';  // use Win 32 by default
                         if (options[Opt.IE64].getBoolean()) {
                           binaries[IEDriver.id].osarch =
@@ -201,7 +201,7 @@ function start(options: Options) {
   Promise.all(promises).then(() => {
     let standalone: Standalone = binaries[Standalone.id];
     standalone.getUrl(standalone.versionCustom)
-        .then(binaryUrl => {
+        .then(() => {
           // starting android
           if (android) {
             if (downloadedBinaries[AndroidSDK.id] != null) {
