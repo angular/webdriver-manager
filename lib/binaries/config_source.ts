@@ -19,8 +19,6 @@ export abstract class ConfigSource {
 }
 
 export abstract class XmlConfigSource extends ConfigSource {
-  xml: any;
-
   constructor(public name: string, public xmlUrl: string) {
     super();
   }
@@ -38,13 +36,12 @@ export abstract class XmlConfigSource extends ConfigSource {
     let fileName = this.getFileName();
     let content = this.readResponse();
     if (content != null) {
-      this.xml = content;
-      return Promise.resolve(this.xml);
+      return Promise.resolve(content);
     }
     return this.requestXml(this.xmlUrl, this.opt_ignoreSSL, this.opt_proxy).then(text => {
-      this.xml = this.convertXml2js(text);
+      let xml = this.convertXml2js(text);
       fs.writeFileSync(fileName, text);
-      return this.xml;
+      return xml;
     });
   }
 
@@ -98,8 +95,6 @@ export abstract class XmlConfigSource extends ConfigSource {
 }
 
 export abstract class JsonConfigSource extends ConfigSource {
-  json: any;
-
   constructor(public name: string, public jsonUrl: string) {
     super();
   }
@@ -130,12 +125,11 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
     let fileName = this.getFileName();
     let content = this.readResponse();
     if (content != null) {
-      this.json = content;
-      return Promise.resolve(this.json);
+      return Promise.resolve(content);
     }
     return this.requestJson().then(() => {
-      fs.writeFileSync(fileName, JSON.stringify(this.json, null, '  '));
-      return this.json;
+      fs.writeFileSync(fileName, JSON.stringify(content, null, '  '));
+      return content;
     });
   }
 
@@ -156,8 +150,7 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
             output += data;
           });
           response.on('end', () => {
-            this.json = JSON.parse(output);
-            resolve(this.json);
+            resolve(JSON.parse(output));
           });
 
         } else {

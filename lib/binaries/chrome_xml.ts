@@ -21,9 +21,28 @@ export class ChromeXml extends XmlConfigSource {
     });
   }
 
+  /**
+   * Get a list of chrome drivers paths available for the configuration OS type and architecture.
+   */
   getVersionList(): Promise<string[]> {
-    return this.getXml().then(() => {
-      return this.getChromeDriverList();
+    return this.getXml().then(xml => {
+      let versionPaths: string[] = [];
+      let osType = this.getOsTypeName();
+
+      for (let content of xml.ListBucketResult.Contents) {
+        let contentKey: string = content.Key[0];
+
+        // Filter for 32-bit devices, make sure x64 is not an option
+        if (this.osarch !== 'x64' && contentKey.includes('64')) {
+          continue;
+        }
+
+        // Filter for only the osType
+        if (contentKey.includes(osType)) {
+          versionPaths.push(contentKey);
+        }
+      }
+      return versionPaths;
     });
   }
 
@@ -42,111 +61,90 @@ export class ChromeXml extends XmlConfigSource {
   }
 
   /**
-   * Get a list of chrome drivers paths available for the configuration OS type and architecture.
-   */
-  private getChromeDriverList(): string[] {
-    let versionPaths: string[] = [];
-    let osType = this.getOsTypeName();
-
-    for (let content of this.xml.ListBucketResult.Contents) {
-      let contentKey: string = content.Key[0];
-
-      // Filter for 32-bit devices, make sure x64 is not an option
-      if (this.osarch !== 'x64' && contentKey.includes('64')) {
-        continue;
-      }
-
-      // Filter for only the osType
-      if (contentKey.includes(osType)) {
-        versionPaths.push(contentKey);
-      }
-    }
-    return versionPaths;
-  }
-
-  /**
    * Gets the latest item from the XML.
    */
-  private getLatestChromeDriverVersion(): BinaryUrl {
-    let list = this.getChromeDriverList();
-    let chromedriverVersion = null;
-    let latest = '';
-    let latestVersion = '';
-    for (let item of list) {
-      // get a semantic version
-      let version = item.split('/')[0];
-      if (semver.valid(version) == null) {
-        version += '.0';
+  private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
+    return this.getVersionList().then(list => {
+      let chromedriverVersion = null;
+      let latest = '';
+      let latestVersion = '';
+      for (let item of list) {
+        // get a semantic version
+        let version = item.split('/')[0];
         if (semver.valid(version) == null) {
-          continue;
+          version += '.0';
+          if (semver.valid(version) == null) {
+            continue;
+          }
         }
-      }
 
-      if (chromedriverVersion == null) {
-        // First time: use the version found.
-        chromedriverVersion = version;
-        latest = item;
-        latestVersion = item.split('/')[0];
-      } else if (semver.gt(version, chromedriverVersion)) {
-        // After the first time, make sure the semantic version is greater.
-        chromedriverVersion = version;
-        latest = item;
-        latestVersion = item.split('/')[0];
-      } else if (version === chromedriverVersion) {
-        // If the semantic version is the same, check os arch.
-        // For 64-bit systems, prefer the 64-bit version.
-        if (this.osarch === 'x64') {
-          if (item.includes(this.getOsTypeName() + '64')) {
-            latest = item;
+        if (chromedriverVersion == null) {
+          // First time: use the version found.
+          chromedriverVersion = version;
+          latest = item;
+          latestVersion = item.split('/')[0];
+        } else if (semver.gt(version, chromedriverVersion)) {
+          // After the first time, make sure the semantic version is greater.
+          chromedriverVersion = version;
+          latest = item;
+          latestVersion = item.split('/')[0];
+        } else if (version === chromedriverVersion) {
+          // If the semantic version is the same, check os arch.
+          // For 64-bit systems, prefer the 64-bit version.
+          if (this.osarch === 'x64') {
+            if (item.includes(this.getOsTypeName() + '64')) {
+              latest = item;
+            }
           }
         }
       }
-    }
-    return {url: latest, version: latestVersion};
+      return {url: latest, version: latestVersion};
+    });
   }
 
   /**
    * Gets a specific item from the XML.
    */
-  private getSpecificChromeDriverVersion(inputVersion: string): BinaryUrl {
-    let list = this.getChromeDriverList();
-    let itemFound = '';
-    let specificVersion = semver.valid(inputVersion) ? inputVersion : inputVersion + '.0';
+  private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
+    return this.getVersionList().then(list => {
+      let itemFound = '';
+      let specificVersion = semver.valid(inputVersion) ? inputVersion : inputVersion + '.0';
 
-    for (let item of list) {
-      // Get a semantic version.
-      let version = item.split('/')[0];
-      if (semver.valid(version) == null) {
-        version += '.0';
+      for (let item of list) {
+        // Get a semantic version.
+        let version = item.split('/')[0];
         if (semver.valid(version) == null) {
-          continue;
-        }
-      }
-
-      // Check to see if the specified version matches.
-      if (version === specificVersion) {
-        // When item found is null, check the os arch
-        // 64-bit version works OR not 64-bit version and the path does not have '64'
-        if (itemFound == '') {
-          if (this.osarch === 'x64' ||
-              (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
-            itemFound = item;
-          }
-
-        }
-        // If the semantic version is the same, check os arch.
-        // For 64-bit systems, prefer the 64-bit version.
-        else if (this.osarch === 'x64') {
-          if (item.includes(this.getOsTypeName() + '64')) {
-            itemFound = item;
+          version += '.0';
+          if (semver.valid(version) == null) {
+            continue;
           }
         }
+
+        // Check to see if the specified version matches.
+        if (version === specificVersion) {
+          // When item found is null, check the os arch
+          // 64-bit version works OR not 64-bit version and the path does not have '64'
+          if (itemFound == '') {
+            if (this.osarch === 'x64' ||
+                (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
+              itemFound = item;
+            }
+
+          }
+          // If the semantic version is the same, check os arch.
+          // For 64-bit systems, prefer the 64-bit version.
+          else if (this.osarch === 'x64') {
+            if (item.includes(this.getOsTypeName() + '64')) {
+              itemFound = item;
+            }
+          }
+        }
       }
-    }
-    if (itemFound == '') {
-      return {url: '', version: inputVersion};
-    } else {
-      return {url: itemFound, version: inputVersion};
-    }
+      if (itemFound == '') {
+        return {url: '', version: inputVersion};
+      } else {
+        return {url: itemFound, version: inputVersion};
+      }
+    });
   }
 }

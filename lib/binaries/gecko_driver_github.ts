@@ -6,7 +6,6 @@ import {BinaryUrl} from './binary';
 import {GithubApiConfigSource} from './config_source';
 
 export class GeckoDriverGithub extends GithubApiConfigSource {
-  versionsLookup: Array<{version: string, index: number}> = [];
   constructor() {
     super('gecko', 'https://api.github.com/repos/mozilla/geckodriver/releases');
   }
@@ -22,50 +21,59 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
   }
 
   getVersionList(): Promise<string[]> {
-    return this.getJson().then(() => {
-      return this.getGeckoDriverList();
+    return this.getJson().then(json => {
+      let versions: string[] = [];
+      for (let i = 0; i < json.length; i++) {
+        let item = json[i];
+        versions.push(item.tag_name);
+      }
+      return versions;
     });
   }
 
-  private getGeckoDriverList(): string[] {
-    this.versionsLookup = [];
-    let versions: string[] = [];
-    for (let i = 0; i < this.json.length; i++) {
-      let item = this.json[i];
-      versions.push(item.tag_name);
-      this.versionsLookup.push({version: item.tag_name, index: i});
-    }
-    return versions;
-  }
-
-  private getLatestGeckoDriverVersion(): BinaryUrl {
-    this.getGeckoDriverList();
-    let latest = '';
-    for (let item of this.versionsLookup) {
-      let version = item.version.replace('v', '');
-      if (latest === '') {
-        latest = version;
-      } else if (semver.lt(latest, version)) {
-        latest = version;
+  getVersionsLookup(): Promise<Array<{version: string, index: string}>> {
+    return this.getJson().then(json => {
+      let versionsLookup: Array<{version: string, index: number}> = [];
+      for (let i = 0; i < json.length; i++) {
+        let item = json[i];
+        versionsLookup.push({version: item.tag_name, index: i});
       }
-    }
-    return this.getSpecificGeckoDrierVersion('v' + latest);
+      return versionsLookup;
+    });
   }
 
-  private getSpecificGeckoDrierVersion(inputVersion: string): BinaryUrl {
-    this.getGeckoDriverList();
-    for (let item of this.versionsLookup) {
-      // Get the asset from the matching version.
-      if (item.version === inputVersion) {
-        let assetsArray = this.json[item.index].assets;
-        for (let asset of assetsArray) {
-          if ((asset.name as string).includes(this.oshelper())) {
-            return {url: asset.browser_download_url, version: inputVersion};
-          }
+  private getLatestGeckoDriverVersion(): Promise<BinaryUrl> {
+    return this.getVersionsLookup().then(versionsLookup => {
+      let latest = '';
+      for (let item of versionsLookup) {
+        let version = item.version.replace('v', '');
+        if (latest === '') {
+          latest = version;
+        } else if (semver.lt(latest, version)) {
+          latest = version;
         }
       }
-    }
-    return null;
+      return this.getSpecificGeckoDrierVersion('v' + latest);
+    });
+  }
+
+  private getSpecificGeckoDrierVersion(inputVersion: string): Promise<BinaryUrl> {
+    return this.getJson().then(json => {
+      return this.getVersionsLookup().then(versionsLookup => {
+        for (let item of versionsLookup) {
+          // Get the asset from the matching version.
+          if (item.version === inputVersion) {
+            let assetsArray = json[item.index].assets;
+            for (let asset of assetsArray) {
+              if ((asset.name as string).includes(this.oshelper())) {
+                return {url: asset.browser_download_url, version: inputVersion};
+              }
+            }
+          }
+        }
+        return null;
+      });
+    });
   }
 
   private oshelper(): string {
