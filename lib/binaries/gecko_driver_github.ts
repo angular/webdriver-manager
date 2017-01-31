@@ -41,17 +41,26 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
   }
 
   private getLatestGeckoDriverVersion(): Promise<BinaryUrl> {
-    return this.getVersionsLookup().then(versionsLookup => {
-      let latest = '';
-      for (let item of versionsLookup) {
-        let version = item.version.replace('v', '');
-        if (latest === '') {
-          latest = version;
-        } else if (semver.lt(latest, version)) {
-          latest = version;
+    return this.getJson().then(json => {
+      return this.getVersionsLookup().then(versionsLookup => {
+        let latest = '';
+        for (let item of versionsLookup) {
+          let version = item.version.replace('v', '');
+          let assetsArray = json[item.index].assets;
+
+          // check to make sure the version found has the OS
+          for (let asset of assetsArray) {
+            if ((asset.name as string).includes(this.oshelper())) {
+              if (latest === '') {
+                latest = version;
+              } else if (semver.lt(latest, version)) {
+                latest = version;
+              }
+            }
+          }
         }
-      }
-      return this.getSpecificGeckoDrierVersion('v' + latest);
+        return this.getSpecificGeckoDrierVersion('v' + latest);
+      });
     });
   }
 
