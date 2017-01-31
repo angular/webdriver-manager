@@ -1,3 +1,8 @@
+# 12.0.1
+
+- ([6209666](https://github.com/angular/webdriver-manager/commit/620966611f48504619a594b582060ba04a61b3a7))
+  fix(gecko): add additional check for OS when getting latest (#200)
+
 # 12.0.0
 
 ### Changes to update
