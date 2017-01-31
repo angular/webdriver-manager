@@ -11,13 +11,11 @@ export class StandaloneXml extends XmlConfigSource {
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
-    return this.getXml().then(() => {
-      if (version === 'latest') {
-        return this.getLatestStandaloneVersion();
-      } else {
-        return this.getSpecificStandaloneVersion(version);
-      }
-    });
+    if (version === 'latest') {
+      return this.getLatestStandaloneVersion();
+    } else {
+      return this.getSpecificStandaloneVersion(version);
+    }
   }
 
   getVersionList(): Promise<string[]> {
@@ -46,23 +44,21 @@ export class StandaloneXml extends XmlConfigSource {
         let version = item.split('selenium-server-standalone-')[1].replace('.jar', '');
 
         // Do not do beta versions for latest.
-        if (version.includes('beta')) {
-          continue;
-        }
-
-        if (standaloneVersion == null) {
-          // First time: use the version found.
-          standaloneVersion = version;
-          latest = item;
-          latestVersion = version;
-        } else if (semver.gt(version, standaloneVersion)) {
-          // Get the latest.
-          standaloneVersion = version;
-          latest = item;
-          latestVersion = version;
+        if (!version.includes('beta')) {
+          if (standaloneVersion == null) {
+            // First time: use the version found.
+            standaloneVersion = version;
+            latest = item;
+            latestVersion = version;
+          } else if (semver.gt(version, standaloneVersion)) {
+            // Get the latest.
+            standaloneVersion = version;
+            latest = item;
+            latestVersion = version;
+          }
         }
       }
-      return {url: latest, version: latestVersion};
+      return {url: Config.cdnUrls().selenium + latest, version: latestVersion};
     });
   }
 
@@ -86,10 +82,10 @@ export class StandaloneXml extends XmlConfigSource {
           if (inputVersion.includes('beta')) {
             let betaInputVersion = inputVersion.replace('.jar', '').split('beta')[1];
             if (item.split('/')[0].includes('beta' + betaInputVersion)) {
-              return {url: item, version: version};
+              return {url: Config.cdnUrls().selenium + item, version: version};
             }
           } else {
-            return {url: item, version: version};
+            return {url: Config.cdnUrls().selenium + item, version: version};
           }
         }
       }

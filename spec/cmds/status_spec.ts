@@ -20,7 +20,8 @@ describe('status', () => {
   beforeAll((done) => {
     argv = {
       '_': ['update'],
-      'versions': {'chrome': '2.24', 'standalone': '2.44.0', 'gecko': 'v0.13.0'},
+      'gecko': 'false',
+      'versions': {'chrome': '2.24', 'standalone': '2.44.0'},
       'out_dir': tmpDir
     };
     program.run(JSON.parse(JSON.stringify(argv)))
@@ -36,15 +37,17 @@ describe('status', () => {
   });
 
   it('should show the version number of the default and latest versions', () => {
-    let lines = spawnSync(
-                    process.execPath,
-                    ['built/lib/webdriver.js', 'status', '--out_dir', 'selenium_test'], 'pipe')
-                    .output[1]
-                    .toString()
-                    .split('\n');
+    let lines =
+        spawnSync(
+            process.execPath,
+            ['built/lib/webdriver.js', 'status', '--out_dir', 'selenium_test', '--gecko', 'false'],
+            'pipe')
+            .output[1]
+            .toString()
+            .split('\n');
     let seleniumLine: string = null;
     let chromeLine: string = null;
-    let geckodriverLine: string = null;
+    // let geckodriverLine: string = null;
     let androidSdkLine: string = null;
     let appiumLine: string = null;
 
@@ -53,8 +56,8 @@ describe('status', () => {
         seleniumLine = line;
       } else if (line.indexOf('chrome') >= 0) {
         chromeLine = line;
-      } else if (line.indexOf('geckodriver') >= 0) {
-        geckodriverLine = line;
+        // } else if (line.indexOf('geckodriver') >= 0) {
+        //   geckodriverLine = line;
       } else if (line.indexOf('android-sdk') >= 0) {
         androidSdkLine = line;
       } else if (line.indexOf('appium') >= 0) {
@@ -70,9 +73,9 @@ describe('status', () => {
     expect(getVersions(chromeLine)[0]).toContain('2.20 [last]');
     expect(getVersions(chromeLine)[1]).toContain('2.24');
 
-    expect(geckodriverLine).not.toBeNull();
-    expect(geckodriverLine).toContain('[last]');
-    expect(getVersions(geckodriverLine).length).toEqual(1);
+    // expect(geckodriverLine).not.toBeNull();
+    // expect(geckodriverLine).toContain('[last]');
+    // expect(getVersions(geckodriverLine).length).toEqual(1);
 
     expect(androidSdkLine).not.toBeNull();
     expect(androidSdkLine).toContain('not present');

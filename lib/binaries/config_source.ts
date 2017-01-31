@@ -125,12 +125,14 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
     let fileName = this.getFileName();
     let content = this.readResponse();
     if (content != null) {
-      return Promise.resolve(content);
+      return Promise.resolve(JSON.parse(content));
+    } else {
+      return this.requestJson().then(body => {
+        let json = JSON.parse(body);
+        fs.writeFileSync(fileName, JSON.stringify(json, null, '  '));
+        return json;
+      });
     }
-    return this.requestJson().then(() => {
-      fs.writeFileSync(fileName, JSON.stringify(content, null, '  '));
-      return content;
-    });
   }
 
   private requestJson(): Promise<any> {
@@ -150,7 +152,7 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
             output += data;
           });
           response.on('end', () => {
-            resolve(JSON.parse(output));
+            resolve(output);
           });
 
         } else {
@@ -168,7 +170,7 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
 
       let now = Date.now();
       if (now - 36000000 < timestamp) {
-        return JSON.parse(contents);
+        return contents;
       }
     } catch (err) {
       return null;

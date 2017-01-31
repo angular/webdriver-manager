@@ -82,7 +82,19 @@ export abstract class Binary {
    * Gets the url to download the file set by the version. This will use the XML if available.
    * If not, it will download from an existing url.
    */
-  abstract getUrl(version?: string): Promise<BinaryUrl>;
+  getUrl(version?: string): Promise<BinaryUrl> {
+    if (this.alternativeDownloadUrl != null) {
+      return Promise.resolve({url: '', version: ''});
+    } else {
+      return this.getVersionList().then(() => {
+        version = version || Config.binaryVersions()[this.id()];
+        return this.configSource.getUrl(version).then(binaryUrl => {
+          this.versionCustom = binaryUrl.version;
+          return {url: binaryUrl.url, version: binaryUrl.version};
+        });
+      });
+    }
+  }
 
   /**
    * Gets the list of available versions available based on the xml. If no XML exists, return an

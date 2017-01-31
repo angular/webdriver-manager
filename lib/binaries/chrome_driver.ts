@@ -29,20 +29,6 @@ export class ChromeDriver extends Binary {
     return '.zip';
   }
 
-  getUrl(version?: string): Promise<BinaryUrl> {
-    if (this.alternativeDownloadUrl != null) {
-      return Promise.resolve({url: '', version: ''});
-    } else {
-      return this.getVersionList().then(() => {
-        version = version || Config.binaryVersions().chrome;
-        return this.configSource.getUrl(version).then(binaryUrl => {
-          this.versionCustom = binaryUrl.version;
-          return {url: Config.cdnUrls().chrome + binaryUrl.url, version: binaryUrl.version};
-        });
-      });
-    }
-  }
-
   getVersionList(): Promise<string[]> {
     // If an alternative cdn is set, return an empty list.
     if (this.alternativeDownloadUrl != null) {

@@ -13,7 +13,9 @@ describe('iedriver xml', () => {
     let iedriverXml = new IEDriverXml();
     iedriverXml.out_dir = out_dir;
     iedriverXml.getUrl('2.53.1').then(binaryUrl => {
-      expect(binaryUrl.url).toEqual('2.53/IEDriverServer_Win32_2.53.1.zip');
+      expect(binaryUrl.url)
+          .toEqual(
+              'https://selenium-release.storage.googleapis.com/2.53/IEDriverServer_Win32_2.53.1.zip');
       done();
     });
   });

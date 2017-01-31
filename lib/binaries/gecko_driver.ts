@@ -48,17 +48,6 @@ export class GeckoDriver extends Binary {
     }
   }
 
-  getUrl(version?: string): Promise<BinaryUrl> {
-    if (this.alternativeDownloadUrl != null) {
-      return Promise.resolve({url: '', version: ''});
-    } else {
-      return this.configSource.getUrl(version).then(binaryUrl => {
-        this.versionCustom = binaryUrl.version;
-        return binaryUrl;
-      });
-    }
-  }
-
   getVersionList(): Promise<string[]> {
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve([]);

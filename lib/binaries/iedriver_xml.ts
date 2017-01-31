@@ -11,13 +11,11 @@ export class IEDriverXml extends XmlConfigSource {
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
-    return this.getXml().then(() => {
-      if (version === 'latest') {
-        return this.getLatestIEDriverVersion();
-      } else {
-        return this.getSpecificIEDriverVersion(version);
-      }
-    });
+    if (version === 'latest') {
+      return this.getLatestIEDriverVersion();
+    } else {
+      return this.getSpecificIEDriverVersion(version);
+    }
   }
 
   getVersionList(): Promise<string[]> {
@@ -54,7 +52,7 @@ export class IEDriverXml extends XmlConfigSource {
           latest = item;
         }
       }
-      return {url: latest, version: latestVersion};
+      return {url: Config.cdnUrls().ie + latest, version: latestVersion};
     });
   }
 
@@ -69,7 +67,7 @@ export class IEDriverXml extends XmlConfigSource {
         // Check to see if the specified version matches.
         let firstPath = item.split('/')[0];
         if (version === inputVersion) {
-          return {url: item, version: version};
+          return {url: Config.cdnUrls().ie + item, version: version};
         }
       }
       return {url: '', version: inputVersion};

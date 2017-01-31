@@ -11,13 +11,11 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
-    return this.getJson().then(() => {
-      if (version === 'latest') {
-        return this.getLatestGeckoDriverVersion();
-      } else {
-        return this.getSpecificGeckoDrierVersion(version);
-      }
-    });
+    if (version === 'latest') {
+      return this.getLatestGeckoDriverVersion();
+    } else {
+      return this.getSpecificGeckoDrierVersion(version);
+    }
   }
 
   getVersionList(): Promise<string[]> {

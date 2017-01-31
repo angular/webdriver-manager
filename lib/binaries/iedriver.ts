@@ -30,20 +30,6 @@ export class IEDriver extends Binary {
     return '.zip';
   }
 
-  getUrl(version?: string): Promise<BinaryUrl> {
-    if (this.alternativeDownloadUrl != null) {
-      return Promise.resolve({url: '', version: ''});
-    } else {
-      return this.getVersionList().then(() => {
-        version = version || Config.binaryVersions().ie;
-        return this.configSource.getUrl(version).then(binaryUrl => {
-          this.versionCustom = binaryUrl.version;
-          return {url: Config.cdnUrls().ie + binaryUrl.url, version: binaryUrl.version};
-        });
-      });
-    }
-  }
-
   getVersionList(): Promise<string[]> {
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve([]);

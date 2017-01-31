@@ -11,14 +11,11 @@ export class ChromeXml extends XmlConfigSource {
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
-    return this.getXml().then(() => {
-      version = version ? version : Config.binaryVersions().chrome;
-      if (version === 'latest') {
-        return this.getLatestChromeDriverVersion();
-      } else {
-        return this.getSpecificChromeDriverVersion(version);
-      }
-    });
+    if (version === 'latest') {
+      return this.getLatestChromeDriverVersion();
+    } else {
+      return this.getSpecificChromeDriverVersion(version);
+    }
   }
 
   /**
@@ -32,14 +29,13 @@ export class ChromeXml extends XmlConfigSource {
       for (let content of xml.ListBucketResult.Contents) {
         let contentKey: string = content.Key[0];
 
-        // Filter for 32-bit devices, make sure x64 is not an option
-        if (this.osarch !== 'x64' && contentKey.includes('64')) {
-          continue;
-        }
 
-        // Filter for only the osType
-        if (contentKey.includes(osType)) {
-          versionPaths.push(contentKey);
+        // Filter for 32-bit devices, make sure x64 is not an option
+        if (this.osarch === 'x64' || !contentKey.includes('64')) {
+          // Filter for only the osType
+          if (contentKey.includes(osType)) {
+            versionPaths.push(contentKey);
+          }
         }
       }
       return versionPaths;
@@ -69,36 +65,34 @@ export class ChromeXml extends XmlConfigSource {
       let latest = '';
       let latestVersion = '';
       for (let item of list) {
-        // get a semantic version
+        // Get a semantic version
         let version = item.split('/')[0];
         if (semver.valid(version) == null) {
           version += '.0';
-          if (semver.valid(version) == null) {
-            continue;
-          }
-        }
-
-        if (chromedriverVersion == null) {
-          // First time: use the version found.
-          chromedriverVersion = version;
-          latest = item;
-          latestVersion = item.split('/')[0];
-        } else if (semver.gt(version, chromedriverVersion)) {
-          // After the first time, make sure the semantic version is greater.
-          chromedriverVersion = version;
-          latest = item;
-          latestVersion = item.split('/')[0];
-        } else if (version === chromedriverVersion) {
-          // If the semantic version is the same, check os arch.
-          // For 64-bit systems, prefer the 64-bit version.
-          if (this.osarch === 'x64') {
-            if (item.includes(this.getOsTypeName() + '64')) {
+          if (semver.valid(version)) {
+            // First time: use the version found.
+            if (chromedriverVersion == null) {
+              chromedriverVersion = version;
               latest = item;
+              latestVersion = item.split('/')[0];
+            } else if (semver.gt(version, chromedriverVersion)) {
+              // After the first time, make sure the semantic version is greater.
+              chromedriverVersion = version;
+              latest = item;
+              latestVersion = item.split('/')[0];
+            } else if (version === chromedriverVersion) {
+              // If the semantic version is the same, check os arch.
+              // For 64-bit systems, prefer the 64-bit version.
+              if (this.osarch === 'x64') {
+                if (item.includes(this.getOsTypeName() + '64')) {
+                  latest = item;
+                }
+              }
             }
           }
         }
       }
-      return {url: latest, version: latestVersion};
+      return {url: Config.cdnUrls().chrome + latest, version: latestVersion};
     });
   }
 
@@ -115,27 +109,25 @@ export class ChromeXml extends XmlConfigSource {
         let version = item.split('/')[0];
         if (semver.valid(version) == null) {
           version += '.0';
-          if (semver.valid(version) == null) {
-            continue;
-          }
-        }
+          if (semver.valid(version)) {
+            // Check to see if the specified version matches.
+            if (version === specificVersion) {
+              // When item found is null, check the os arch
+              // 64-bit version works OR not 64-bit version and the path does not have '64'
+              if (itemFound == '') {
+                if (this.osarch === 'x64' ||
+                    (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
+                  itemFound = item;
+                }
 
-        // Check to see if the specified version matches.
-        if (version === specificVersion) {
-          // When item found is null, check the os arch
-          // 64-bit version works OR not 64-bit version and the path does not have '64'
-          if (itemFound == '') {
-            if (this.osarch === 'x64' ||
-                (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
-              itemFound = item;
-            }
-
-          }
-          // If the semantic version is the same, check os arch.
-          // For 64-bit systems, prefer the 64-bit version.
-          else if (this.osarch === 'x64') {
-            if (item.includes(this.getOsTypeName() + '64')) {
-              itemFound = item;
+              }
+              // If the semantic version is the same, check os arch.
+              // For 64-bit systems, prefer the 64-bit version.
+              else if (this.osarch === 'x64') {
+                if (item.includes(this.getOsTypeName() + '64')) {
+                  itemFound = item;
+                }
+              }
             }
           }
         }
@@ -143,7 +135,7 @@ export class ChromeXml extends XmlConfigSource {
       if (itemFound == '') {
         return {url: '', version: inputVersion};
       } else {
-        return {url: itemFound, version: inputVersion};
+        return {url: Config.cdnUrls().chrome + itemFound, version: inputVersion};
       }
     });
   }
