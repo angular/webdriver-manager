@@ -1,4 +1,4 @@
-import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Cli, Option, Options} from '../cli';
 import {Config} from '../config';
 
@@ -55,7 +55,7 @@ opts[IGNORE_SSL] = new Option(IGNORE_SSL, 'Ignore SSL certificates', 'boolean', 
 opts[PROXY] = new Option(PROXY, 'Proxy to use for the install or update command', 'string');
 opts[ALTERNATE_CDN] = new Option(ALTERNATE_CDN, 'Alternate CDN to binaries', 'string');
 opts[STANDALONE] = new Option(
-    STANDALONE, 'Install or update selenium standalone', 'boolean', StandAlone.isDefault);
+    STANDALONE, 'Install or update selenium standalone', 'boolean', Standalone.isDefault);
 opts[CHROME] =
     new Option(CHROME, 'Install or update chromedriver', 'boolean', ChromeDriver.isDefault);
 opts[GECKO] = new Option(GECKO, 'Install or update geckodriver', 'boolean', GeckoDriver.isDefault);
@@ -71,18 +71,23 @@ opts[EDGE] = new Option(
 opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', AndroidSDK.isDefault);
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
-    VERSIONS_CHROME, 'Optional chrome driver version', 'string', ChromeDriver.versionDefault);
-opts[VERSIONS_GECKO] = new Option(
-    VERSIONS_GECKO, 'Optional gecko driver version', 'string', GeckoDriver.versionDefault);
+    VERSIONS_CHROME,
+    'Optional chrome driver version (use \'latest\' to get the most recent version)', 'string',
+    'latest');
+opts[VERSIONS_GECKO] =
+    new Option(VERSIONS_GECKO, 'Optional gecko driver version', 'string', 'latest');
 opts[VERSIONS_ANDROID] = new Option(
     VERSIONS_ANDROID, 'Optional android sdk version', 'string', AndroidSDK.versionDefault);
 opts[VERSIONS_STANDALONE] = new Option(
-    VERSIONS_STANDALONE, 'Optional seleniuim standalone server version', 'string',
-    StandAlone.versionDefault);
+    VERSIONS_STANDALONE,
+    'Optional seleniuim standalone server version (use \'latest\' to get the most recent version)',
+    'string', 'latest');
 opts[VERSIONS_APPIUM] =
     new Option(VERSIONS_APPIUM, 'Optional appium version', 'string', Appium.versionDefault);
 opts[VERSIONS_IE] = new Option(
-    VERSIONS_IE, 'Optional internet explorer driver version', 'string', IEDriver.versionDefault);
+    VERSIONS_IE,
+    'Optional internet explorer driver version (use \'latest\' to get the most recent version)',
+    'string', 'latest');
 opts[CHROME_LOGS] = new Option(CHROME_LOGS, 'File path to chrome logs', 'string', undefined);
 opts[LOGGING] = new Option(LOGGING, 'File path to logging properties file', 'string', undefined);
 opts[ANDROID_API_LEVELS] = new Option(
@@ -110,7 +115,8 @@ opts[STARTED_SIGNIFIER] = new Option(
     'A string to be outputted once the selenium server is up and running.  Useful if you are writing a script which uses webdriver-manager.',
     'string');
 opts[SIGNAL_VIA_IPC] = new Option(
-    SIGNAL_VIA_IPC, 'If you are using --' + STARTED_SIGNIFIER +
+    SIGNAL_VIA_IPC,
+    'If you are using --' + STARTED_SIGNIFIER +
         ', this flag will emit the signal string using process.send(), rather than writing it to stdout',
     'boolean', false);
 opts[DETACH] = new Option(

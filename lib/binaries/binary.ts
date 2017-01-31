@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import {Config} from '../config';
+import {ConfigSource} from './config_source';
 
 /**
  * operating system enum
@@ -9,103 +11,109 @@ export enum OS {
   Darwin
 }
 
+export interface BinaryUrl {
+  url: string;
+  version: string;
+}
+
 /**
  * Dictionary to map the binary's id to the binary object
  */
 export interface BinaryMap<T extends Binary> { [id: string]: T; }
 
+export abstract class Binary {
+  static os: OS[];
 
-/**
- * The binary object base class
- */
-export class Binary {
-  static os: OS[];                // the operating systems, the binary can run on
-  static id: string;              // the binaries key identifier
-  static versionDefault: string;  // a static default version variable
-  name: string;                   // used for logging to console
-  prefixDefault: string;          // start of the file name
-  versionCustom: string;          // version of file
-  suffixDefault: string;          // file type for downloading
-  cdn: string;                    // url protocol and host
-  arch: string;
+  configSource: ConfigSource;
 
-  constructor(cdn?: string) {
-    this.cdn = cdn;
+  ostype: string = Config.osType();
+  osarch: string = Config.osArch();
+
+  // TODO(cnishina): downloading the latest requires parsing XML or JSON that is assumed to be
+  //   published and formatted in a specific way. If this is not available, let the user download
+  //   the file from an alternative download URL.
+  alternativeDownloadUrl: string;
+
+  cdn: string;             // The url host for XML reading or the base path to the url.
+  opt_ignoreSSL: boolean;  // An optional ignore ssl.
+  opt_proxy: string        // An optional proxy.
+
+  name: string;
+  versionDefault: string;
+  versionCustom: string;
+
+  constructor(opt_alternativeCdn?: string) {
+    this.cdn = opt_alternativeCdn;
   }
 
-  /**
-   * @param ostype The operating system.
-   * @returns The executable file type.
-   */
-  executableSuffix(ostype: string): string {
-    if (ostype == 'Windows_NT') {
+  abstract prefix(): string;
+  abstract suffix(): string;
+
+  executableSuffix(): string {
+    if (this.ostype == 'Windows_NT') {
       return '.exe';
     } else {
       return '';
     }
   }
 
-  /**
-   * @param ostype The operating system.
-   * @returns The file name for the executable.
-   */
-  executableFilename(ostype: string): string {
-    return this.prefix() + this.version() + this.executableSuffix(ostype);
-  }
-
-  prefix(): string {
-    return this.prefixDefault;
-  }
-
   version(): string {
     return this.versionCustom;
   }
 
-  suffix(ostype?: string, arch?: string): string {
-    return this.suffixDefault;
-  }
-
-  filename(ostype?: string, arch?: string): string {
-    return this.prefix() + this.version() + this.suffix(ostype, arch);
+  filename(): string {
+    return this.prefix() + this.version() + this.suffix();
   }
 
   /**
    * @param ostype The operating system.
-   * @returns The file name for the file inside the downloaded zip file
+   * @returns The file name for the executable.
    */
-  zipContentName(ostype: string): string {
-    return this.name + this.executableSuffix(ostype);
-  }
-
-  shortVersion(version: string): string {
-    return version.slice(0, version.lastIndexOf('.'));
+  executableFilename(): string {
+    return this.prefix() + this.version() + this.executableSuffix();
   }
 
   /**
-   * A base class method that should be overridden.
+   * Gets the id of the binary.
    */
-  id(): string {
-    return 'not implemented';
+  abstract id(): string;
+
+  /**
+   * Gets the url to download the file set by the version. This will use the XML if available.
+   * If not, it will download from an existing url.
+   */
+  getUrl(version?: string): Promise<BinaryUrl> {
+    if (this.alternativeDownloadUrl != null) {
+      return Promise.resolve({url: '', version: ''});
+    } else {
+      return this.getVersionList().then(() => {
+        version = version || Config.binaryVersions()[this.id()];
+        return this.configSource.getUrl(version).then(binaryUrl => {
+          this.versionCustom = binaryUrl.version;
+          return {url: binaryUrl.url, version: binaryUrl.version};
+        });
+      });
+    }
   }
 
   /**
-   * A base class method that should be overridden.
+   * Gets the list of available versions available based on the xml. If no XML exists, return an
+   * empty list.
    */
-  versionDefault(): string {
-    return 'not implemented';
-  }
-
-  /**
-   * A base class method that should be overridden.
-   */
-  url(ostype?: string, arch?: string): string {
-    return 'not implemented';
-  }
+  abstract getVersionList(): Promise<string[]>;
 
   /**
    * Delete an instance of this binary from the file system
    */
   remove(filename: string): void {
     fs.unlinkSync(filename);
+  }
+
+  /**
+   * @param ostype The operating system.
+   * @returns The file name for the file inside the downloaded zip file
+   */
+  zipContentName(): string {
+    return this.name + this.executableSuffix();
   }
 }

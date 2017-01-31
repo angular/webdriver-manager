@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
-import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, StandAlone} from '../binaries';
+import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
@@ -115,7 +115,7 @@ function update(options: Options): Promise<void> {
 
   // setup versions for binaries
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
-  binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
+  binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
@@ -130,44 +130,49 @@ function update(options: Options): Promise<void> {
   // else if the file has already been downloaded, unzip the file, rename it, and give it
   // permissions
   if (standalone) {
-    let binary = binaries[StandAlone.id];
-    updateBrowserFile(binary, outputDir);
-    promises.push(
-        FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL)
-            .then<void>((downloaded: boolean) => {
-              if (!downloaded) {
-                logger.info(
-                    binary.name + ': file exists ' +
-                    path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
-                logger.info(binary.name + ': ' + binary.versionCustom + ' up to date');
-              }
-            }));
+    let binary: Standalone = binaries[Standalone.id];
+    promises.push(FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL)
+                      .then<void>((downloaded: boolean) => {
+                        if (!downloaded) {
+                          logger.info(
+                              binary.name + ': file exists ' +
+                              path.resolve(outputDir, binary.filename()));
+                          logger.info(binary.name + ': ' + binary.filename() + ' up to date');
+                        }
+                      })
+                      .then(() => {
+                        updateBrowserFile(binary, outputDir);
+                      }));
   }
   if (chrome) {
-    let binary = binaries[ChromeDriver.id];
-    updateBrowserFile(binary, outputDir);
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
+    let binary: ChromeDriver = binaries[ChromeDriver.id];
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
+      return Promise.resolve(updateBrowserFile(binary, outputDir));
+    }));
   }
   if (gecko) {
-    let binary = binaries[GeckoDriver.id];
-    updateBrowserFile(binary, outputDir);
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
+    let binary: GeckoDriver = binaries[GeckoDriver.id];
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
+      return Promise.resolve(updateBrowserFile(binary, outputDir));
+    }));
   }
   if (ie64) {
-    let binary = binaries[IEDriver.id];
-    binary.arch = Config.osArch();  // Win32 or x64
-    updateBrowserFile(binary, outputDir);
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
+    let binary: IEDriver = binaries[IEDriver.id];
+    binary.osarch = Config.osArch();  // Win32 or x64
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
+      return Promise.resolve(updateBrowserFile(binary, outputDir));
+    }));
   }
   if (ie32) {
-    let binary = binaries[IEDriver.id];
-    binary.arch = 'Win32';
-    updateBrowserFile(binary, outputDir);
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL));
+    let binary: IEDriver = binaries[IEDriver.id];
+    binary.osarch = 'Win32';
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
+      return Promise.resolve(updateBrowserFile(binary, outputDir));
+    }));
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
-    let sdk_path = path.resolve(outputDir, binary.executableFilename(Config.osType()));
+    let sdk_path = path.resolve(outputDir, binary.executableFilename());
     let oldAVDList: string;
 
     updateBrowserFile(binary, outputDir);
@@ -184,7 +189,7 @@ function update(options: Options): Promise<void> {
                       })
                       .then<void>(() => {
                         initializeAndroid(
-                            path.resolve(outputDir, binary.executableFilename(Config.osType())),
+                            path.resolve(outputDir, binary.executableFilename()),
                             android_api_levels, android_architectures, android_platforms,
                             android_accept_licenses, binaries[AndroidSDK.id].versionCustom,
                             JSON.parse(oldAVDList), logger, verbose);
@@ -194,17 +199,17 @@ function update(options: Options): Promise<void> {
     checkIOS(logger);
   }
   if (android || ios) {
-    updateBrowserFile(binaries[Appium.id], outputDir);
     installAppium(binaries[Appium.id], outputDir);
+    updateBrowserFile(binaries[Appium.id], outputDir);
   }
 
-  writeBrowserFile(outputDir);
-
-  return Promise.all(promises).then(() => {});
+  return Promise.all(promises).then(() => {
+    writeBrowserFile(outputDir);
+  });
 }
 
-function updateBinary(
-    binary: Binary, outputDir: string, proxy: string, ignoreSSL: boolean): Promise<void> {
+function updateBinary<T extends Binary>(
+    binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): Promise<void> {
   return FileManager
       .downloadFile(
           binary, outputDir, proxy, ignoreSSL,
@@ -214,12 +219,10 @@ function updateBinary(
       .then<void>(downloaded => {
         if (!downloaded) {
           // The file did not have to download, we should unzip it.
-          logger.info(
-              binary.name + ': file exists ' +
-              path.resolve(outputDir, binary.filename(Config.osType(), Config.osArch())));
-          let fileName = binary.filename(Config.osType(), Config.osArch());
+          logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename()));
+          let fileName = binary.filename();
           unzip(binary, outputDir, fileName);
-          logger.info(binary.name + ': ' + binary.versionCustom + ' up to date');
+          logger.info(binary.name + ': ' + binary.executableFilename() + ' up to date');
         }
       });
 }
@@ -227,7 +230,7 @@ function updateBinary(
 function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string): void {
   // remove the previously saved file and unzip it
   let osType = Config.osType();
-  let mv = path.resolve(outputDir, binary.executableFilename(osType));
+  let mv = path.resolve(outputDir, binary.executableFilename());
   try {
     fs.unlinkSync(mv);
   } catch (err) {
@@ -248,7 +251,7 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   }
 
   // rename
-  fs.renameSync(path.resolve(outputDir, binary.zipContentName(osType)), mv);
+  fs.renameSync(path.resolve(outputDir, binary.zipContentName()), mv);
 
   // set permissions
   if (osType !== 'Windows_NT') {
@@ -287,7 +290,7 @@ interface BrowserFile {
 }
 
 function updateBrowserFile<T extends Binary>(binary: T, outputDir: string) {
-  let currentDownload = path.resolve(outputDir, binary.executableFilename(Config.osType()));
+  let currentDownload = path.resolve(outputDir, binary.executableFilename());
 
   // if browserFile[id] exists, we should update it
   if ((browserFile as any)[binary.id()]) {

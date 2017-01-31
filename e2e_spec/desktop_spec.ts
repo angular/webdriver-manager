@@ -11,12 +11,12 @@ describe('desktop browser smoke tests', () => {
                        .usingServer('http://localhost:4444/wd/hub')
                        .withCapabilities({browserName: browserName})
                        .build();
-      driver.get('http://localhost:4444/selenium-server/driver/?cmd=getLogMessages')
+      driver.get('http://localhost:4444/wd/hub/status')
           .then(() => {
             return driver.getPageSource();
           })
           .then((source: string) => {
-            expect(source).toContain('OK');
+            expect(source).toContain('"state":"success"');
             return driver.quit();
           })
           .then(() => {

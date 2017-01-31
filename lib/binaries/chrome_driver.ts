@@ -1,66 +1,40 @@
-import * as semver from 'semver';
-
 import {Config} from '../config';
 
-import {Binary, OS} from './binary';
+import {Binary, BinaryUrl, OS} from './binary';
+import {ChromeXml} from './chrome_xml';
 
-
-/**
- * The chrome driver binary.
- */
 export class ChromeDriver extends Binary {
-  static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
   static id = 'chrome';
-  static versionDefault = Config.binaryVersions().chrome;
   static isDefault = true;
+  static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
+  static versionDefault = Config.binaryVersions().chrome;
 
-  constructor(alternateCDN?: string) {
-    super(alternateCDN || Config.cdnUrls().chrome);
-
+  constructor(opt_alternativeCdn?: string) {
+    super(opt_alternativeCdn || Config.cdnUrls().chrome);
+    this.configSource = new ChromeXml();
     this.name = 'chromedriver';
-    this.versionCustom = ChromeDriver.versionDefault;
-    this.prefixDefault = 'chromedriver_';
-    this.suffixDefault = '.zip';
+    this.versionDefault = ChromeDriver.versionDefault;
+    this.versionCustom = this.versionDefault;
   }
 
   id(): string {
     return ChromeDriver.id;
   }
 
-  versionDefault(): string {
-    return ChromeDriver.versionDefault;
+  prefix(): string {
+    return 'chromedriver_';
   }
 
-  suffix(ostype: string, arch: string): string {
-    if (ostype === 'Darwin') {
-      let version: string = this.version();
+  suffix(): string {
+    return '.zip';
+  }
 
-      if (version.split('.').length === 2) {
-        // we need to make the version valid semver since there is only a major and a minor
-        version = `${version}.0`;
-      }
-
-      if (semver.gt(version, '2.23.0')) {
-        // after chromedriver version 2.23, the name of the binary changed
-        // They no longer provide a 32 bit binary
-        return 'mac64' + this.suffixDefault;
-      } else {
-        return 'mac32' + this.suffixDefault;
-      }
-    } else if (ostype === 'Linux') {
-      if (arch === 'x64') {
-        return 'linux64' + this.suffixDefault;
-      } else {
-        return 'linux32' + this.suffixDefault;
-      }
-    } else if (ostype === 'Windows_NT') {
-      return 'win32' + this.suffixDefault;
+  getVersionList(): Promise<string[]> {
+    // If an alternative cdn is set, return an empty list.
+    if (this.alternativeDownloadUrl != null) {
+      Promise.resolve([]);
+    } else {
+      return this.configSource.getVersionList();
     }
-  }
-
-  url(ostype: string, arch: string): string {
-    let urlBase = this.cdn + this.version() + '/';
-    let filename = this.prefix() + this.suffix(ostype, arch);
-    return urlBase + filename;
   }
 }

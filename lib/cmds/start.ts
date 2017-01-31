@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as minimist from 'minimist';
 import * as path from 'path';
+import * as q from 'q';
 
-import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, IEDriver, StandAlone} from '../binaries';
-import {GeckoDriver} from '../binaries/gecko_driver';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -104,7 +104,7 @@ function start(options: Options) {
       chromeLogs = path.resolve(Config.getBaseDir(), options[Opt.CHROME_LOGS].getString());
     }
   }
-  binaries[StandAlone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
+  binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
   binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
   if (options[Opt.VERSIONS_IE]) {
@@ -114,12 +114,13 @@ function start(options: Options) {
   binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
   let downloadedBinaries = FileManager.downloadedBinaries(outputDir);
 
-  if (downloadedBinaries[StandAlone.id] == null) {
+  if (downloadedBinaries[Standalone.id] == null) {
     logger.error(
         'Selenium Standalone is not present. Install with ' +
         'webdriver-manager update --standalone');
     process.exit(1);
   }
+  let promises: q.IPromise<any>[] = [];
   let args: string[] = [];
   if (osType === 'Linux') {
     // selenium server may take a long time to start because /dev/random is BLOCKING if there is not
@@ -127,7 +128,7 @@ function start(options: Options) {
     // because of a java bug)
     // https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/1301
     // https://bugs.openjdk.java.net/browse/JDK-6202721
-    args.push('-Djava.security.egd=file:///dev/./urandom');
+    promises.push(Promise.resolve(args.push('-Djava.security.egd=file:///dev/./urandom')));
   }
   if (options[Opt.LOGGING].getString()) {
     if (path.isAbsolute(options[Opt.LOGGING].getString())) {
@@ -135,103 +136,139 @@ function start(options: Options) {
     } else {
       loggingFile = path.resolve(Config.getBaseDir(), options[Opt.LOGGING].getString());
     }
-    args.push('-Djava.util.logging.config.file=' + loggingFile);
+    promises.push(Promise.resolve(args.push('-Djava.util.logging.config.file=' + loggingFile)));
   }
 
   if (downloadedBinaries[ChromeDriver.id] != null) {
-    args.push(
-        '-Dwebdriver.chrome.driver=' +
-        path.resolve(outputDir, binaries[ChromeDriver.id].executableFilename(osType)));
-    if (chromeLogs != null) {
-      args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
-    }
+    let chrome: ChromeDriver = binaries[ChromeDriver.id];
+    promises.push(
+        chrome.getUrl(chrome.versionCustom)
+            .then(() => {
+              args.push(
+                  '-Dwebdriver.chrome.driver=' +
+                  path.resolve(outputDir, binaries[ChromeDriver.id].executableFilename()));
+              if (chromeLogs != null) {
+                args.push('-Dwebdriver.chrome.logfile=' + chromeLogs);
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            }));
   }
   if (downloadedBinaries[GeckoDriver.id] != null) {
-    args.push(
-        '-Dwebdriver.gecko.driver=' +
-        path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename(osType)));
+    let gecko: GeckoDriver = binaries[GeckoDriver.id];
+    promises.push(gecko.getUrl(gecko.versionCustom)
+                      .then(() => {
+                        args.push(
+                            '-Dwebdriver.gecko.driver=' +
+                            path.resolve(outputDir, binaries[GeckoDriver.id].executableFilename()));
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      }));
   }
   if (downloadedBinaries[IEDriver.id] != null) {
-    binaries[IEDriver.id].arch = 'Win32';  // use Win 32 by default
-    if (options[Opt.IE64].getBoolean()) {
-      binaries[IEDriver.id].arch = Config.osArch();  // use the system architecture
-    }
-    args.push(
-        '-Dwebdriver.ie.driver=' +
-        path.resolve(outputDir, binaries[IEDriver.id].executableFilename(osType)));
+    let ie: IEDriver = binaries[IEDriver.id];
+    promises.push(ie.getUrl(ie.versionCustom)
+                      .then(() => {
+                        binaries[IEDriver.id].osarch = 'Win32';  // use Win 32 by default
+                        if (options[Opt.IE64].getBoolean()) {
+                          binaries[IEDriver.id].osarch =
+                              Config.osArch();  // use the system architecture
+                        }
+                        args.push(
+                            '-Dwebdriver.ie.driver=' +
+                            path.resolve(outputDir, binaries[IEDriver.id].executableFilename()));
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      }));
   }
   if (options[Opt.EDGE] && options[Opt.EDGE].getString()) {
     // validate that the file exists prior to adding it to args
     try {
       let edgeFile = options[Opt.EDGE].getString();
       if (fs.statSync(edgeFile).isFile()) {
-        args.push('-Dwebdriver.edge.driver=' + options[Opt.EDGE].getString());
+        promises.push(
+            Promise.resolve(args.push('-Dwebdriver.edge.driver=' + options[Opt.EDGE].getString())));
       }
     } catch (err) {
       // Either the default file or user specified location of the edge
       // driver does not exist.
     }
   }
-  if (android) {
-    if (downloadedBinaries[AndroidSDK.id] != null) {
-      let avds = options[Opt.AVDS].getString();
-      startAndroid(
-          outputDir, binaries[AndroidSDK.id], avds.split(','),
-          options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), avdPort, stdio);
-    } else {
-      logger.warn('Not starting android because it is not installed');
-    }
-  }
-  if (downloadedBinaries[Appium.id] != null) {
-    startAppium(outputDir, binaries[Appium.id], binaries[AndroidSDK.id], appiumPort, stdio);
-  }
 
-  // log the command to launch selenium server
-  args.push('-jar');
-  args.push(path.resolve(outputDir, binaries[StandAlone.id].filename()));
+  Promise.all(promises).then(() => {
+    let standalone: Standalone = binaries[Standalone.id];
+    standalone.getUrl(standalone.versionCustom)
+        .then(() => {
+          // starting android
+          if (android) {
+            if (downloadedBinaries[AndroidSDK.id] != null) {
+              let avds = options[Opt.AVDS].getString();
+              startAndroid(
+                  outputDir, binaries[AndroidSDK.id], avds.split(','),
+                  options[Opt.AVD_USE_SNAPSHOTS].getBoolean(), avdPort, stdio);
+            } else {
+              logger.warn('Not starting android because it is not installed');
+            }
+          }
+          if (downloadedBinaries[Appium.id] != null) {
+            startAppium(outputDir, binaries[Appium.id], binaries[AndroidSDK.id], appiumPort, stdio);
+          }
 
-  // Add the port parameter, has to declared after the jar file
-  if (seleniumPort) {
-    args.push('-port', seleniumPort);
-  }
+          args.push('-jar');
+          args.push(path.resolve(outputDir, binaries[Standalone.id].filename()));
+        })
+        .catch(err => {
+          console.log(err);
+        })
+        .then(() => {
+          // Add the port parameter, has to declared after the jar file
+          if (seleniumPort) {
+            args.push('-port', seleniumPort);
+          }
 
-  let argsToString = '';
-  for (let arg in args) {
-    argsToString += ' ' + args[arg];
-  }
-  logger.info('java' + argsToString);
+          let argsToString = '';
+          for (let arg in args) {
+            argsToString += ' ' + args[arg];
+          }
+          logger.info('java' + argsToString);
 
-  let seleniumProcess = spawn('java', args, stdio);
-  if (options[Opt.STARTED_SIGNIFIER].getString()) {
-    signalWhenReady(
-        options[Opt.STARTED_SIGNIFIER].getString(), options[Opt.SIGNAL_VIA_IPC].getBoolean(),
-        outputDir, seleniumPort, downloadedBinaries[Appium.id] ? appiumPort : '',
-        binaries[AndroidSDK.id], avdPort, androidActiveAVDs);
-  }
-  logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
-  seleniumProcess.on('exit', (code: number) => {
-    logger.info('Selenium Standalone has exited with code ' + code);
-    shutdownEverything();
-    process.exit(process.exitCode || code);
-  });
-  seleniumProcess.on('error', (error: Error) => {
-    logger.warn('Selenium Standalone server encountered an error: ' + error);
-  });
-  process.stdin.resume();
-  process.stdin.on('data', (chunk: Buffer) => {
-    logger.info('Attempting to shut down selenium nicely');
-    shutdownEverything(seleniumPort);
-  });
-  process.on('SIGINT', () => {
-    logger.info('Staying alive until the Selenium Standalone process exits');
-    shutdownEverything(seleniumPort);
+          let seleniumProcess = spawn('java', args, stdio);
+          if (options[Opt.STARTED_SIGNIFIER].getString()) {
+            signalWhenReady(
+                options[Opt.STARTED_SIGNIFIER].getString(),
+                options[Opt.SIGNAL_VIA_IPC].getBoolean(), outputDir, seleniumPort,
+                downloadedBinaries[Appium.id] ? appiumPort : '', binaries[AndroidSDK.id], avdPort,
+                androidActiveAVDs);
+          }
+          logger.info('seleniumProcess.pid: ' + seleniumProcess.pid);
+          seleniumProcess.on('exit', (code: number) => {
+            logger.info('Selenium Standalone has exited with code ' + code);
+            shutdownEverything();
+            process.exit(process.exitCode || code);
+          });
+          seleniumProcess.on('error', (error: Error) => {
+            logger.warn('Selenium Standalone server encountered an error: ' + error);
+          });
+          process.stdin.resume();
+          process.stdin.on('data', (chunk: Buffer) => {
+            logger.info('Attempting to shut down selenium nicely');
+            shutdownEverything(seleniumPort);
+          });
+          process.on('SIGINT', () => {
+            logger.info('Staying alive until the Selenium Standalone process exits');
+            shutdownEverything(seleniumPort);
+          });
+        });
   });
 }
 
 function startAndroid(
     outputDir: string, sdk: Binary, avds: string[], useSnapshots: boolean, port: number,
     stdio: string): void {
-  let sdkPath = path.resolve(outputDir, sdk.executableFilename(Config.osType()));
+  let sdkPath = path.resolve(outputDir, sdk.executableFilename());
   if (avds[0] == 'all') {
     avds = <string[]>require(path.resolve(sdkPath, 'available_avds.json'));
   } else if (avds[0] == 'none') {
@@ -289,8 +326,7 @@ function startAppium(
     outputDir: string, binary: Binary, androidSDK: Binary, port: string, stdio: string) {
   logger.info('Starting appium server');
   if (androidSDK) {
-    process.env.ANDROID_HOME =
-        path.resolve(outputDir, androidSDK.executableFilename(Config.osType()));
+    process.env.ANDROID_HOME = path.resolve(outputDir, androidSDK.executableFilename());
   }
   appiumProcess = spawn(
       'npm', ['run', 'appium'].concat(port ? ['--', '--port', port] : []), stdio,
@@ -342,7 +378,7 @@ function signalWhenReady(
     });
   };
   function waitForAndroid(avdPort: number, avdName: string, appiumPort: string): Promise<void> {
-    let sdkPath = path.resolve(outputDir, androidSDK.executableFilename(Config.osType()));
+    let sdkPath = path.resolve(outputDir, androidSDK.executableFilename());
     logger.info('Waiting for ' + avdName + '\'s emulator to start');
     return adb(sdkPath, avdPort, 'wait-for-device', maxWait)
         .then<void>(
@@ -396,10 +432,10 @@ function signalWhenReady(
   }
   let pending = [waitFor(
       () => {
-        return request('GET', seleniumPort, '/selenium-server/driver/?cmd=getLogMessages', maxWait);
+        return request('GET', appiumPort, '/wd/hub/status', maxWait);
       },
-      (logs) => {
-        return logs.toUpperCase().indexOf('OK') != -1;
+      (status) => {
+        return JSON.parse(status).status == 0;
       },
       'selenium server')];
   if (appiumPort) {
