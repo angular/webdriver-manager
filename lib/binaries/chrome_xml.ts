@@ -61,7 +61,7 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-      let chromedriverVersion = null;
+      let chromedriverVersion: string = null;
       let latest = '';
       let latestVersion = '';
       for (let item of list) {

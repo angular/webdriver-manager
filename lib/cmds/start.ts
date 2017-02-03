@@ -289,7 +289,7 @@ function startAndroid(
       avd + '-v' + sdk.versionCustom + '-wd-manager',
       '-netfast',
     ];
-    let portArg = null;
+    let portArg: number = null;
     if (!useSnapshots) {
       emuArgs = emuArgs.concat(['-no-snapshot-load', '-no-snapshot-save']);
     }

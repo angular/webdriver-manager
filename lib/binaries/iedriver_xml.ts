@@ -36,7 +36,7 @@ export class IEDriverXml extends XmlConfigSource {
 
   private getLatestIEDriverVersion(): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-      let latestVersion = null;
+      let latestVersion: string = null;
       let latest = '';
       for (let item of list) {
         // Get a semantic version.
