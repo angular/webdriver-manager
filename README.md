@@ -47,6 +47,13 @@ Clear out the server and driver files. If `webdriver-manager start` does not wor
 webdriver-manager clean
 ```
 
+Running / stopping server in background process (stopping is not yet supported on standalone server 3.x.x):
+
+```
+webdriver-manager start --detach
+webdriver-manager shutdown
+```
+
 Other topics:
 --------------
 
