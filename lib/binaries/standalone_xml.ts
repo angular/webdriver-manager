@@ -36,7 +36,7 @@ export class StandaloneXml extends XmlConfigSource {
 
   private getLatestStandaloneVersion(): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-      let standaloneVersion = null;
+      let standaloneVersion: string = null;
       let latest = '';
       let latestVersion = '';
       for (let item of list) {
@@ -65,7 +65,7 @@ export class StandaloneXml extends XmlConfigSource {
   private getSpecificStandaloneVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
       let itemFound = '';
-      let standaloneVersion = null;
+      let standaloneVersion: string = null;
 
       for (let item of list) {
         // Get a semantic version.

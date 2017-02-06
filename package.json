@@ -65,7 +65,7 @@
     "jasmine": "^2.4.1",
     "run-sequence": "^1.1.5",
     "selenium-webdriver": "~3.0.1",
-    "typescript": "^2.1.1"
+    "typescript": "~2.0.0"
   },
   "engines": {
     "node": ">=6.9.x"
