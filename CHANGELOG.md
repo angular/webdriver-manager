@@ -1,3 +1,8 @@
+# 12.0.2
+
+- ([0bdf6a4](https://github.com/angular/webdriver-manager/commit/0bdf6a465ae2a4b106bb5ff948718ef4ae3f31ad))
+  deps(typescript): use typescript@~2.0.0. fix any types (#203)
+
 # 12.0.1
 
 - ([6209666](https://github.com/angular/webdriver-manager/commit/620966611f48504619a594b582060ba04a61b3a7))
