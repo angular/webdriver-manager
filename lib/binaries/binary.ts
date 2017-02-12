@@ -81,14 +81,20 @@ export abstract class Binary {
   /**
    * Gets the url to download the file set by the version. This will use the XML if available.
    * If not, it will download from an existing url.
+   *
+   * @param {string} version The version we are looking for. This could also be 'latest'.
+   * @param {opt_proxy} string Option to get proxy URL.
+   * @param {opt_ignoreSSL} boolean Option to ignore SSL.
    */
-  getUrl(version?: string): Promise<BinaryUrl> {
+  getUrl(version?: string, opt_proxy?: string, opt_ignoreSSL?: boolean): Promise<BinaryUrl> {
+    this.opt_proxy = opt_proxy || this.opt_proxy;
+    this.opt_ignoreSSL = opt_ignoreSSL || this.opt_ignoreSSL;
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve({url: '', version: ''});
     } else {
       return this.getVersionList().then(() => {
         version = version || Config.binaryVersions()[this.id()];
-        return this.configSource.getUrl(version).then(binaryUrl => {
+        return this.configSource.getUrl(version, opt_proxy, opt_ignoreSSL).then(binaryUrl => {
           this.versionCustom = binaryUrl.version;
           return {url: binaryUrl.url, version: binaryUrl.version};
         });
