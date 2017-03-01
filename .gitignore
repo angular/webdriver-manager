@@ -5,3 +5,4 @@ selenium_test/
 typings/
 .idea/
 npm-debug.log
+.vscode
