@@ -2,7 +2,7 @@ import * as os from 'os';
 import * as webdriver from 'selenium-webdriver';
 import {AndroidSDK} from '../lib/binaries'
 
-let versions: { androidsdk: string, appium: string } = require('../config.json').webdriverVersions;
+let versions: {androidsdk: string, appium: string} = require('../config.json').webdriverVersions;
 
 describe('browser smoke tests', () => {
   it('should be able to boot up android chrome', (done) => {

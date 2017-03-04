@@ -10,7 +10,9 @@ export class IEDriverXml extends XmlConfigSource {
     super('iedriver', Config.cdnUrls()['ie']);
   }
 
-  getUrl(version: string): Promise<BinaryUrl> {
+  getUrl(version: string, opt_proxy?: string, opt_ignoreSSL?: boolean): Promise<BinaryUrl> {
+    this.opt_proxy = opt_proxy == undefined ? this.opt_proxy : opt_proxy;
+    this.opt_ignoreSSL = opt_ignoreSSL == undefined ? this.opt_ignoreSSL : opt_ignoreSSL;
     if (version === 'latest') {
       return this.getLatestIEDriverVersion();
     } else {

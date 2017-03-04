@@ -14,7 +14,8 @@ export abstract class ConfigSource {
   opt_ignoreSSL: boolean;
   opt_proxy: string;
 
-  abstract getUrl(version: string): Promise<{url: string, version: string}>;
+  abstract getUrl(version: string, opt_proxy?: string, opt_ignoreSSL?: boolean):
+      Promise<{url: string, version: string}>;
   abstract getVersionList(): Promise<string[]>;
 }
 
@@ -38,7 +39,7 @@ export abstract class XmlConfigSource extends ConfigSource {
     if (content != null) {
       return Promise.resolve(content);
     }
-    return this.requestXml(this.xmlUrl, this.opt_ignoreSSL, this.opt_proxy).then(text => {
+    return this.requestXml().then(text => {
       let xml = this.convertXml2js(text);
       fs.writeFileSync(fileName, text);
       return xml;
@@ -60,11 +61,11 @@ export abstract class XmlConfigSource extends ConfigSource {
     }
   }
 
-  private requestXml(url: string, opt_ignoreSSL: boolean, opt_proxy: string): Promise<string> {
+  private requestXml(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      let options = HttpUtils.initOptions(url);
-      options = HttpUtils.optionsSSL(options, opt_ignoreSSL);
-      options = HttpUtils.optionsProxy(options, url, opt_proxy);
+      let options = HttpUtils.initOptions(this.xmlUrl);
+      options = HttpUtils.optionsSSL(options, this.opt_ignoreSSL);
+      options = HttpUtils.optionsProxy(options, this.xmlUrl, this.opt_proxy);
 
       let req = request(options);
       req.on('response', response => {

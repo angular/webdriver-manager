@@ -178,7 +178,8 @@ export class FileManager {
       let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
       let contentLength = 0;
 
-      binary.getUrl(binary.version()).then(fileUrl => {
+      // Pass options down to binary to make request to get the latest version to download.
+      binary.getUrl(binary.version(), opt_proxy, opt_ignoreSSL).then(fileUrl => {
         binary.versionCustom = fileUrl.version;
         let filePath = path.resolve(outputDir, binary.filename());
         let fileName = binary.filename();
