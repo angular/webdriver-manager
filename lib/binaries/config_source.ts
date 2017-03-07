@@ -156,8 +156,10 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
             resolve(output);
           });
 
+        } else if (response.statusCode == 403 && response.headers['x-ratelimit-remaining'] == 0) {
+          reject(new Error('Failed to make Github request, rate limit reached.'));
         } else {
-          reject(new Error('response status code is not 200'));
+          reject(new Error('response status code is not 200.  It was ' + response.statusCode));
         }
       })
     });
