@@ -1,3 +1,18 @@
+# 12.0.3
+
+## Bug Fixes
+
+- ([bb13882](https://github.com/angular/webdriver-manager/commit/bb13882f1d111fc0c16032be33a7b8dc7b1a797c))
+  feat(gecko): Improve error message when Github api limit reached. (#217)
+
+ the user.  Also, API limit is reached, the error message now directly informs
+  when any other failure occurs the status code is reported.
+   This should hopefully give more info for issue #216.
+- ([2cffd30](https://github.com/angular/webdriver-manager/commit/2cffd30d9ef87c5b53433f2aa73eda92b4251a76))
+  fix(ignoressl): pass proxy and ignore ssl down to the binary and config source (#208)
+
+  closes #207 and closes #221
+
 # 12.0.2
 
 - ([0bdf6a4](https://github.com/angular/webdriver-manager/commit/0bdf6a465ae2a4b106bb5ff948718ef4ae3f31ad))
