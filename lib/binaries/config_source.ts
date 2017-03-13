@@ -14,8 +14,7 @@ export abstract class ConfigSource {
   opt_ignoreSSL: boolean;
   opt_proxy: string;
 
-  abstract getUrl(version: string, opt_proxy?: string, opt_ignoreSSL?: boolean):
-      Promise<{url: string, version: string}>;
+  abstract getUrl(version: string): Promise<{url: string, version: string}>;
   abstract getVersionList(): Promise<string[]>;
 }
 
