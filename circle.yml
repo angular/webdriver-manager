@@ -8,6 +8,13 @@ dependencies:
     - curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     - sudo dpkg -i google-chrome.deb
 
+  override: 
+    # Install latest Firefox
+    # https://discuss.circleci.com/t/installing-the-latest-version-of-firefox-in-circleci/1347
+    - pip install mozdownload mozinstall
+    - mozdownload --version latest --destination firefox.tar.bz2
+    - mozinstall firefox.tar.bz2
+
 test:
   override:
     - npm run check_format
