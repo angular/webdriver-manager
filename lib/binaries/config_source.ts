@@ -53,7 +53,8 @@ export abstract class XmlConfigSource extends ConfigSource {
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
 
       let now = Date.now();
-      if (now - 36000000 < timestamp) {
+      // 60 minutes * 60 seconds / minute * 1000 ms / second
+      if (now - (60 * 60 * 1000) < timestamp) {
         return this.convertXml2js(contents);
       }
     } catch (err) {
@@ -172,7 +173,8 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
 
       let now = Date.now();
-      if (now - 36000000 < timestamp) {
+      // 60 minutes * 60 seconds / minute * 1000 ms / second
+      if (now - (60 * 60 * 1000) < timestamp) {
         return contents;
       }
     } catch (err) {
