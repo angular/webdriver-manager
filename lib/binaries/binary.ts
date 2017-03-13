@@ -89,16 +89,19 @@ export abstract class Binary {
   getUrl(version?: string, opt_proxy?: string, opt_ignoreSSL?: boolean): Promise<BinaryUrl> {
     this.opt_proxy = opt_proxy == undefined ? this.opt_proxy : opt_proxy;
     this.opt_ignoreSSL = opt_ignoreSSL == undefined ? this.opt_ignoreSSL : opt_ignoreSSL;
+    if (this.configSource) {
+      this.configSource.opt_proxy = this.opt_proxy;
+      this.configSource.opt_ignoreSSL = this.opt_ignoreSSL;
+    }
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve({url: '', version: ''});
     } else {
       return this.getVersionList().then(() => {
         version = version || Config.binaryVersions()[this.id()];
-        return this.configSource.getUrl(version, this.opt_proxy, this.opt_ignoreSSL)
-            .then(binaryUrl => {
-              this.versionCustom = binaryUrl.version;
-              return {url: binaryUrl.url, version: binaryUrl.version};
-            });
+        return this.configSource.getUrl(version).then(binaryUrl => {
+          this.versionCustom = binaryUrl.version;
+          return {url: binaryUrl.url, version: binaryUrl.version};
+        });
       });
     }
   }
