@@ -1,3 +1,16 @@
+# 12.0.4
+
+## Bug Fixes
+- ([52d8a23](https://github.com/angular/webdriver-manager/commit/52d8a23f2d5d5021d1d9d302c492bf78a233a79d))
+  fix(ignoressl): pass option to both binary and config source
+
+  closes #207.
+
+- ([5af1c1c](https://github.com/angular/webdriver-manager/commit/5af1c1cdfb2d718004b02e9c0325ea6e758e78f1))
+  fix(cache): change timestamp to 1 hour instead of 10 hours (#223)
+
+  closes #221
+
 # 12.0.3
 
 ## Bug Fixes
