@@ -11,8 +11,6 @@ export abstract class ConfigSource {
   ostype = Config.osType();
   osarch = Config.osArch();
   out_dir: string = Config.getSeleniumDir();
-  opt_ignoreSSL: boolean;
-  opt_proxy: string;
 
   abstract getUrl(version: string): Promise<{url: string, version: string}>;
   abstract getVersionList(): Promise<string[]>;
@@ -64,8 +62,6 @@ export abstract class XmlConfigSource extends ConfigSource {
   private requestXml(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       let options = HttpUtils.initOptions(this.xmlUrl);
-      options = HttpUtils.optionsSSL(options, this.opt_ignoreSSL);
-      options = HttpUtils.optionsProxy(options, this.xmlUrl, this.opt_proxy);
 
       let req = request(options);
       req.on('response', response => {
@@ -139,8 +135,6 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
   private requestJson(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       let options = HttpUtils.initOptions(this.jsonUrl);
-      options = HttpUtils.optionsSSL(options, this.opt_ignoreSSL);
-      options = HttpUtils.optionsProxy(options, this.jsonUrl, this.opt_proxy);
       options = HttpUtils.optionsHeader(options, 'Host', 'api.github.com');
       options = HttpUtils.optionsHeader(options, 'User-Agent', 'request');
 

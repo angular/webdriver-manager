@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
 import * as request from 'request';
-import * as url from 'url';
 
 import {Binary} from '../binaries';
 import {Logger} from '../cli';
@@ -24,20 +23,17 @@ export class Downloader {
    * @param outputDir The directory where files are downloaded and stored.
    * @param contentLength The content length of the existing file.
    * @param opt_proxy The proxy for downloading files.
-   * @param opt_ignoreSSL Should the downloader ignore SSL.
    * @param opt_callback Callback method to be executed after the file is downloaded.
    * @returns Promise<boolean> Resolves true = downloaded. Resolves false = not downloaded.
    *          Rejected with an error.
    */
   static getFile(
       binary: Binary, fileUrl: string, fileName: string, outputDir: string, contentLength: number,
-      opt_proxy?: string, opt_ignoreSSL?: boolean, callback?: Function): Promise<boolean> {
+      callback?: Function): Promise<boolean> {
     let filePath = path.resolve(outputDir, fileName);
     let file: any;
 
     let options = HttpUtils.initOptions(fileUrl);
-    options = HttpUtils.optionsSSL(options, opt_ignoreSSL);
-    options = HttpUtils.optionsProxy(options, fileUrl, opt_proxy);
 
     let req: request.Request = null;
     let resContentLength: number;
@@ -52,17 +48,6 @@ export class Downloader {
                    response.destroy();
                    resolve(false);
                  } else {
-                   if (opt_proxy) {
-                     let pathUrl = url.parse(options.url.toString()).path;
-                     let host = url.parse(options.url.toString()).host;
-                     let newFileUrl = url.resolve(opt_proxy, pathUrl);
-                     logger.info(
-                         'curl -o ' + outputDir + '/' + fileName + ' \'' + newFileUrl +
-                         '\' -H \'host:' + host + '\'');
-                   } else {
-                     logger.info('curl -o ' + outputDir + '/' + fileName + ' ' + fileUrl);
-                   }
-
                    // only pipe if the headers are different length
                    file = fs.createWriteStream(filePath);
                    req.pipe(file);

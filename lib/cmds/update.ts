@@ -10,6 +10,7 @@ import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, Standal
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
+import {HttpUtils} from '../http_utils';
 import {spawn} from '../utils';
 
 import * as Opt from './';
@@ -111,6 +112,7 @@ function update(options: Options): Promise<void> {
   }
   let ignoreSSL = options[Opt.IGNORE_SSL].getBoolean();
   let proxy = options[Opt.PROXY].getString();
+  HttpUtils.assignOptions({ignoreSSL, proxy});
   let verbose = options[Opt.VERBOSE].getBoolean();
 
   // setup versions for binaries
@@ -131,7 +133,7 @@ function update(options: Options): Promise<void> {
   // permissions
   if (standalone) {
     let binary: Standalone = binaries[Standalone.id];
-    promises.push(FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL)
+    promises.push(FileManager.downloadFile(binary, outputDir)
                       .then<void>((downloaded: boolean) => {
                         if (!downloaded) {
                           logger.info(
@@ -212,7 +214,7 @@ function updateBinary<T extends Binary>(
     binary: T, outputDir: string, proxy: string, ignoreSSL: boolean): Promise<void> {
   return FileManager
       .downloadFile(
-          binary, outputDir, proxy, ignoreSSL,
+          binary, outputDir,
           (binary: Binary, outputDir: string, fileName: string) => {
             unzip(binary, outputDir, fileName);
           })
