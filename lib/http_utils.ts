@@ -6,7 +6,18 @@ import {Config} from './config';
 
 let logger = new Logger('http_utils');
 
+export declare interface RequestOptionsValue {
+  proxy?: string;
+  ignoreSSL?: boolean;
+}
+
+let requestOpts: RequestOptionsValue = {};
+
 export class HttpUtils {
+  static assignOptions(options: RequestOptionsValue): void {
+    Object.assign(requestOpts, options);
+  }
+
   static initOptions(url: string, timeout?: number): OptionsWithUrl {
     let options: OptionsWithUrl = {
       url: url,
@@ -14,6 +25,8 @@ export class HttpUtils {
       // increasing this arbitrarily to 4 minutes
       timeout: 240000
     };
+    HttpUtils.optionsSSL(options, requestOpts.ignoreSSL);
+    HttpUtils.optionsProxy(options, url, requestOpts.proxy);
     return options;
   }
 

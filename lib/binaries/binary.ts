@@ -34,9 +34,7 @@ export abstract class Binary {
   //   the file from an alternative download URL.
   alternativeDownloadUrl: string;
 
-  cdn: string;             // The url host for XML reading or the base path to the url.
-  opt_ignoreSSL: boolean;  // An optional ignore ssl.
-  opt_proxy: string        // An optional proxy.
+  cdn: string;  // The url host for XML reading or the base path to the url.
 
   name: string;
   versionDefault: string;
@@ -83,16 +81,8 @@ export abstract class Binary {
    * If not, it will download from an existing url.
    *
    * @param {string} version The version we are looking for. This could also be 'latest'.
-   * @param {opt_proxy} string Option to get proxy URL.
-   * @param {opt_ignoreSSL} boolean Option to ignore SSL.
    */
-  getUrl(version?: string, opt_proxy?: string, opt_ignoreSSL?: boolean): Promise<BinaryUrl> {
-    this.opt_proxy = opt_proxy == undefined ? this.opt_proxy : opt_proxy;
-    this.opt_ignoreSSL = opt_ignoreSSL == undefined ? this.opt_ignoreSSL : opt_ignoreSSL;
-    if (this.configSource) {
-      this.configSource.opt_proxy = this.opt_proxy;
-      this.configSource.opt_ignoreSSL = this.opt_ignoreSSL;
-    }
+  getUrl(version?: string): Promise<BinaryUrl> {
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve({url: '', version: ''});
     } else {

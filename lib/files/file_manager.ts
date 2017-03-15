@@ -169,9 +169,8 @@ export class FileManager {
    * @returns Promise resolved to true for files downloaded, resolved to false for files not
    *          downloaded because they exist, rejected if there is an error.
    */
-  static downloadFile<T extends Binary>(
-      binary: T, outputDir: string, opt_proxy?: string, opt_ignoreSSL?: boolean,
-      callback?: Function): Promise<boolean> {
+  static downloadFile<T extends Binary>(binary: T, outputDir: string, callback?: Function):
+      Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
 
       let outDir = Config.getSeleniumDir();
@@ -179,7 +178,7 @@ export class FileManager {
       let contentLength = 0;
 
       // Pass options down to binary to make request to get the latest version to download.
-      binary.getUrl(binary.version(), opt_proxy, opt_ignoreSSL).then(fileUrl => {
+      binary.getUrl(binary.version()).then(fileUrl => {
         binary.versionCustom = fileUrl.version;
         let filePath = path.resolve(outputDir, binary.filename());
         let fileName = binary.filename();
@@ -195,10 +194,7 @@ export class FileManager {
             if (v === version) {
               contentLength = fs.statSync(filePath).size;
 
-              Downloader
-                  .getFile(
-                      binary, fileUrl.url, fileName, outputDir, contentLength, opt_proxy,
-                      opt_ignoreSSL, callback)
+              Downloader.getFile(binary, fileUrl.url, fileName, outputDir, contentLength, callback)
                   .then(downloaded => {
                     resolve(downloaded);
                   });
@@ -207,10 +203,7 @@ export class FileManager {
         }
         // We have not downloaded it before, or the version does not exist. Use the default content
         // length of zero and download the file.
-        Downloader
-            .getFile(
-                binary, fileUrl.url, fileName, outputDir, contentLength, opt_proxy, opt_ignoreSSL,
-                callback)
+        Downloader.getFile(binary, fileUrl.url, fileName, outputDir, contentLength, callback)
             .then(downloaded => {
               resolve(downloaded);
             });
