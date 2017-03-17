@@ -53,25 +53,25 @@ export class FileManager {
    * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that are available for the operating system.
    */
-  static compileBinaries_(osType: string, alternateCDN?: string): BinaryMap<Binary> {
+  static compileBinaries_(osType: string, alternateDownloadUrl?: string): BinaryMap<Binary> {
     let binaries: BinaryMap<Binary> = {};
     if (FileManager.checkOS_(osType, Standalone)) {
-      binaries[Standalone.id] = new Standalone(alternateCDN);
+      binaries[Standalone.id] = new Standalone(alternateDownloadUrl);
     }
     if (FileManager.checkOS_(osType, ChromeDriver)) {
-      binaries[ChromeDriver.id] = new ChromeDriver(alternateCDN);
+      binaries[ChromeDriver.id] = new ChromeDriver(alternateDownloadUrl);
     }
     if (FileManager.checkOS_(osType, GeckoDriver)) {
-      binaries[GeckoDriver.id] = new GeckoDriver(alternateCDN);
+      binaries[GeckoDriver.id] = new GeckoDriver(alternateDownloadUrl);
     }
     if (FileManager.checkOS_(osType, IEDriver)) {
-      binaries[IEDriver.id] = new IEDriver(alternateCDN);
+      binaries[IEDriver.id] = new IEDriver(alternateDownloadUrl);
     }
     if (FileManager.checkOS_(osType, AndroidSDK)) {
-      binaries[AndroidSDK.id] = new AndroidSDK(alternateCDN);
+      binaries[AndroidSDK.id] = new AndroidSDK(alternateDownloadUrl);
     }
     if (FileManager.checkOS_(osType, Appium)) {
-      binaries[Appium.id] = new Appium(alternateCDN);
+      binaries[Appium.id] = new Appium(alternateDownloadUrl);
     }
     return binaries;
   }
@@ -82,8 +82,8 @@ export class FileManager {
    * @param alternateCDN URL of the alternative CDN to be used instead of the default ones.
    * @returns A binary map that is available for the operating system.
    */
-  static setupBinaries(alternateCDN?: string): BinaryMap<Binary> {
-    return FileManager.compileBinaries_(Config.osType(), alternateCDN);
+  static setupBinaries(alternateDownloadUrl?: string): BinaryMap<Binary> {
+    return FileManager.compileBinaries_(Config.osType(), alternateDownloadUrl);
   }
 
   /**

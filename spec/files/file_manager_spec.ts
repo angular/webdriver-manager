@@ -219,54 +219,5 @@ describe('file manager', () => {
     });
   });
 
-  describe('configuring the CDN location', () => {
-
-    describe('when no custom CDN is specified', () => {
-
-      let defaults = Config.cdnUrls();
-      let binaries = FileManager.compileBinaries_('Windows_NT');
-
-      it('should use the default configuration for Android SDK', () => {
-        expect(binaries[AndroidSDK.id].cdn).toEqual(defaults[AndroidSDK.id]);
-      });
-
-      it('should use the default configuration for Appium', () => {
-        expect(binaries[Appium.id].cdn).toEqual(defaults[Appium.id]);
-      });
-
-      it('should use the default configuration for Chrome Driver', () => {
-        expect(binaries[ChromeDriver.id].cdn).toEqual(defaults[ChromeDriver.id]);
-      });
-
-      it('should use the default configuration for Gecko Driver', () => {
-        expect(binaries[GeckoDriver.id].cdn).toEqual(defaults[GeckoDriver.id]);
-      });
-
-      it('should use the default configuration for IE Driver', () => {
-        expect(binaries[IEDriver.id].cdn).toEqual(defaults[IEDriver.id]);
-      });
-
-      it('should use the default configuration for Selenium Standalone', () => {
-        expect(binaries[Standalone.id].cdn).toEqual(defaults['selenium']);
-      });
-    });
-
-    describe('when custom CDN is specified', () => {
-
-      it('should configure the CDN for each binary', () => {
-        let customCDN = 'https://my.corporate.cdn/';
-        let binaries = FileManager.compileBinaries_('Windows_NT', customCDN);
-
-        forEachOf(binaries, binary => expect(binary.cdn).toEqual(customCDN, binary.name));
-      });
-    });
-
-    function forEachOf<T extends Binary>(binaries: BinaryMap<T>, fn: (binary: T) => void) {
-      for (var key in binaries) {
-        fn(binaries[key]);
-      }
-    }
-  });
-
   // TODO(cnishina): download binaries for each os type / arch combination
 });

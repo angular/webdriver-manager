@@ -15,8 +15,8 @@ export class Appium extends Binary {
   static versionDefault = Config.binaryVersions().appium;
   static isDefault = false;
 
-  constructor(alternateCDN?: string) {
-    super(alternateCDN || Config.cdnUrls().appium);
+  constructor(alternativeDownloadUrl?: string) {
+    super(alternativeDownloadUrl);
     this.name = 'appium';
     this.versionCustom = Appium.versionDefault;
   }
@@ -26,7 +26,11 @@ export class Appium extends Binary {
   }
 
   prefix(): string {
-    return 'appium-';
+    return 'appium';
+  }
+
+  version_concatenator(): string {
+    return '-';
   }
 
   suffix(): string {

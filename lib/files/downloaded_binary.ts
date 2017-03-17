@@ -21,6 +21,9 @@ export class DownloadedBinary extends Binary {
   prefix(): string {
     return null;
   }
+  version_concatenator(): string {
+    return null;
+  }
   suffix(): string {
     return null;
   }

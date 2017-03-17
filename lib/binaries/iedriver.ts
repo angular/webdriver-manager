@@ -10,8 +10,8 @@ export class IEDriver extends Binary {
   static os = [OS.Windows_NT];
   static versionDefault = Config.binaryVersions().ie;
 
-  constructor(opt_alternativeCdn?: string) {
-    super(opt_alternativeCdn || Config.cdnUrls().ie);
+  constructor(alternativeDownloadUrl?: string) {
+    super(alternativeDownloadUrl);
     this.configSource = new IEDriverXml();
     this.name = 'IEDriverServer';
     this.versionDefault = IEDriver.versionDefault;
@@ -24,6 +24,10 @@ export class IEDriver extends Binary {
 
   prefix(): string {
     return 'IEDriverServer';
+  }
+
+  version_concatenator(): string {
+    return '';
   }
 
   suffix(): string {

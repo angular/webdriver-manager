@@ -24,7 +24,7 @@ let prog = new Program()
                .addOption(Opts[Opt.VERBOSE])
                .addOption(Opts[Opt.IGNORE_SSL])
                .addOption(Opts[Opt.PROXY])
-               .addOption(Opts[Opt.ALTERNATE_CDN])
+               .addOption(Opts[Opt.ALTERNATE_DOWNLOAD_URL])
                .addOption(Opts[Opt.STANDALONE])
                .addOption(Opts[Opt.CHROME])
                .addOption(Opts[Opt.GECKO])
@@ -114,7 +114,7 @@ function update(options: Options): Promise<void> {
   let verbose = options[Opt.VERBOSE].getBoolean();
 
   // setup versions for binaries
-  let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
+  let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_DOWNLOAD_URL].getString());
   binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
   if (options[Opt.VERSIONS_IE]) {
@@ -133,11 +133,13 @@ function update(options: Options): Promise<void> {
     let binary: Standalone = binaries[Standalone.id];
     promises.push(FileManager.downloadFile(binary, outputDir, proxy, ignoreSSL)
                       .then<void>((downloaded: boolean) => {
-                        if (!downloaded) {
+                        if (downloaded === false) {
                           logger.info(
                               binary.name + ': file exists ' +
                               path.resolve(outputDir, binary.filename()));
                           logger.info(binary.name + ': ' + binary.filename() + ' up to date');
+                        } else if (downloaded === undefined) {
+                          logger.info(binary.name + ': could not be downloaded');
                         }
                       })
                       .then(() => {
@@ -217,12 +219,14 @@ function updateBinary<T extends Binary>(
             unzip(binary, outputDir, fileName);
           })
       .then<void>(downloaded => {
-        if (!downloaded) {
+        if (downloaded === false) {
           // The file did not have to download, we should unzip it.
           logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename()));
           let fileName = binary.filename();
           unzip(binary, outputDir, fileName);
           logger.info(binary.name + ': ' + binary.executableFilename() + ' up to date');
+        } else if(downloaded === undefined) {
+          logger.info(binary.name + ': could not be downloaded');
         }
       });
 }
