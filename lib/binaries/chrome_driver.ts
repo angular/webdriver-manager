@@ -9,8 +9,8 @@ export class ChromeDriver extends Binary {
   static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
   static versionDefault = Config.binaryVersions().chrome;
 
-  constructor(opt_alternativeCdn?: string) {
-    super(opt_alternativeCdn || Config.cdnUrls().chrome);
+  constructor(alternativeDownloadUrl?: string) {
+    super(alternativeDownloadUrl);
     this.configSource = new ChromeXml();
     this.name = 'chromedriver';
     this.versionDefault = ChromeDriver.versionDefault;
@@ -22,7 +22,11 @@ export class ChromeDriver extends Binary {
   }
 
   prefix(): string {
-    return 'chromedriver_';
+    return 'chromedriver';
+  }
+
+  version_concatenator(): string {
+    return '_';
   }
 
   suffix(): string {
@@ -30,7 +34,7 @@ export class ChromeDriver extends Binary {
   }
 
   getVersionList(): Promise<string[]> {
-    // If an alternative cdn is set, return an empty list.
+    // If an alternative download url is set, return an empty list.
     if (this.alternativeDownloadUrl != null) {
       Promise.resolve([]);
     } else {

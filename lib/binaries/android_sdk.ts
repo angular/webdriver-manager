@@ -44,8 +44,11 @@ export class AndroidSDK extends Binary {
     25: '7.1'
   }
 
-  constructor(alternateCDN?: string) {
-    super(alternateCDN || Config.cdnUrls().android);
+  private cdn: string;
+
+  constructor(alternativeDownloadUrl?: string) {
+    super(alternativeDownloadUrl);
+    this.cdn = Config.cdnUrls().android;
 
     this.name = 'android-sdk';
     this.versionCustom = AndroidSDK.versionDefault;
@@ -57,6 +60,10 @@ export class AndroidSDK extends Binary {
 
   prefix(): string {
     return 'android-sdk_r';
+  }
+
+  version_concatenator(): string {
+    return '';
   }
 
   suffix(): string {

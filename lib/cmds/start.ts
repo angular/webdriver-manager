@@ -24,6 +24,7 @@ let prog = new Program()
                .addOption(Opts[Opt.SELENIUM_PORT])
                .addOption(Opts[Opt.APPIUM_PORT])
                .addOption(Opts[Opt.AVD_PORT])
+               .addOption(Opts[Opt.ALTERNATE_DOWNLOAD_URL])
                .addOption(Opts[Opt.VERSIONS_STANDALONE])
                .addOption(Opts[Opt.VERSIONS_CHROME])
                .addOption(Opts[Opt.VERSIONS_GECKO])
@@ -72,7 +73,7 @@ function start(options: Options) {
 
   let osType = Config.osType();
   let stdio = options[Opt.QUIET].getBoolean() ? 'pipe' : 'inherit';
-  let binaries = FileManager.setupBinaries();
+  let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_DOWNLOAD_URL].getString());
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
   let appiumPort = options[Opt.APPIUM_PORT].getString();
   let avdPort = options[Opt.AVD_PORT].getNumber();

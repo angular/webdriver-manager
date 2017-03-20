@@ -10,8 +10,8 @@ export class Standalone extends Binary {
   static os = [OS.Windows_NT, OS.Linux, OS.Darwin];
   static versionDefault = Config.binaryVersions().selenium;
 
-  constructor(opt_alternativeCdn?: string) {
-    super(opt_alternativeCdn || Config.cdnUrls().selenium);
+  constructor(opt_alternativeDownloadUrl?: string) {
+    super(opt_alternativeDownloadUrl);
     this.configSource = new StandaloneXml();
     this.name = 'selenium standalone';
     this.versionDefault = Standalone.versionDefault;
@@ -23,7 +23,11 @@ export class Standalone extends Binary {
   }
 
   prefix(): string {
-    return 'selenium-server-standalone-';
+    return 'selenium-server-standalone';
+  }
+
+  version_concatenator(): string {
+    return '-';
   }
 
   suffix(): string {
@@ -35,7 +39,7 @@ export class Standalone extends Binary {
   }
 
   getVersionList(): Promise<string[]> {
-    // If an alternative cdn is set, return an empty list.
+    // If an alternative download url is set, return an empty list.
     if (this.alternativeDownloadUrl != null) {
       return Promise.resolve([]);
     } else {

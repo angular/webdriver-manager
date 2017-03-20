@@ -14,6 +14,7 @@ import {Opts} from './opts';
 let logger = new Logger('status');
 let prog = new Program()
                .command('status', 'list the current available drivers')
+               .addOption(Opts[Opt.ALTERNATE_DOWNLOAD_URL])
                .addOption(Opts[Opt.OUT_DIR])
                .action(status);
 
@@ -32,7 +33,7 @@ if (argv._[0] === 'status-run') {
  * @param options
  */
 function status(options: Options) {
-  let binaries = FileManager.setupBinaries();
+  let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_DOWNLOAD_URL].getString());
   let outputDir = Config.getSeleniumDir();
   if (options[Opt.OUT_DIR].value) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {

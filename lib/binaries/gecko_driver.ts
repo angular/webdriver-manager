@@ -24,8 +24,8 @@ export class GeckoDriver extends Binary {
     }
   };
 
-  constructor(opt_alternativeCdn?: string) {
-    super(opt_alternativeCdn || Config.cdnUrls().gecko);
+  constructor(alternativeDownloadUrl?: string) {
+    super(alternativeDownloadUrl);
     this.configSource = new GeckoDriverGithub();
     this.name = 'geckodriver';
     this.versionDefault = GeckoDriver.versionDefault;
@@ -37,7 +37,11 @@ export class GeckoDriver extends Binary {
   }
 
   prefix(): string {
-    return 'geckodriver-';
+    return 'geckodriver';
+  }
+
+  version_concatenator(): string {
+    return '-';
   }
 
   suffix(): string {

@@ -34,7 +34,6 @@ export abstract class Binary {
   //   the file from an alternative download URL.
   alternativeDownloadUrl: string;
 
-  cdn: string;             // The url host for XML reading or the base path to the url.
   opt_ignoreSSL: boolean;  // An optional ignore ssl.
   opt_proxy: string        // An optional proxy.
 
@@ -42,12 +41,17 @@ export abstract class Binary {
   versionDefault: string;
   versionCustom: string;
 
-  constructor(opt_alternativeCdn?: string) {
-    this.cdn = opt_alternativeCdn;
+  constructor(opt_alternativeDownloadUrl?: string) {
+    // if opt_alternativeDownloadUrl is a empty string, assign null for simpler checks
+    this.alternativeDownloadUrl =
+        opt_alternativeDownloadUrl != null && opt_alternativeDownloadUrl.length > 0 ?
+        opt_alternativeDownloadUrl :
+        null;
   }
 
   abstract prefix(): string;
   abstract suffix(): string;
+  abstract version_concatenator(): string;  // the string to concatenate prefix and version
 
   executableSuffix(): string {
     if (this.ostype == 'Windows_NT') {
@@ -62,7 +66,9 @@ export abstract class Binary {
   }
 
   filename(): string {
-    return this.prefix() + this.version() + this.suffix();
+    let version =
+        this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
+    return this.prefix() + version + this.suffix();
   }
 
   /**
@@ -70,7 +76,9 @@ export abstract class Binary {
    * @returns The file name for the executable.
    */
   executableFilename(): string {
-    return this.prefix() + this.version() + this.executableSuffix();
+    let version =
+        this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
+    return this.prefix() + version + this.executableSuffix();
   }
 
   /**
@@ -94,7 +102,9 @@ export abstract class Binary {
       this.configSource.opt_ignoreSSL = this.opt_ignoreSSL;
     }
     if (this.alternativeDownloadUrl != null) {
-      return Promise.resolve({url: '', version: ''});
+      // remove any trailing slashes on alternativeDownloadUrl
+      let url = this.alternativeDownloadUrl.replace(/\/+$/, '') + '/' + this.filename();
+      return Promise.resolve({url: url, version: ''});
     } else {
       return this.getVersionList().then(() => {
         version = version || Config.binaryVersions()[this.id()];

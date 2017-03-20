@@ -73,10 +73,11 @@ export class Downloader {
                          return reject(error);
                        }
                        if (stats.size != resContentLength) {
-                         (error as any).msg = 'Error: corrupt download for ' + fileName +
+                         let err: any = error || new Error();
+                         err.msg = 'Error: corrupt download for ' + fileName +
                              '. Please re-run webdriver-manager update';
                          fs.unlinkSync(filePath);
-                         reject(error);
+                         reject(err);
                        }
                        if (callback) {
                          callback(binary, outputDir, fileName);
@@ -93,18 +94,20 @@ export class Downloader {
                  reject(error);
                }
              });
-             req.on('error', error => {
-               if ((error as any).code === 'ETIMEDOUT') {
-                 (error as any).msg = 'Connection timeout downloading: ' + fileUrl +
+             req.on('error', (error: any) => {
+               if (error.code === 'ETIMEDOUT') {
+                 error.msg = 'Connection timeout downloading: ' + fileUrl +
                      '. Default timeout is 4 minutes.';
-               } else if ((error as any).connect) {
-                 (error as any).msg = 'Could not connect to the server to download: ' + fileUrl;
+               } else if (error.code === 'ECONNREFUSED') {
+                 error.msg = 'Could not connect to ' + error.address + ':' + error.port;
+               } else if (error.connect) {
+                 error.msg = 'Could not connect to the server to download: ' + fileUrl;
                }
                reject(error);
              });
            })
-        .catch(error => {
-          logger.error((error as any).msg);
+        .catch((error: any) => {
+          logger.error(error.msg);
         });
   }
 }
