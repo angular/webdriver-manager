@@ -43,12 +43,15 @@ export abstract class Binary {
 
   constructor(opt_alternativeDownloadUrl?: string) {
     // if opt_alternativeDownloadUrl is a empty string, assign null for simpler checks
-    this.alternativeDownloadUrl = opt_alternativeDownloadUrl != null && opt_alternativeDownloadUrl.length > 0 ? opt_alternativeDownloadUrl : null;
+    this.alternativeDownloadUrl =
+        opt_alternativeDownloadUrl != null && opt_alternativeDownloadUrl.length > 0 ?
+        opt_alternativeDownloadUrl :
+        null;
   }
 
   abstract prefix(): string;
   abstract suffix(): string;
-  abstract version_concatenator(): string; // the string to concatenate prefix and version
+  abstract version_concatenator(): string;  // the string to concatenate prefix and version
 
   executableSuffix(): string {
     if (this.ostype == 'Windows_NT') {
@@ -63,7 +66,8 @@ export abstract class Binary {
   }
 
   filename(): string {
-    let version = this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
+    let version =
+        this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
     return this.prefix() + version + this.suffix();
   }
 
@@ -72,7 +76,8 @@ export abstract class Binary {
    * @returns The file name for the executable.
    */
   executableFilename(): string {
-    let version = this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
+    let version =
+        this.alternativeDownloadUrl == null ? this.version_concatenator() + this.version() : '';
     return this.prefix() + version + this.executableSuffix();
   }
 

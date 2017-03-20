@@ -99,7 +99,7 @@ export class Downloader {
                  error.msg = 'Connection timeout downloading: ' + fileUrl +
                      '. Default timeout is 4 minutes.';
                } else if(error.code === 'ECONNREFUSED') {
-                   error.msg = 'Could not connect to ' + error.address + ':' + error.port;
+                 error.msg = 'Could not connect to ' + error.address + ':' + error.port;
                } else if (error.connect) {
                  error.msg = 'Could not connect to the server to download: ' + fileUrl;
                }
@@ -107,7 +107,7 @@ export class Downloader {
              });
            })
         .catch((error: any) => {
-            logger.error(error.msg);
+          logger.error(error.msg);
         });
   }
 }

@@ -225,7 +225,7 @@ function updateBinary<T extends Binary>(
           let fileName = binary.filename();
           unzip(binary, outputDir, fileName);
           logger.info(binary.name + ': ' + binary.executableFilename() + ' up to date');
-        } else if(downloaded === undefined) {
+        } else if (downloaded === undefined) {
           logger.info(binary.name + ': could not be downloaded');
         }
       });

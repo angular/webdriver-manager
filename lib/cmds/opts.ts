@@ -53,7 +53,8 @@ opts[AVD_PORT] = new Option(
     5554);
 opts[IGNORE_SSL] = new Option(IGNORE_SSL, 'Ignore SSL certificates', 'boolean', false);
 opts[PROXY] = new Option(PROXY, 'Proxy to use for the install or update command', 'string');
-opts[ALTERNATE_DOWNLOAD_URL] = new Option(ALTERNATE_DOWNLOAD_URL, 'Alternate Url to download binaries', 'string');
+opts[ALTERNATE_DOWNLOAD_URL] =
+    new Option(ALTERNATE_DOWNLOAD_URL, 'Alternate Url to download binaries', 'string');
 opts[STANDALONE] = new Option(
     STANDALONE, 'Install or update selenium standalone', 'boolean', Standalone.isDefault);
 opts[CHROME] =
