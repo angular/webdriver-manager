@@ -30,6 +30,7 @@ let prog = new Program()
                .addOption(Opts[Opt.CHROME])
                .addOption(Opts[Opt.GECKO])
                .addOption(Opts[Opt.ANDROID])
+               .addOption(Opts[Opt.APPIUM])
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
                .addOption(Opts[Opt.ANDROID_ARCHITECTURES])
                .addOption(Opts[Opt.ANDROID_PLATFORMS])
@@ -85,6 +86,7 @@ function update(options: Options): Promise<void> {
     ie64 = options[Opt.IE64].getBoolean();
   }
   let android: boolean = options[Opt.ANDROID].getBoolean();
+  let appium: boolean = options[Opt.APPIUM].getBoolean();
   let ios: boolean = false;
   if (options[Opt.IOS]) {
     ios = options[Opt.IOS].getBoolean();
@@ -203,6 +205,10 @@ function update(options: Options): Promise<void> {
   if (android || ios) {
     installAppium(binaries[Appium.id], outputDir);
     updateBrowserFile(binaries[Appium.id], outputDir);
+  }
+
+  if (appium) {
+    installAppium(binaries[Appium.id], outputDir);
   }
 
   return Promise.all(promises).then(() => {

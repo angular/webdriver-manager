@@ -18,6 +18,7 @@ export const EDGE = 'edge';
 export const GECKO = 'gecko';
 export const ANDROID = 'android';
 export const IOS = 'ios';
+export const APPIUM = 'appium';
 export const VERSIONS_CHROME = 'versions.chrome';
 export const VERSIONS_GECKO = 'versions.gecko';
 export const VERSIONS_STANDALONE = 'versions.standalone';
@@ -42,7 +43,7 @@ export const ALREADY_OFF_ERROR = 'already-off-error';
 /**
  * The options used by the commands.
  */
-var opts: Options = {};
+let opts: Options = {};
 opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
 opts[SELENIUM_PORT] =
     new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string', '4444');
@@ -70,6 +71,7 @@ opts[EDGE] = new Option(
     'C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe');
 opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', AndroidSDK.isDefault);
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
+opts[APPIUM] = new Option(APPIUM, 'Update the Appium sdk by itself', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
     VERSIONS_CHROME,
     'Optional chrome driver version (use \'latest\' to get the most recent version)', 'string',
@@ -130,4 +132,4 @@ opts[ALREADY_OFF_ERROR] = new Option(
     'Normally if you try to shut down a selenium which is not running, you will get a warning.  This turns it into an error',
     'boolean', false);
 
-export var Opts = opts;
+export let Opts = opts;

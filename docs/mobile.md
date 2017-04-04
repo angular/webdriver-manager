@@ -77,3 +77,10 @@ commandline tools come with several virtual devices pre-setup.  If you need more
 Once you have installed Appium, `webdriver-manager` will launch it automatically when you run
 `webdriver-manager start`.  Appium will automatically handle starting iOS device emulation as
 needed.
+
+Appium
+------
+
+When you run `webdriver-manager update --appium` `webdriver-manager` will install appium without
+also installing android sdk, or performing a check for iOS simulation capabilities. This is useful
+if you manage your own device simulators and just want `webdriver-manager` to launch appium.
