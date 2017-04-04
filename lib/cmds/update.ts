@@ -17,6 +17,8 @@ import * as Opt from './';
 import {android as initializeAndroid, iOS as checkIOS} from './initialize';
 import {Opts} from './opts';
 
+Config.runCommand = 'update';
+
 let logger = new Logger('update');
 let prog = new Program()
                .command('update', 'install or update selected binaries')
