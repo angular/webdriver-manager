@@ -1,5 +1,6 @@
 import * as http from 'http';
 import * as minimist from 'minimist';
+const ps = require('ps-node');
 
 import {Logger, Options, Program} from '../cli';
 
@@ -30,19 +31,40 @@ if (argv._[0] === 'shutdown-run') {
  */
 function shutdown(options: Options) {
   logger.info('Attempting to shut down selenium nicely');
-  http.get(
-          'http://localhost:' + options[Opt.SELENIUM_PORT].getString() +
-          '/selenium-server/driver/?cmd=shutDownSeleniumServer')
-      .on('error', (e: NodeJS.ErrnoException) => {
-        if ((e.code == 'ECONNREFUSED') && (e.syscall == 'connect')) {
-          if (!options[Opt.ALREADY_OFF_ERROR].getBoolean()) {
-            logger.warn('Server does not appear to be on');
-          } else {
-            logger.error('Server unreachable, probably not running');
-            throw e;
-          }
+  ps.lookup({
+    command: 'java',
+    arguments: '-port,' + options[Opt.SELENIUM_PORT].getString()
+  }, (err: any, results: any) => {
+    if (err) {
+      throw new Error(err);
+    }
+
+    switch (results.length) {
+      case 0:
+        if (!options[Opt.ALREADY_OFF_ERROR].getBoolean()) {
+          logger.warn('Server does not appear to be on');
         } else {
-          throw e;
+          logger.error('Server unreachable, probably not running');
+          throw new Error('Server unreachable, probably not running');
         }
-      });
+        break;
+      case 1:
+        logger.info('Found selenium with PID:', results[0].pid);
+        ps.kill(results[0].pid, 'SIGINT', (err: any) => {
+          if (err) {
+            throw new Error(err);
+          } else {
+            logger.info('Selenium has been shutdown');
+          }
+        });
+        break;
+      default:
+        if (!options[Opt.ALREADY_OFF_ERROR].getBoolean()) {
+          logger.warn('Multiple server instances running');
+        } else {
+          logger.error('Multiple server instances running');
+          throw new Error('Multiple server instances running');
+        }
+    };
+  });
 }

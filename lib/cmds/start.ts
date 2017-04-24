@@ -253,13 +253,10 @@ function start(options: Options) {
             logger.warn('Selenium Standalone server encountered an error: ' + error);
           });
           process.stdin.resume();
-          process.stdin.on('data', (chunk: Buffer) => {
-            logger.info('Attempting to shut down selenium nicely');
-            shutdownEverything(seleniumPort);
-          });
           process.on('SIGINT', () => {
             logger.info('Staying alive until the Selenium Standalone process exits');
-            shutdownEverything(seleniumPort);
+            shutdownEverything();
+            process.exit();
           });
         });
   });
@@ -460,7 +457,7 @@ function signalWhenReady(
       },
       (error) => {
         logger.error(error);
-        shutdownEverything(seleniumPort);
+        shutdownEverything();
         process.exitCode = 1;
       });
 }
@@ -476,11 +473,7 @@ function sendStartedSignal(signal: string, viaIPC: boolean) {
   console.log(signal);
 }
 
-function shutdownEverything(seleniumPort?: string) {
-  if (seleniumPort) {
-    http.get(
-        'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
-  }
+function shutdownEverything() {
   killAndroid();
   killAppium();
 }
