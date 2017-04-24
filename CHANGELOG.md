@@ -1,3 +1,10 @@
+# 12.0.5
+
+## Bug Fix
+
+- ([242a72f](https://github.com/angular/webdriver-manager/commit/242a72ffc93037d651c9805e09b4fb30318d9f05))
+  feat(start): start selenium without making web requests (#232)
+
 # 12.0.4
 
 ## Bug Fixes
