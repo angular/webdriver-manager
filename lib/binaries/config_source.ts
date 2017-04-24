@@ -33,14 +33,15 @@ export abstract class XmlConfigSource extends ConfigSource {
   protected getXml(): Promise<any> {
     let fileName = this.getFileName();
     let content = this.readResponse();
-    if (content != null) {
+    if (content) {
       return Promise.resolve(content);
+    } else {
+      return this.requestXml().then(text => {
+        let xml = this.convertXml2js(text);
+        fs.writeFileSync(fileName, text);
+        return xml;
+      });
     }
-    return this.requestXml().then(text => {
-      let xml = this.convertXml2js(text);
-      fs.writeFileSync(fileName, text);
-      return xml;
-    });
   }
 
   private readResponse(): any {
@@ -48,11 +49,15 @@ export abstract class XmlConfigSource extends ConfigSource {
     try {
       let contents = fs.readFileSync(fileName).toString();
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
-
       let now = Date.now();
+
+      // Ignore validating the cache OR if we are validating the cache, make
+      // it is within the cache time.
       // 60 minutes * 60 seconds / minute * 1000 ms / second
-      if (now - (60 * 60 * 1000) < timestamp) {
+      if (Config.runCommand === 'start' || (now - (60 * 60 * 1000) < timestamp)) {
         return this.convertXml2js(contents);
+      } else {
+        return null;
       }
     } catch (err) {
       return null;
@@ -121,7 +126,7 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
   getJson(): Promise<any> {
     let fileName = this.getFileName();
     let content = this.readResponse();
-    if (content != null) {
+    if (content) {
       return Promise.resolve(JSON.parse(content));
     } else {
       return this.requestJson().then(body => {
@@ -164,11 +169,11 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
     try {
       let contents = fs.readFileSync(fileName).toString();
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
-
       let now = Date.now();
-      // 60 minutes * 60 seconds / minute * 1000 ms / second
-      if (now - (60 * 60 * 1000) < timestamp) {
+      if (Config.runCommand === 'start' || (now - (60 * 60 * 1000) < timestamp)) {
         return contents;
+      } else {
+        return null;
       }
     } catch (err) {
       return null;

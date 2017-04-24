@@ -15,6 +15,9 @@ dependencies:
     - mozdownload --version latest --destination firefox.tar.bz2
     - mozinstall firefox.tar.bz2
 
+    # NPM install node module dependencies
+    - npm install
+
 test:
   override:
     - npm run check_format

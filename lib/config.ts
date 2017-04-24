@@ -25,6 +25,8 @@ export interface ConfigFile {
  *
  */
 export class Config {
+  static runCommand: string;
+
   static configFile: string = 'config.json';
   static packageFile: string = 'package.json';
   static nodeModuleName = 'webdriver-manager';

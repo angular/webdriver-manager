@@ -15,6 +15,7 @@ import * as Opt from './';
 import {Opts} from './opts';
 
 const commandName = 'start';
+Config.runCommand = commandName;
 
 let logger = new Logger('start');
 let prog = new Program()
