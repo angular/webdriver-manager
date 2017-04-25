@@ -54,8 +54,23 @@ webdriver-manager start --detach
 webdriver-manager shutdown
 ```
 
+Help commands
+-------------
+
+Wedriver-manager has a main help option: `webdriver-manager help`. There are also other built in help menus for each of the commands. So for example, if you would like to look up all the flag options you can set in `update`, you could run `webdriver-manager update help`.
+
+Here are a list of all the commands with help:
+
+```
+webdriver-manager update help
+webdriver-manager start help
+webdriver-manager clean help
+webdriver-manager status help
+```
+
 Other topics:
 --------------
 
 - [mobile browser support](docs/mobile.md)
 - [protractor support](docs/protractor.md)
+- [set specific versions](docs/versions.md)
