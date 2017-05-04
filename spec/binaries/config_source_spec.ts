@@ -86,6 +86,23 @@ describe('config', () => {
              });
 
        });
+
+    it('on update: if the size of the file is zero, invalidate the cache', done => {
+      spyOn(fs, 'statSync').and.callFake(() => {
+        return {size: 0};
+      });
+      Config.runCommand = 'update';
+      let xmlConfig = new XMLConfig('json', 'url');
+      xmlConfig.testGetXml()
+          .then(xml => {
+            // should do nothing
+            done.fail('this should not work');
+          })
+          .catch(err => {
+            expect(err.toString()).toContain('Invalid URI "url"');
+            done();
+          });
+    });
   });
 
   describe('github json', () => {
@@ -131,7 +148,23 @@ describe('config', () => {
                expect(err.toString()).toContain('Invalid URI "url"');
                done();
              });
-
        });
+
+    it('on update: if the size of the file is zero, invalidate the cache', done => {
+      spyOn(fs, 'statSync').and.callFake(() => {
+        return {size: 0};
+      });
+      Config.runCommand = 'update';
+      let jsonConfig = new JSONConfig('json', 'url');
+      jsonConfig.testGetJson()
+          .then(json => {
+            // should do nothing
+            done.fail('this should not work');
+          })
+          .catch(err => {
+            expect(err.toString()).toContain('Invalid URI "url"');
+            done();
+          });
+    });
   });
 });

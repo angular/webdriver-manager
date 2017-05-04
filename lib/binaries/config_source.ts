@@ -49,12 +49,13 @@ export abstract class XmlConfigSource extends ConfigSource {
     try {
       let contents = fs.readFileSync(fileName).toString();
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
+      let size = fs.statSync(fileName).size;
       let now = Date.now();
 
-      // Ignore validating the cache OR if we are validating the cache, make
-      // it is within the cache time.
+      // On start, read the file. If not on start, check use the cache as long as the
+      // size > 0 and within the cache time.
       // 60 minutes * 60 seconds / minute * 1000 ms / second
-      if (Config.runCommand === 'start' || (now - (60 * 60 * 1000) < timestamp)) {
+      if (Config.runCommand === 'start' || (size > 0 && (now - (60 * 60 * 1000) < timestamp))) {
         return this.convertXml2js(contents);
       } else {
         return null;
@@ -169,8 +170,13 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
     try {
       let contents = fs.readFileSync(fileName).toString();
       let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
+      let size = fs.statSync(fileName).size;
       let now = Date.now();
-      if (Config.runCommand === 'start' || (now - (60 * 60 * 1000) < timestamp)) {
+
+      // On start, read the file. If not on start, check use the cache as long as the
+      // size > 0 and within the cache time.
+      // 60 minutes * 60 seconds / minute * 1000 ms / second
+      if (Config.runCommand === 'start' || (size > 0 && (now - (60 * 60 * 1000) < timestamp))) {
         return contents;
       } else {
         return null;

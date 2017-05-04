@@ -240,12 +240,19 @@ export class FileManager {
       }
     });
 
-    let updateConfig = path.resolve(outputDir, 'update-config.json');
-    try {
-      fs.unlinkSync(updateConfig);
-      logger.info('removed update-config.json');
-    } catch (e) {
-      return;
+    let metaFiles = [
+      'chromedriver-response.xml', 'gecko-response.json', 'iedriver-response.xml',
+      'standalone-response.xml', 'update-config.json'
+    ];
+    for (let metaFile of metaFiles) {
+      try {
+        let metaFilePath = path.resolve(outputDir, metaFile);
+        if (fs.statSync(metaFilePath)) {
+          fs.unlinkSync(metaFilePath);
+          logger.info('removed ' + metaFile);
+        }
+      } catch (e) {
+      }
     }
   }
 }
