@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "12.0.5",
+  "version": "12.0.6",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "check_format": "gulp format:enforce",
@@ -65,7 +65,7 @@
     "jasmine": "^2.4.1",
     "run-sequence": "^1.1.5",
     "selenium-webdriver": "~3.0.1",
-    "typescript": "~2.2.0"
+    "typescript": "~2.3.0"
   },
   "engines": {
     "node": ">=6.9.x"

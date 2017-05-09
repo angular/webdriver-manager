@@ -1,3 +1,10 @@
+# 12.0.6
+
+## Bug Fix
+
+- ([708ade3](https://github.com/angular/webdriver-manager/commit/708ade31564ab5a48fbfcff80c37370fdc4f659a))
+  fix(responses): response xml and json files (#247)
+
 # 12.0.5
 
 ## Bug Fix
