@@ -31,10 +31,11 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
 
   getVersionsLookup(): Promise<Array<{version: string, index: string}>> {
     return this.getJson().then(json => {
-      let versionsLookup: Array<{version: string, index: number}> = [];
+      let versionsLookup: Array<{version: string, index: string}> = [];
       for (let i = 0; i < json.length; i++) {
         let item = json[i];
-        versionsLookup.push({version: item.tag_name, index: i});
+        let index = i.toString();
+        versionsLookup.push({version: item.tag_name, index: index});
       }
       return versionsLookup;
     });
