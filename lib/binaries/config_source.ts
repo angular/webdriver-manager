@@ -2,10 +2,14 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as request from 'request';
+import * as url from 'url';
 import * as xml2js from 'xml2js';
 
+import {Logger} from '../cli/logger';
 import {Config} from '../config';
 import {HttpUtils} from '../http_utils';
+
+let logger = new Logger('config_source');
 
 export abstract class ConfigSource {
   ostype = Config.osType();
@@ -69,10 +73,21 @@ export abstract class XmlConfigSource extends ConfigSource {
     return new Promise<string>((resolve, reject) => {
       let options = HttpUtils.initOptions(this.xmlUrl);
 
+      let curl = this.getFileName() + ' ' + options.url;
+      if (HttpUtils.requestOpts.proxy) {
+        let pathUrl = url.parse(options.url.toString()).path;
+        let host = url.parse(options.url.toString()).host;
+        let newFileUrl = url.resolve(HttpUtils.requestOpts.proxy, pathUrl);
+        curl = this.getFileName() + ' \'' + newFileUrl + '\' -H \'host:' + host + '\'';
+      }
+      if (HttpUtils.requestOpts.ignoreSSL) {
+        curl = 'k ' + curl;
+      }
+      logger.info('curl -o' + curl);
+
       let req = request(options);
       req.on('response', response => {
         if (response.statusCode === 200) {
-          // logger.info('curl -v ' + options.url);
           let output = '';
           response.on('data', (data) => {
             output += data;
@@ -144,10 +159,21 @@ export abstract class GithubApiConfigSource extends JsonConfigSource {
       options = HttpUtils.optionsHeader(options, 'Host', 'api.github.com');
       options = HttpUtils.optionsHeader(options, 'User-Agent', 'request');
 
+      let curl = this.getFileName() + ' ' + options.url;
+      if (HttpUtils.requestOpts.proxy) {
+        let pathUrl = url.parse(options.url.toString()).path;
+        let host = url.parse(options.url.toString()).host;
+        let newFileUrl = url.resolve(HttpUtils.requestOpts.proxy, pathUrl);
+        curl = this.getFileName() + ' \'' + newFileUrl + '\' -H \'host:' + host + '\'';
+      }
+      if (HttpUtils.requestOpts.ignoreSSL) {
+        curl = 'k ' + curl;
+      }
+      logger.info('curl -o' + curl);
+
       let req = request(options);
       req.on('response', response => {
         if (response.statusCode === 200) {
-          // logger.info('curl -v ' + options.url);
           let output = '';
           response.on('data', (data) => {
             output += data;
