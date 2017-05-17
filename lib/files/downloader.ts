@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
 import * as request from 'request';
+import * as url from 'url';
 
 import {Binary} from '../binaries';
 import {Logger} from '../cli';
@@ -48,6 +49,19 @@ export class Downloader {
                    response.destroy();
                    resolve(false);
                  } else {
+                   let curl = outputDir + '/' + fileName + ' ' + options.url;
+                   if (HttpUtils.requestOpts.proxy) {
+                     let pathUrl = url.parse(options.url.toString()).path;
+                     let host = url.parse(options.url.toString()).host;
+                     let newFileUrl = url.resolve(HttpUtils.requestOpts.proxy, pathUrl);
+                     curl = outputDir + '/' + fileName + ' \'' + newFileUrl +
+                         '\' -H \'host:' + host + '\'';
+                   }
+                   if (HttpUtils.requestOpts.ignoreSSL) {
+                     curl = 'k ' + curl;
+                   }
+                   logger.info('curl -o' + curl);
+
                    // only pipe if the headers are different length
                    file = fs.createWriteStream(filePath);
                    req.pipe(file);

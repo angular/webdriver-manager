@@ -11,11 +11,10 @@ export declare interface RequestOptionsValue {
   ignoreSSL?: boolean;
 }
 
-let requestOpts: RequestOptionsValue = {};
-
 export class HttpUtils {
+  static requestOpts: RequestOptionsValue = {};
   static assignOptions(options: RequestOptionsValue): void {
-    Object.assign(requestOpts, options);
+    Object.assign(HttpUtils.requestOpts, options);
   }
 
   static initOptions(url: string, timeout?: number): OptionsWithUrl {
@@ -25,8 +24,8 @@ export class HttpUtils {
       // increasing this arbitrarily to 4 minutes
       timeout: 240000
     };
-    HttpUtils.optionsSSL(options, requestOpts.ignoreSSL);
-    HttpUtils.optionsProxy(options, url, requestOpts.proxy);
+    HttpUtils.optionsSSL(options, HttpUtils.requestOpts.ignoreSSL);
+    HttpUtils.optionsProxy(options, url, HttpUtils.requestOpts.proxy);
     return options;
   }
 
