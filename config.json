@@ -5,7 +5,7 @@
     "geckodriver": "v0.13.0",
     "iedriver": "2.53.1",
     "androidsdk": "24.4.1",
-    "appium": "1.6.0"
+    "appium": "1.6.5"
   },
   "cdnUrls": {
     "selenium": "https://selenium-release.storage.googleapis.com/",
