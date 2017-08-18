@@ -378,10 +378,7 @@ function signalWhenReady(
       })();
     });
   };
-  function waitForAndroid(avdPort: number, avdName: string, 
-                           
-                           
-                           : string): Promise<void> {
+  function waitForAndroid(avdPort: number, avdName: string, appiumPort: string): Promise<void> {
     let sdkPath = path.resolve(outputDir, androidSDK.executableFilename());
     logger.info('Waiting for ' + avdName + '\'s emulator to start');
     return adb(sdkPath, avdPort, 'wait-for-device', maxWait)
@@ -436,7 +433,7 @@ function signalWhenReady(
   }
   let pending = [waitFor(
       () => {
-        return request('GET', seleniumPort, '/wd/hub/status', maxWait);
+        return request('GET', appiumPort, '/wd/hub/status', maxWait);
       },
       (status) => {
         return JSON.parse(status).status == 0;
