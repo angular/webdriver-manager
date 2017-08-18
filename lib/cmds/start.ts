@@ -433,7 +433,7 @@ function signalWhenReady(
   }
   let pending = [waitFor(
       () => {
-        return request('GET', appiumPort, '/wd/hub/status', maxWait);
+        return request('GET', seleniumPort, '/wd/hub/status', maxWait);
       },
       (status) => {
         return JSON.parse(status).status == 0;
