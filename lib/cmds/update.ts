@@ -2,6 +2,7 @@ import * as AdmZip from 'adm-zip';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as minimist from 'minimist';
+import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
@@ -279,7 +280,7 @@ function installAppium(binary: Binary, outputDir: string): void {
   } catch (err) {
   }
 
-  fs.mkdirSync(folder);
+  mkdirp.sync(folder);
   fs.writeFileSync(
       path.resolve(folder, 'package.json'), JSON.stringify({scripts: {appium: 'appium'}}));
   spawn('npm', ['install', 'appium@' + binary.version()], null, {cwd: folder});

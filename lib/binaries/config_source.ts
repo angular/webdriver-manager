@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import * as os from 'os';
 import * as path from 'path';
 import * as request from 'request';
@@ -26,11 +27,7 @@ export abstract class XmlConfigSource extends ConfigSource {
   }
 
   protected getFileName(): string {
-    try {
-      fs.statSync(this.out_dir);
-    } catch (e) {
-      fs.mkdirSync(this.out_dir);
-    }
+    mkdirp.sync(this.out_dir);
     return path.resolve(this.out_dir, this.name + '-response.xml');
   }
 
@@ -118,11 +115,7 @@ export abstract class JsonConfigSource extends ConfigSource {
   }
 
   protected getFileName(): string {
-    try {
-      fs.statSync(this.out_dir);
-    } catch (e) {
-      fs.mkdirSync(this.out_dir);
-    }
+    mkdirp.sync(this.out_dir);
     return path.resolve(this.out_dir, this.name + '-response.json');
   }
 

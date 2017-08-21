@@ -1,6 +1,6 @@
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import * as path from 'path';
-import * as process from 'process';
 import * as rimraf from 'rimraf';
 
 import {Logger, WriteTo} from '../../lib/cli/logger';
@@ -26,7 +26,7 @@ describe('update', () => {
       } catch (err) {
         // do nothing, the directory does not exist
       }
-      fs.mkdirSync(tmpDir);
+      mkdirp.sync(tmpDir);
     });
 
     afterEach(() => {

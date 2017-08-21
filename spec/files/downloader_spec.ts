@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 
@@ -25,7 +26,7 @@ describe('downloader', () => {
       } catch (err) {
         // do nothing, the directory does not exist
       }
-      fs.mkdirSync(outputDir);
+      mkdirp.sync(outputDir);
     });
 
     it('should download a file with mismatch content length', (done) => {

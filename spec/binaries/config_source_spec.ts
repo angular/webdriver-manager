@@ -41,14 +41,17 @@ describe('config', () => {
         <ListBucketResult xmlns="http://doc.s3.amazonaws.com/2006-03-01">
           <Name>foobar-release</Name>
           <Contents>
-            <Key>0.01/foobar.zip</Key>  
+            <Key>0.01/foobar.zip</Key>
           </Contents>
         </ListBucketResult>
         `;
       });
       spyOn(fs, 'statSync').and.callFake(() => {
         return {
-          mtime: 0
+          mtime: 0, isDirectory: () => {
+            // identify as a directory so mkdirp does not fail when it calls statSync
+            return true;
+          }
         }
       });
       Config.runCommand = 'start';
@@ -63,14 +66,17 @@ describe('config', () => {
           });
     });
 
-    it('on udpate: should check the timestamp, invaidate cache, and try to make a web request',
+    it('on update: should check the xml timestamp, invalidate cache, and try to make a web request',
        done => {
          spyOn(fs, 'readFileSync').and.callFake(() => {
            return 'foobar';
          });
          spyOn(fs, 'statSync').and.callFake(() => {
            return {
-             mtime: 0
+             mtime: 0, isDirectory: () => {
+               // identify as a directory so mkdirp does not fail when it calls statSync
+               return true;
+             }
            }
          });
          Config.runCommand = 'update';
@@ -87,9 +93,14 @@ describe('config', () => {
 
        });
 
-    it('on update: if the size of the file is zero, invalidate the cache', done => {
+    it('on update: if the size of the xml file is zero, invalidate the cache', done => {
       spyOn(fs, 'statSync').and.callFake(() => {
-        return {size: 0};
+        return {
+          size: 0, isDirectory: () => {
+            // identify as a directory so mkdirp does not fail when it calls statSync
+            return true;
+          }
+        }
       });
       Config.runCommand = 'update';
       let xmlConfig = new XMLConfig('json', 'url');
@@ -112,7 +123,10 @@ describe('config', () => {
       });
       spyOn(fs, 'statSync').and.callFake(() => {
         return {
-          mtime: 0
+          mtime: 0, isDirectory: () => {
+            // identify as a directory so mkdirp does not fail when it calls statSync
+            return true;
+          }
         }
       });
       Config.runCommand = 'start';
@@ -127,14 +141,17 @@ describe('config', () => {
           });
     });
 
-    it('on udpate: should check the timestamp, invaidate cache, and try to make a web request',
+    it('on update: should check the json timestamp, invalidate cache, and try to make a web request',
        done => {
          spyOn(fs, 'readFileSync').and.callFake(() => {
            return 'foobar';
          });
          spyOn(fs, 'statSync').and.callFake(() => {
            return {
-             mtime: 0
+             mtime: 0, isDirectory: () => {
+               // identify as a directory so mkdirp does not fail when it calls statSync
+               return true;
+             }
            }
          });
          Config.runCommand = 'update';
@@ -150,9 +167,14 @@ describe('config', () => {
              });
        });
 
-    it('on update: if the size of the file is zero, invalidate the cache', done => {
+    it('on update: if the size of the json file is zero, invalidate the cache', done => {
       spyOn(fs, 'statSync').and.callFake(() => {
-        return {size: 0};
+        return {
+          size: 0, isDirectory: () => {
+            // identify as a directory so mkdirp does not fail when it calls statSync
+            return true;
+          }
+        }
       });
       Config.runCommand = 'update';
       let jsonConfig = new JSONConfig('json', 'url');

@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as q from 'q';
 
@@ -26,7 +27,7 @@ export class FileManager {
       fs.statSync(outputDir);
     } catch (e) {
       logger.info('creating folder ' + outputDir);
-      fs.mkdirSync(outputDir);
+      mkdirp.sync(outputDir);
     }
   }
 
