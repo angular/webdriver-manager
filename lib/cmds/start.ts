@@ -220,6 +220,12 @@ function start(options: Options) {
 
           args.push('-jar');
           args.push(path.resolve(outputDir, binaries[Standalone.id].filename()));
+          args.push('-role');
+          args.push('node');
+          args.push('-servlet');
+          args.push('org.openqa.grid.web.servlet.LifecycleServlet');
+          args.push('-registerCycle');
+          args.push('0');
         })
         .catch(err => {
           console.log(err);
@@ -479,8 +485,7 @@ function sendStartedSignal(signal: string, viaIPC: boolean) {
 
 function shutdownEverything(seleniumPort?: string) {
   if (seleniumPort) {
-    http.get(
-        'http://localhost:' + seleniumPort + '/selenium-server/driver/?cmd=shutDownSeleniumServer');
+    http.get('http://localhost:' + seleniumPort + '/extra/LifecycleServlet?action=shutdown');
   }
   killAndroid();
   killAppium();

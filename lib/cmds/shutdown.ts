@@ -25,14 +25,14 @@ if (argv._[0] === 'shutdown-run') {
 }
 
 /**
- * Parses the options and starts the selenium standalone server.
+ * Parses the options and shutdown the selenium standalone server.
  * @param options
  */
 function shutdown(options: Options) {
   logger.info('Attempting to shut down selenium nicely');
   http.get(
           'http://localhost:' + options[Opt.SELENIUM_PORT].getString() +
-          '/selenium-server/driver/?cmd=shutDownSeleniumServer')
+          '/extra/LifecycleServlet?action=shutdown')
       .on('error', (e: NodeJS.ErrnoException) => {
         if ((e.code == 'ECONNREFUSED') && (e.syscall == 'connect')) {
           if (!options[Opt.ALREADY_OFF_ERROR].getBoolean()) {
