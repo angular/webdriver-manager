@@ -17,7 +17,7 @@ const noop = () => {};
 function respondFactory(question: string, answer: string, verbose: boolean): Function {
   return (child: ChildProcess) => {
     (<any>child.stdin).setDefaultEncoding('utf-8');
-    child.stdout.on('data', (data: Buffer | String) => {
+    child.stdout.on('data', (data: Buffer|String) => {
       if (data != null) {
         if (verbose) {
           process.stdout.write(data as string);
@@ -201,7 +201,7 @@ function configureAVDHardware(sdkPath: string, desc: AVDDescriptor): q.Promise<a
           (err: Error) => {
             return q('');
           })
-      .then((contents: string | Buffer) => {
+      .then((contents: string|Buffer) => {
         let config: any = ini.parse(contents.toString());
         config['hw.keyboard'] = 'yes';
         config['hw.battery'] = 'yes';

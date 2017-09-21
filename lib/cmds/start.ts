@@ -395,7 +395,7 @@ function signalWhenReady(
                   },
                   avdName + '\'s OS');
             },
-            (error: {code: string | number, message: string}) => {
+            (error: {code: string|number, message: string}) => {
               return Promise.reject(
                   'Failed to wait for ' + avdName + '\'s emulator to start (' + error.code + ': ' +
                   error.message + ')');
@@ -415,7 +415,7 @@ function signalWhenReady(
                   (data) => {
                     return JSON.parse(data)['sessionId'];
                   },
-                  (error: {code: string | number, message: string}) => {
+                  (error: {code: string|number, message: string}) => {
                     return Promise.reject(
                         'Could not start chrome on ' + avdName + ' (' + error.code + ': ' +
                         error.message + ')');
@@ -424,7 +424,7 @@ function signalWhenReady(
         .then<void>((sessionId: string) => {
           logger.info('Shutting down dummy chrome instance for ' + avdName);
           return request('DELETE', appiumPort, '/wd/hub/session/' + sessionId)
-              .then<void>(() => {}, (error: {code: string | number, message: string}) => {
+              .then<void>(() => {}, (error: {code: string|number, message: string}) => {
                 return Promise.reject(
                     'Could not close chrome on ' + avdName + ' (' + error.code + ': ' +
                     error.message + ')');
