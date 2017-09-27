@@ -16,7 +16,7 @@ function spawnFactory(sync: boolean):
      opts?: child_process.SpawnOptions|child_process.SpawnSyncOptions) =>
         child_process.ChildProcess | child_process.SpawnSyncReturns<any> {
   return (cmd: string, args: string[], stdio?: string,
-          opts?: child_process.SpawnOptions | child_process.SpawnSyncOptions) => {
+          opts?: child_process.SpawnOptions|child_process.SpawnSyncOptions) => {
     if ((Config.osType() === 'Windows_NT') && (cmd.slice(-4) !== '.exe')) {
       if (fs.existsSync(cmd + '.exe')) {
         cmd += '.exe';
