@@ -16,7 +16,7 @@ describe('desktop browser smoke tests', () => {
             return driver.getPageSource();
           })
           .then((source: string) => {
-            expect(source).toContain('"state":"success"');
+            expect(source).toContain('"message":"Server is running"');
             return driver.quit();
           })
           .then(() => {
