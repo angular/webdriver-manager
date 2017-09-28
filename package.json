@@ -3,12 +3,20 @@
   "version": "12.0.6",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
-    "check_format": "gulp format:enforce",
     "format": "gulp format",
-    "prepublish": "gulp prepublish",
-    "test": "gulp test",
-    "test_unit": "gulp test:unit",
-    "test_circle_e2e": "gulp test:e2e:no_kvm"
+    "format-enforce": "gulp format:enforce",
+    "gulp": "gulp",
+    "jasmine": "jasmine",
+    "prepublish": "npm run format-enforce && tsc && gulp copy",
+    "tsc": "tsc",
+    "pretest": "tsc && gulp copy",
+    "test": "npm run test-unit && npm run test-e2e",
+    "test-unit": "jasmine",
+    "pretest-e2e:update": "webdriver-manager update --android --android-accept-licenses --avds none",
+    "pretest-e2e:start": "webdriver-manager start --detach --seleniumPort 4444 --android --appium-port 4723 --quiet",
+    "pretest-e2e": "npm run pretest && npm run pretest-e2e:update && npm run pretest-e2e:start",
+    "test-e2e": "jasmine JASMINE_CONFIG_PATH=e2e_spec/support/headless.json",
+    "posttest-e2e": "webdriver-manager shutdown"
   },
   "keywords": [
     "angular",
