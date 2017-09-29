@@ -251,8 +251,14 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
     zip.extractAllTo(outputDir, true);
   } else {
     // We will only ever get .tar files on linux
-    if (child_process.spawnSync('tar', ['zxvf', path.resolve(outputDir, fileName), '-C', outputDir], { stdio: ['ignore', 'ignore', process.stderr] }).status) {
-      console.warn(path.resolve(outputDir, fileName) + ' is corrupt, please retry `webdriver-manager update`!' );
+    if (child_process
+            .spawnSync(
+                'tar', ['zxvf', path.resolve(outputDir, fileName), '-C', outputDir],
+                {stdio: ['ignore', 'ignore', process.stderr]})
+            .status) {
+      console.warn(
+          path.resolve(outputDir, fileName) +
+          ' is corrupt, please retry `webdriver-manager update`!');
     }
   }
 
