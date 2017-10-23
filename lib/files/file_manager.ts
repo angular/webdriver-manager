@@ -241,7 +241,7 @@ export class FileManager {
     });
 
     let metaFiles = [
-      'chromedriver-response.xml', 'gecko-response.json', 'iedriver-response.xml',
+      'chrome-response.xml', 'gecko-response.json', 'iedriver-response.xml',
       'standalone-response.xml', 'update-config.json'
     ];
     for (let metaFile of metaFiles) {
