@@ -8,7 +8,7 @@ describe('sever smoke tests', () => {
       let logs = '';
       resp.on('data', (chunk) => logs += chunk);
       resp.on('end', () => {
-        expect(logs).toContain('"state":"success"');
+        expect(logs).toContain('"status":0');
         done()
       });
     });
