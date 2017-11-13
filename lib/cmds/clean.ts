@@ -11,7 +11,8 @@ import {Opts} from './opts';
 let prog = new Program()
                .command('clean', 'removes all downloaded driver files from the out_dir')
                .action(clean)
-               .addOption(Opts[Opt.OUT_DIR]);
+               .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.OUT_DIR_FROM_CWD]);
 
 export var program = prog;
 
@@ -33,8 +34,11 @@ function clean(options: Options): void {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(
+          Config.getBaseDir(options[Opt.OUT_DIR_FROM_CWD].getBoolean()),
+          options[Opt.OUT_DIR].getString());
     }
+    Config.seleniumDir = outputDir;
   }
   FileManager.removeExistingFiles(outputDir);
 }

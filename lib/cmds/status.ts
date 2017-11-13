@@ -9,12 +9,14 @@ import {Config} from '../config';
 import {FileManager} from '../files';
 
 import * as Opt from './';
+import {OUT_DIR_FROM_CWD} from './';
 import {Opts} from './opts';
 
 let logger = new Logger('status');
 let prog = new Program()
                .command('status', 'list the current available drivers')
                .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[OUT_DIR_FROM_CWD])
                .action(status);
 
 export var program = prog;
@@ -38,8 +40,11 @@ function status(options: Options) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(
+          Config.getBaseDir(options[Opt.OUT_DIR_FROM_CWD].getBoolean()),
+          options[Opt.OUT_DIR].getString());
     }
+    Config.seleniumDir = outputDir;
   }
 
   try {

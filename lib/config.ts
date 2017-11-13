@@ -36,6 +36,8 @@ export class Config {
   static parentPath = path.resolve(Config.cwd, '..');
   static dir = __dirname;
   static folder = Config.cwd.replace(Config.parentPath, '').substring(1);
+  static seleniumDir =
+      process.env.SELENIUM_DIR || path.resolve(Config.dir, '..', '..', 'selenium/');
 
   static isProjectVersion = Config.folder === Config.nodeModuleName;
   static isLocalVersion = false;
@@ -75,10 +77,10 @@ export class Config {
   }
 
   static getSeleniumDir(): string {
-    return path.resolve(Config.dir, '..', '..', 'selenium/');
+    return Config.seleniumDir;
   }
-  static getBaseDir(): string {
-    return path.resolve(Config.dir, '..', '..');
+  static getBaseDir(useCwd: boolean = false): string {
+    return useCwd ? Config.cwd : path.resolve(Config.dir, '..', '..');
   }
 
   /**

@@ -3,6 +3,7 @@ import {Cli, Option, Options} from '../cli';
 import {Config} from '../config';
 
 export const OUT_DIR = 'out_dir';
+export const OUT_DIR_FROM_CWD = 'relativeFromCwd';
 export const SELENIUM_PORT = 'seleniumPort';
 export const APPIUM_PORT = 'appium-port';
 export const AVD_PORT = 'avd-port';
@@ -44,6 +45,9 @@ export const ALREADY_OFF_ERROR = 'already-off-error';
  */
 var opts: Options = {};
 opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
+opts[OUT_DIR_FROM_CWD] = new Option(
+    OUT_DIR_FROM_CWD, 'Whether the out_dir option is relative to the current working directory',
+    'boolean', false);
 opts[SELENIUM_PORT] =
     new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string', '4444');
 opts[APPIUM_PORT] =

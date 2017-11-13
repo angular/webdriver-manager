@@ -22,6 +22,7 @@ let prog = new Program()
                .command(commandName, 'start up the selenium server')
                .action(start)
                .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.OUT_DIR_FROM_CWD])
                .addOption(Opts[Opt.SELENIUM_PORT])
                .addOption(Opts[Opt.APPIUM_PORT])
                .addOption(Opts[Opt.AVD_PORT])
@@ -83,8 +84,11 @@ function start(options: Options) {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(
+          Config.getBaseDir(options[Opt.OUT_DIR_FROM_CWD].getBoolean()),
+          options[Opt.OUT_DIR].getString());
     }
+    Config.seleniumDir = outputDir;
   }
 
   try {

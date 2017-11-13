@@ -24,6 +24,7 @@ let prog = new Program()
                .command('update', 'install or update selected binaries')
                .action(update)
                .addOption(Opts[Opt.OUT_DIR])
+               .addOption(Opts[Opt.OUT_DIR_FROM_CWD])
                .addOption(Opts[Opt.VERBOSE])
                .addOption(Opts[Opt.IGNORE_SSL])
                .addOption(Opts[Opt.PROXY])
@@ -108,8 +109,11 @@ function update(options: Options): Promise<void> {
     if (path.isAbsolute(options[Opt.OUT_DIR].getString())) {
       outputDir = options[Opt.OUT_DIR].getString();
     } else {
-      outputDir = path.resolve(Config.getBaseDir(), options[Opt.OUT_DIR].getString());
+      outputDir = path.resolve(
+          Config.getBaseDir(options[Opt.OUT_DIR_FROM_CWD].getBoolean()),
+          options[Opt.OUT_DIR].getString());
     }
+    Config.seleniumDir = outputDir;
     FileManager.makeOutputDirectory(outputDir);
   }
   let ignoreSSL = options[Opt.IGNORE_SSL].getBoolean();
