@@ -72,6 +72,7 @@ export class Downloader {
                          return reject(error);
                        }
                        if (stats.size != resContentLength) {
+                         let error = new Error();
                          (error as any).msg = 'Error: corrupt download for ' + fileName +
                              '. Please re-run webdriver-manager update';
                          fs.unlinkSync(filePath);
