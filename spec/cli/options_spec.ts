@@ -5,7 +5,6 @@ describe('options', () => {
   let option: Option;
 
   describe('get number', () => {
-
     describe('for this.value not set', () => {
       it('should return the default value', () => {
         option = new Option('fake opt', 'fake description', 'number', 10);

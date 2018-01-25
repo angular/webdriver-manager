@@ -7,7 +7,6 @@ import {DownloadedBinary, FileManager} from '../../lib/files';
 
 
 describe('file manager', () => {
-
   describe('setting up for windows', () => {
     let osType = 'Windows_NT';
 
@@ -220,9 +219,7 @@ describe('file manager', () => {
   });
 
   describe('configuring the CDN location', () => {
-
     describe('when no custom CDN is specified', () => {
-
       let defaults = Config.cdnUrls();
       let binaries = FileManager.compileBinaries_('Windows_NT');
 
@@ -252,7 +249,6 @@ describe('file manager', () => {
     });
 
     describe('when custom CDN is specified', () => {
-
       it('should configure the CDN for each binary', () => {
         let customCDN = 'https://my.corporate.cdn/';
         let binaries = FileManager.compileBinaries_('Windows_NT', customCDN);

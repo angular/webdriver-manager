@@ -7,7 +7,6 @@ import {Downloader} from '../../lib/files';
 import {HttpUtils} from '../../lib/http_utils';
 
 describe('downloader', () => {
-
   describe('get file', () => {
     let fileUrl =
         'https://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.0.jar';
