@@ -172,7 +172,6 @@ export class FileManager {
   static downloadFile<T extends Binary>(binary: T, outputDir: string, callback?: Function):
       Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-
       let outDir = Config.getSeleniumDir();
       let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
       let contentLength = 0;

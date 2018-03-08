@@ -84,7 +84,6 @@ describe('config', () => {
                expect(err.toString()).toContain('Invalid URI "url"');
                done();
              });
-
        });
 
     it('on update: if the size of the file is zero, invalidate the cache', done => {
