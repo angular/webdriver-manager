@@ -72,10 +72,9 @@ export class Downloader {
                          return reject(error);
                        }
                        if (stats.size != resContentLength) {
-                         (error as any).msg = 'Error: corrupt download for ' + fileName +
-                             '. Please re-run webdriver-manager update';
                          fs.unlinkSync(filePath);
-                         reject(error);
+                         reject(new Error('Error: corrupt download for ' + fileName +
+                             '. Please re-run webdriver-manager update'));
                        }
                        if (callback) {
                          callback(binary, outputDir, fileName);
