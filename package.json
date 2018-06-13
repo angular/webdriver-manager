@@ -1,0 +1,19 @@
+{
+  "name": "webderpy-manager",
+  "version": "0.0.0",
+  "description": "not the webdriver manager cli",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cnishina/webderpy-manager.git"
+  },
+  "author": "Craig Nishina <craig.nishina@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cnishina/webderpy-manager/issues"
+  },
+  "homepage": "https://github.com/cnishina/webderpy-manager#readme"
+}
