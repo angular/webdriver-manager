@@ -4,7 +4,11 @@
   "description": "not the webdriver manager cli",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "http-server": "tsc && node dist/spec/server/http_server.js",
+    "jasmine": "jasmine",
+    "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/support/jasmine-int.json",
+    "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/support/jasmine-unit.json",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
