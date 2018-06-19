@@ -13,8 +13,30 @@ import { initOptions, JsonObject } from './http_utils';
 export async function updateXml(
     xmlUrl: string,
     fileName: string): Promise<JsonObject> {
-  // TODO(cnishina): implement
-  return null;
+
+  if (isExpired(fileName)) {
+    let contents = await requestXml(xmlUrl, fileName);
+    fs.writeFileSync(fileName, contents);
+    return convertXml2js(contents);
+  } else {
+    return readXml(fileName);
+  }
+}
+
+export function isExpired(fileName: string): boolean {
+  try {
+    let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
+    let size = fs.statSync(fileName).size;
+    let now = Date.now();
+
+    if (size > 0 && (now - (60 * 60 * 1000) < timestamp)) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (err) {
+    return true;
+  }
 }
 
 /**
@@ -37,7 +59,6 @@ export function requestXml(
     xmlUrl: string,
     fileName: string): Promise<string> {
 
-  
   let options = initOptions(xmlUrl);
   let curl = fileName + ' ' + options.url;
   if (options.proxy) {
@@ -70,10 +91,6 @@ export function requestXml(
       reject(error);
     });
   });
-    
-
-    
-  // });
 }
 
 /**

@@ -2,21 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as xmlUtils from './xml_utils';
 
-const contents = `
-  <?xml version='1.0' encoding='UTF-8'?>
-  <ListBucketResult xmlns='http://doc.s3.amazonaws.com/2006-03-01'>
-    <Name>foobar_driver</Name>
-    <Contents>
-      <Key>2.0/foobar.zip</Key>
-    </Contents>
-  </ListBucketResult>`
+const fileName = path.resolve('spec/support/files/foo.xml');
+const contents = fs.readFileSync(fileName).toString();
 
 describe('xml utils', () => {
   describe('readXml', () => {
     it('should read the file', () => {
-      spyOn(fs, 'readFileSync').and.callFake(() => {
-        return contents;
-      });
+      spyOn(fs, 'readFileSync').and.returnValue(contents);
       let xmlContent = xmlUtils.readXml('foobar');
       expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
       expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
@@ -30,6 +22,35 @@ describe('xml utils', () => {
       expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
       expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
         .toBe('2.0/foobar.zip');
+    });
+  });
+
+  describe('isExpired', () => {
+    it('should return true if the file is zero', () => {
+      let mtime = Date.now() - 1000;
+      spyOn(fs, 'statSync').and.returnValue({
+        size: 0,
+        mtime: mtime
+      });
+      expect(xmlUtils.isExpired('foobar.xml')).toBeTruthy();
+    });
+
+    it('should return true if the file is zero', () => {
+      let mtime = Date.now() - (60 * 60 * 1000) - 5000;
+      spyOn(fs, 'statSync').and.returnValue({
+        size: 1000,
+        mtime: mtime
+      });
+      expect(xmlUtils.isExpired('foobar.xml')).toBeTruthy();
+    });
+
+    it('should return true if the file is zero', () => {
+      let mtime = Date.now() - (60 * 60 * 1000) + 5000;
+      spyOn(fs, 'statSync').and.returnValue({
+        size: 1000,
+        mtime: mtime
+      });
+      expect(xmlUtils.isExpired('foobar.xml')).toBeFalsy();
     });
   });
 });
