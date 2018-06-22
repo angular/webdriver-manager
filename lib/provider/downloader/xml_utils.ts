@@ -46,8 +46,12 @@ export function isExpired(fileName: string): boolean {
 export function readXml(
   fileName: string): JsonObject | null {
   
-  let contents = fs.readFileSync(fileName).toString();
-  return convertXml2js(contents);
+  try {
+    let contents = fs.readFileSync(fileName).toString();
+    return convertXml2js(contents);
+  } catch (err) {
+    return null;
+  }
 }
 
 /**

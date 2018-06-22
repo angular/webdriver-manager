@@ -52,7 +52,13 @@ describe('xml_utils', () => {
       try {
         fs.unlinkSync(fileName);
       } catch (err) {}
-    })
+    });
+
+    afterAll(() => {
+      try {
+        fs.unlinkSync(fileName);
+      } catch (err) {}
+    });
 
     it('should request and write the file if it does not exist', (done) => {
       try {

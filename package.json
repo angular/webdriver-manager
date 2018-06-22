@@ -22,12 +22,14 @@
   "homepage": "https://github.com/cnishina/webderpy-manager#readme",
   "dependencies": {
     "request": "^2.87.0",
+    "semver": "^5.5.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
     "@types/node": "^10.3.3",
     "@types/request": "^2.47.0",
+    "@types/semver": "^5.5.0",
     "@types/xml2js": "^0.4.3",
     "jasmine": "^3.1.0",
     "typescript": "^2.9.2"
