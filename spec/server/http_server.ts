@@ -39,7 +39,7 @@ export let httpServer = http.createServer((request: http.ServerRequest,
       return;
     }
 
-    response.writeHead(200);
+    response.writeHead(200, {'Content-Length': fs.statSync(fileName).size});
     response.write(file, 'binary');
     response.end();
   }));

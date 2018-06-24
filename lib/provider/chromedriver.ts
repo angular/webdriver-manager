@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Flag } from '../flags';
 import * as xmlUtils from './downloader/xml_utils';
-import { VersionList } from './version_list';
+import { getVersion, VersionList } from './version_list';
 
 
 export const CHROME_VERSION: Flag = {
@@ -24,11 +24,15 @@ export class ChromeDriver {
   /**
    * Should update the cache and download, find the version to download,
    * then download that binary.
+   *
+   * @param version Optional to provide the version number or latest.
    */
-  async updateBinary(): Promise<boolean> {
+  async updateBinary(version?: string): Promise<boolean> {
     let jsonObj = await xmlUtils.updateXml(this.requestUrl,
       path.resolve(this.outDir, this.fileName));
     let versionList = convertXmlToVersionList(this.fileName);
+    let versionObj = getVersion(versionList, version);
+    let partialUrl = getPartialUrl(versionObj, this.osType, this.osArch);
     return true;
   }
 }
@@ -84,6 +88,17 @@ export function osHelper(ostype: string, osarch: string): string {
       return 'linux64';
     } else if (osarch === 'x32') {
       return 'linux32';
+    }
+  }
+  return null;
+}
+
+export function getPartialUrl(versionObj: {[key:string]: number},
+    ostype: string, osarch: string): [string, number]|null {
+  let osMatch = osHelper(ostype, osarch);
+  for (let versionKey of Object.keys(versionObj)) {
+    if (versionKey.includes(osMatch)) {
+      return [versionKey, versionObj[versionKey]];
     }
   }
   return null;

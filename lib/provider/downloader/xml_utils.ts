@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as request from 'request';
 import * as url from 'url';
 import * as xml2js from 'xml2js';
-import { initOptions, JsonObject } from './http_utils';
+import { curlCommand, initOptions, JsonObject } from './http_utils';
 
 /**
  * Read the xml file from cache. If the cache time has been exceeded or the
@@ -55,7 +55,7 @@ export function readXml(
 }
 
 /**
- * Request the XML url and log the curl.
+ * Request the XML url.
  * @param xmlUrl The xml url.
  * @param fileName The xml filename.
  */
@@ -64,17 +64,7 @@ export function requestXml(
     fileName: string): Promise<string> {
 
   let options = initOptions(xmlUrl);
-  let curl = fileName + ' ' + options.url;
-  if (options.proxy) {
-    let pathUrl = url.parse(options.url.toString()).path;
-    let host = url.parse(options.url.toString()).host;
-    let newFileUrl = url.resolve(options.proxy, pathUrl);
-    curl = fileName + ' \'' + newFileUrl + '\' -H \'host:' + host + '\'';
-  }
-  if (options.ignoreSSL) {
-    curl = 'k ' + curl;
-  }
-  console.log('curl -o ' + curl);
+  console.log(curlCommand(options, fileName));
 
   return new Promise((resolve, reject) => {
     let req = request(options);

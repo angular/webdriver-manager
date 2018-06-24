@@ -57,6 +57,7 @@ describe('xml_utils', () => {
     afterAll(() => {
       try {
         fs.unlinkSync(fileName);
+        fs.rmdirSync(tmpDir);
       } catch (err) {}
     });
 
