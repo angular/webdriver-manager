@@ -8,11 +8,13 @@ export interface VersionList {
   // The version is the semver equivalent version of the version number.
   // An example is 2.9 would translate into 2.9.0
   [version: string]: {
-    // The key-value pair represents:
-    // - key: the partial path to download the binary
-    // - value: the size of the binary
-    [key: string]: number;
+    [partialUrl: string]: VersionObj;
   };
+}
+
+export interface VersionObj {
+  partialUrl?: string;
+  size?: number;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface VersionList {
  * @returns The object with paritial urls associated with the binary size.
  */
 export function getVersion(versionList: VersionList,
-      version?: string): {[key:string]: number} {
+      version?: string): { [key: string]: VersionObj } {
   if (version && version !== 'latest') {
     return versionList[version];
   } else {

@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { Flag } from '../flags';
 import * as xmlUtils from './downloader/xml_utils';
-import { getVersion, VersionList } from './version_list';
+import { getVersion, VersionList, VersionObj } from './version_list';
 
 
 export const CHROME_VERSION: Flag = {
@@ -57,7 +57,10 @@ export function convertXmlToVersionList(fileName: string): VersionList | null {
       if (!versionList[version]) {
         versionList[version] = {};
       }
-      versionList[version][key] = size;
+      versionList[version][key] = {
+        partialUrl: key,
+        size: size
+      };
     }
     
   }
@@ -75,7 +78,7 @@ export function convertXmlToVersionList(fileName: string): VersionList | null {
  */
 export function osHelper(ostype: string, osarch: string): string {
   if (ostype === 'Darwin') {
-    return 'macos';
+    return 'mac';
   } else if (ostype === 'Windows_NT') {
     if (osarch === 'x64')  {
       return 'win64';
@@ -93,12 +96,12 @@ export function osHelper(ostype: string, osarch: string): string {
   return null;
 }
 
-export function getPartialUrl(versionObj: {[key:string]: number},
-    ostype: string, osarch: string): [string, number]|null {
+export function getPartialUrl(versionObjs: {[key:string]: VersionObj},
+    ostype: string, osarch: string): VersionObj|null {
   let osMatch = osHelper(ostype, osarch);
-  for (let versionKey of Object.keys(versionObj)) {
+  for (let versionKey of Object.keys(versionObjs)) {
     if (versionKey.includes(osMatch)) {
-      return [versionKey, versionObj[versionKey]];
+      return versionObjs[versionKey];
     }
   }
   return null;
