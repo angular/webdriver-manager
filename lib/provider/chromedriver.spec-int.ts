@@ -1,4 +1,8 @@
-import { convertXmlToVersionList, osHelper } from './chromedriver';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+import { convertXmlToVersionList, ChromeDriver } from './chromedriver';
 
 describe('chromedriver', () => {
   describe('convertXmlToVersionList', () => {
@@ -19,6 +23,26 @@ describe('chromedriver', () => {
     it('should return a null value if the file does not exist', () => {
       let versionList = convertXmlToVersionList('spec/support/files/does_not_exist.xml');
       expect(versionList).toBeNull();
+    });
+  });
+
+  describe('updateBinary', () => {
+    let outDir: string;
+    beforeEach(() => {
+      outDir = path.resolve(os.tmpdir(), 'selenium');
+    });
+
+    afterEach(() => {
+      try {
+        rimraf.sync(path.resolve(outDir, 'chromedriver*'));
+        fs.rmdirSync(outDir);
+      } catch (err) {}
+    });
+
+    it('download the binary', async() => {
+      let chromeDriver = new ChromeDriver();
+      chromeDriver.outDir = outDir;
+      await chromeDriver.updateBinary();
     });
   });
 });

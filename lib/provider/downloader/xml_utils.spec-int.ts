@@ -3,7 +3,7 @@ import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import * as xml_utils from './xml_utils';
+import * as xmlUtils from './xml_utils';
 
 function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) {
   opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
@@ -14,7 +14,7 @@ function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) {
   return child_process.spawn(task, opt_arg, {stdio: stdio});
 }
 
-describe('xml_utils', () => {
+describe('xmlUtils', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
   let proc: child_process.ChildProcess;
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -34,7 +34,7 @@ describe('xml_utils', () => {
 
   describe('requestXml', () => {
     it('should get the xml file', async() => {
-      let text = await xml_utils.requestXml(
+      let text = await xmlUtils.requestXml(
           'http://127.0.0.1:8812/spec/support/files/foo.xml',
           'foo.xml');
       expect(text.length).toBeGreaterThan(0);
@@ -66,7 +66,7 @@ describe('xml_utils', () => {
         fs.statSync(fileName);
         done.fail('file should not exist.');
       } catch (err) {
-        xml_utils.updateXml(xmlUrl, fileName).then(xmlContent => {
+        xmlUtils.updateXml(xmlUrl, fileName).then(xmlContent => {
           expect(fs.statSync(fileName).size).toBeGreaterThan(0);
           expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
             .toBe('2.0/foobar.zip');
@@ -87,7 +87,7 @@ describe('xml_utils', () => {
       spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime: mtime});
 
       try {
-        xml_utils.updateXml(xmlUrl, fileName).then(xmlContent => {
+        xmlUtils.updateXml(xmlUrl, fileName).then(xmlContent => {
           expect(fsStatSync(fileName).size).toBeGreaterThan(0);
           expect(fsStatSync(fileName).size).not.toBe(1000);
           expect(fsStatSync(fileName).mtime.getMilliseconds())
@@ -113,7 +113,7 @@ describe('xml_utils', () => {
       spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime: mtime});
 
       try {
-        xml_utils.updateXml(xmlUrl, fileName).then(xmlContent => {
+        xmlUtils.updateXml(xmlUrl, fileName).then(xmlContent => {
           expect(fsStatSync(fileName).size).toBe(initialStats.size);
           expect(fsStatSync(fileName).mtime.getMilliseconds())
             .toBe(initialStats.mtime.getMilliseconds());

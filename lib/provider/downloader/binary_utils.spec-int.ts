@@ -1,4 +1,4 @@
-import * as child_process from 'child_process';
+import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -10,7 +10,7 @@ function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) {
   if (opt_io === 'ignore') {
     stdio = 'ignore';
   }
-  return child_process.spawn(task, opt_arg, {stdio: stdio});
+  return childProcess.spawn(task, opt_arg, {stdio: stdio});
 }
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');
@@ -21,7 +21,7 @@ const barSize = 30;
 
 describe('binary_utils', () => {
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  let proc: child_process.ChildProcess;
+  let proc: childProcess.ChildProcess;
 
   beforeAll((done) => {  
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;

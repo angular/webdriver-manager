@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as request from 'request';
 import { curlCommand, initOptions } from './http_utils';
 
@@ -26,6 +27,10 @@ export function requestBinary(binaryUrl: string,
           resolve(false);
         } else {
           // Only pipe if the headers are different length.
+          let dir = path.dirname(fileName);
+          try {
+            fs.mkdirSync(dir);
+          } catch (err) {}
           let file = fs.createWriteStream(fileName);
           req.pipe(file);
           file.on('close', () => {

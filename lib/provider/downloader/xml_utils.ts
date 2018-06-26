@@ -1,6 +1,6 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as request from 'request';
-import * as url from 'url';
 import * as xml2js from 'xml2js';
 import { curlCommand, initOptions, JsonObject } from './http_utils';
 
@@ -16,6 +16,10 @@ export async function updateXml(
 
   if (isExpired(fileName)) {
     let contents = await requestXml(xmlUrl, fileName);
+    let dir = path.dirname(fileName);
+    try {
+      fs.mkdirSync(dir);
+    } catch (err) {}
     fs.writeFileSync(fileName, contents);
     return convertXml2js(contents);
   } else {

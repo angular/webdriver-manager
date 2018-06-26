@@ -1,5 +1,5 @@
-import * as xml_utils from './downloader/xml_utils';
-import { convertXmlToVersionList, getPartialUrl, osHelper } from './chromedriver';
+import * as xmlUtils from './downloader/xml_utils';
+import { convertXmlToVersionList, getVersionObj, osHelper } from './chromedriver';
 import { getVersion, VersionList } from './version_list';
 
 const xmlJs = {
@@ -37,7 +37,7 @@ const xmlJs = {
 describe('chromedriver', () => {
   describe('convertXmlToVersionList', () => {
     it ('should convert an xml file an object from the xml file', () => {
-      spyOn(xml_utils, 'readXml').and.returnValue(xmlJs);
+      spyOn(xmlUtils, 'readXml').and.returnValue(xmlJs);
       let versionList = convertXmlToVersionList('foo');
       expect(Object.keys(versionList).length).toBe(2);
       expect(versionList['2.0.0']).toBeTruthy();
@@ -49,7 +49,7 @@ describe('chromedriver', () => {
     });
 
     it('should return null when the method to read an xml file returns null', () => {
-      spyOn(xml_utils, 'readXml').and.returnValue(null);
+      spyOn(xmlUtils, 'readXml').and.returnValue(null);
       let versionList = convertXmlToVersionList('foo');
       expect(versionList).toBeNull();
     });
@@ -69,33 +69,33 @@ describe('chromedriver', () => {
     });
   });
 
-  describe('getPartialUrl', () => {
+  describe('getVersionObj', () => {
     let versionList: VersionList;
 
     beforeAll(() => {
-      spyOn(xml_utils, 'readXml').and.returnValue(xmlJs);
+      spyOn(xmlUtils, 'readXml').and.returnValue(xmlJs);
       versionList = convertXmlToVersionList('foo');
     });
 
     it('should get the partial url for mac', () => {
-      let versionObjs = getVersion(versionList);
-      let version = getPartialUrl(versionObjs, 'Darwin', 'x64');
-      expect(version.partialUrl).toBe('2.10/chromedriver_mac32.zip');
-      expect(version.size).toBe(4116418);
+      let versionObjMap = getVersion(versionList);
+      let versionObj = getVersionObj(versionObjMap, 'Darwin', 'x64');
+      expect(versionObj.partialUrl).toBe('2.10/chromedriver_mac32.zip');
+      expect(versionObj.size).toBe(4116418);
     });
 
     it('should get the partial url for windows', () => {
-      let versionObjs = getVersion(versionList);
-      let version = getPartialUrl(versionObjs, 'Windows_NT', 'x32');
-      expect(version.partialUrl).toBe('2.10/chromedriver_win32.zip');
-      expect(version.size).toBe(2843903);
+      let versionObjMap = getVersion(versionList);
+      let versionObj = getVersionObj(versionObjMap, 'Windows_NT', 'x32');
+      expect(versionObj.partialUrl).toBe('2.10/chromedriver_win32.zip');
+      expect(versionObj.size).toBe(2843903);
     });
 
     it('should get the partial url for linux', () => {
-      let versionObjs = getVersion(versionList);
-      let version = getPartialUrl(versionObjs, 'Linux', 'x64');
-      expect(version.partialUrl).toBe('2.10/chromedriver_linux64.zip');
-      expect(version.size).toBe(2301804);
+      let versionObjMap = getVersion(versionList);
+      let versionObj = getVersionObj(versionObjMap, 'Linux', 'x64');
+      expect(versionObj.partialUrl).toBe('2.10/chromedriver_linux64.zip');
+      expect(versionObj.size).toBe(2301804);
     });
   });
 });
