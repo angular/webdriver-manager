@@ -114,18 +114,27 @@ export function resolveProxy(
  * @returns The curl command.
  */
 export function curlCommand(requestOptions: RequestOptionsValue,
-    fileName: string) {
-  let curl = `${fileName} ${requestOptions.url}`;
+    fileName?: string) {
+  let curl = `${requestOptions.url}`;
   if (requestOptions.proxy) {
     let pathUrl = url.parse(requestOptions.url.toString()).path;
     let host = url.parse(requestOptions.url.toString()).host;
-    let newFileUrl = url.resolve(requestOptions.proxy, pathUrl);
-    curl = `${fileName} '${newFileUrl}' -H 'host: ${host}'`;
+    if (requestOptions.proxy) {
+      let modifiedUrl = url.resolve(requestOptions.proxy, pathUrl);
+      curl = `'${modifiedUrl}' -H 'host: ${host}'`;
+    }
+    
+    for (let headerName in Object.keys(requestOptions.headers)) {
+      curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}`;
+    }
   }
   if (requestOptions.ignoreSSL) {
-    curl = `'k ${curl}`;
+    curl = `-k ${curl}`;
   }
-  return `curl -o ${curl}`;
+  if (fileName) {
+    curl = `-o ${fileName} ${curl}`;
+  }
+  return `curl ${curl}`;
 }
 
 /**
@@ -142,5 +151,4 @@ export function addHeader(options: RequestOptionsValue, name: string,
   }
   options.headers[name] = value;
   return options;
-
 }
