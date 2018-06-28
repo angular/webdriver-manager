@@ -94,7 +94,8 @@ export function resolveProxy(
       }
     }
 
-    // If the HTTPS_PROXY and HTTP_PROXY environment variable is set, use that as the proxy
+    // If the HTTPS_PROXY and HTTP_PROXY environment variable is set,
+    // use that as the proxy
     const httpsProxy = process.env.HTTPS_PROXY || process.env.https_proxy;
     const httpProxy = process.env.HTTP_PROXY || process.env.http_proxy;
     if (protocol === 'https:') {
@@ -125,4 +126,21 @@ export function curlCommand(requestOptions: RequestOptionsValue,
     curl = `'k ${curl}`;
   }
   return `curl -o ${curl}`;
+}
+
+/**
+ * Add a header to the request.
+ * @param options The options to add a header.
+ * @param name The key name of the header.
+ * @param value The value of the header.
+ * @returns The modified options object.
+ */
+export function addHeader(options: RequestOptionsValue, name: string,
+    value: string|number): RequestOptionsValue {
+  if (!options.headers) {
+    options.headers = {};
+  }
+  options.headers[name] = value;
+  return options;
+
 }

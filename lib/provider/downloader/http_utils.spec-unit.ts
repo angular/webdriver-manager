@@ -1,4 +1,5 @@
 import {
+  addHeader,
   initOptions,
   optionsProxy,
   optionsSSL,
@@ -144,6 +145,41 @@ describe('http utils', () => {
 
       delete process.env['HTTP_PROXY'];
       expect(process.env['HTTP_PROXY']).toBeUndefined();
+    });
+  });
+
+  describe('addHeader', () => {
+    let options: RequestOptionsValue;
+    beforeEach(() => {
+      options = {
+        url: 'http://foo.bar'
+      };
+    })
+    it('should create a new header if no header exists', () => {
+      let modifiedOptions = addHeader(options, 'foo', 'bar');
+      expect(modifiedOptions.headers).toBeTruthy();
+      expect(Object.keys(modifiedOptions.headers).length).toBe(1);
+      expect(modifiedOptions.headers['foo']).toBe('bar');
+    });
+
+    it('should add a header to an existing header without destroying the value', () => {
+      let modifiedOptions = addHeader(options, 'foo1', 'bar1');
+      modifiedOptions = addHeader(options, 'foo2', 'bar2');
+      expect(modifiedOptions.headers).toBeTruthy();
+      expect(Object.keys(modifiedOptions.headers).length).toBe(2);
+      expect(modifiedOptions.headers['foo1']).toBe('bar1');
+      expect(modifiedOptions.headers['foo2']).toBe('bar2');
+    });
+
+    it('should replace the header if selecting the same header name', () => {
+      let modifiedOptions = addHeader(options, 'foo', 'bar');
+      expect(modifiedOptions.headers).toBeTruthy();
+      expect(Object.keys(modifiedOptions.headers).length).toBe(1);
+      expect(modifiedOptions.headers['foo']).toBe('bar');
+
+      modifiedOptions = addHeader(options, 'foo', 'baz');
+      expect(Object.keys(modifiedOptions.headers).length).toBe(1);
+      expect(modifiedOptions.headers['foo']).toBe('baz');
     });
   });
 });
