@@ -32,7 +32,7 @@ export class ChromeDriver {
     let versionList = convertXmlToVersionList(path.resolve(this.outDir, this.fileName));
     let versionObjMap = getVersion(versionList, version);
     let versionObj = getVersionObj(versionObjMap, this.osType, this.osArch);
-    let chromeDriverUrl = this.requestUrl + versionObj.partialUrl;
+    let chromeDriverUrl = this.requestUrl + versionObj.url;
     let chromeDriverZip = path.resolve(this.outDir, 'chromedriver.zip');
     return await binaryUtils.requestBinary(chromeDriverUrl,
       chromeDriverZip, 0);
@@ -54,12 +54,13 @@ export function convertXmlToVersionList(fileName: string): VersionList | null {
     let key = content['Key'][0] as string;
     if (key.includes('.zip')) {
       let version = key.split('/')[0] + '.0';
+      let name = key.split('/')[1];
       let size = +content['Size'][0];
       if (!versionList[version]) {
         versionList[version] = {};
       }
-      versionList[version][key] = {
-        partialUrl: key,
+      versionList[version][name] = {
+        url: key,
         size: size
       };
     }

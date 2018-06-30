@@ -1,22 +1,14 @@
 
-import * as child_process from 'child_process';
+import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as xmlUtils from './xml_utils';
-
-function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) {
-  opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
-  let stdio = 'inherit';
-  if (opt_io === 'ignore') {
-    stdio = 'ignore';
-  }
-  return child_process.spawn(task, opt_arg, {stdio: stdio});
-}
+import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
 describe('xmlUtils', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
-  let proc: child_process.ChildProcess;
+  let proc: childProcess.ChildProcess;
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   beforeAll((done) => {

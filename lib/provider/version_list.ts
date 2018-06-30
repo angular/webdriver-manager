@@ -8,12 +8,12 @@ export interface VersionList {
   // The version is the semver equivalent version of the version number.
   // An example is 2.9 would translate into 2.9.0
   [version: string]: {
-    [partialUrl: string]: VersionObj;
+    [name: string]: VersionObj;
   };
 }
 
 export interface VersionObj {
-  partialUrl?: string;
+  url?: string;
   size?: number;
 }
 

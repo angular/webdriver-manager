@@ -3,15 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { requestBinary } from './binary_utils';
-
-function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) {
-  opt_arg = typeof opt_arg !== 'undefined' ? opt_arg : [];
-  let stdio = 'inherit';
-  if (opt_io === 'ignore') {
-    stdio = 'ignore';
-  }
-  return childProcess.spawn(task, opt_arg, {stdio: stdio});
-}
+import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const fileName = path.resolve(tmpDir, 'bar.zip');

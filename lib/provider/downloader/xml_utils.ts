@@ -47,9 +47,7 @@ export function isExpired(fileName: string): boolean {
  * Reads the xml file.
  * @param fileName The xml filename to read.
  */
-export function readXml(
-  fileName: string): JsonObject | null {
-  
+export function readXml(fileName: string): JsonObject | null {
   try {
     let contents = fs.readFileSync(fileName).toString();
     return convertXml2js(contents);

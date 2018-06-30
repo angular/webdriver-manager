@@ -6,8 +6,8 @@
   "scripts": {
     "http-server": "tsc && node dist/spec/server/http_server.js",
     "jasmine": "jasmine",
-    "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/support/jasmine-int.json",
-    "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/support/jasmine-unit.json",
+    "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-int.json",
+    "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",
     "tsc": "tsc"
   },
   "repository": {
