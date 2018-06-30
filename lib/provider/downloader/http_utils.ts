@@ -80,7 +80,7 @@ export function resolveProxy(
     let hostname = url.parse(requestUrl).hostname;
     // If the NO_PROXY environment variable exists and matches the host name,
     // to ignore the resolve proxy.
-    // the checks to see if it exists and equal to empty string is to help with testing
+    // Check to see if it exists and equal to empty string is to help with testing
     const noProxy: string = process.env.NO_PROXY || process.env.no_proxy;
     if (noProxy) {
       // array of hostnames/domain names listed in the NO_PROXY environment variable

@@ -27,8 +27,9 @@ export function requestGitHubJson(
   headers['User-Agent'] = 'angular/webdriver-manager';
   if (oauthToken) {
     headers['Authorization'] = 'token ' + oauthToken;
-  } else if (process.env['GITHUB_TOKEN']) {
-    headers['Authorization'] = 'token ' + process.env['GITHUB_TOKEN'];
+  } else if (process.env['GITHUB_TOKEN'] || process.env['github_token']) {
+    let token = process.env['GITHUB_TOKEN'] || process.env['github_token'];
+    headers['Authorization'] = 'token ' + token;
   }
   return requestJson(jsonUrl, fileName, headers);
 }
