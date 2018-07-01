@@ -1,9 +1,11 @@
 import * as semver from 'semver';
 
-// An object of multiple versions of a binary. Each version could have
-// different keys where each key represents a partial url path. Each
-// partial url path could represent a combination of os architecture
-// and os type.
+/**
+ * An object of multiple versions of a binary. Each version could have
+ * different keys where each key represents a partial url path. Each
+ * partial url path could represent a combination of os architecture
+ * and os type.
+ */
 export interface VersionList {
   // The version is the semver equivalent version of the version number.
   // An example is 2.9 would translate into 2.9.0
@@ -42,4 +44,21 @@ export function getVersion(versionList: VersionList,
     }
     return versionList[latestVersion];
   }
+}
+
+/**
+ * Get the version obj from the map.
+ * @param versionObjs A map of partial urls to VersionObj
+ * @param osMatch The OS name and architecture.
+ * @returns Either a VersionObj or null.
+ */
+export function getVersionObj(
+    versionObjMap: {[key:string]: VersionObj},
+    osMatch: string): VersionObj|null {
+  for (let name of Object.keys(versionObjMap)) {
+    if (name.includes(osMatch)) {
+      return versionObjMap[name];
+    }
+  }
+  return null;
 }

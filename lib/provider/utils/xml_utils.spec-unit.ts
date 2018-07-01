@@ -7,9 +7,11 @@ const contents = `
   <Name>foobar_driver</Name>
   <Contents>
     <Key>2.0/foobar.zip</Key>
+    <Size>10</Size>
   </Contents>
   <Contents>
     <Key>2.1/foobar.zip</Key>
+    <Size>11</Size>
   </Contents>
 </ListBucketResult>`
 
@@ -33,32 +35,20 @@ describe('xml utils', () => {
     });
   });
 
-  describe('isExpired', () => {
-    it('should return true if the file is zero', () => {
-      let mtime = Date.now() - 1000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 0,
-        mtime: mtime
-      });
-      expect(xmlUtils.isExpired('foobar.xml')).toBeTruthy();
+  describe('convertXmlToVersionList', () => {
+    it ('should convert an xml file an object from the xml file', () => {
+      spyOn(fs, 'readFileSync').and.returnValue(contents);
+      let versionList = xmlUtils.convertXmlToVersionList('foobar');
+      expect(Object.keys(versionList).length).toBe(2);
+      expect(versionList['2.0.0']['foobar.zip'].url).toBe('2.0/foobar.zip');
+      expect(versionList['2.0.0']['foobar.zip'].size).toBe(10);
+      expect(versionList['2.1.0']['foobar.zip'].url).toBe('2.1/foobar.zip');
+      expect(versionList['2.1.0']['foobar.zip'].size).toBe(11);
     });
 
-    it('should return true if the file is zero', () => {
-      let mtime = Date.now() - (60 * 60 * 1000) - 5000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 1000,
-        mtime: mtime
-      });
-      expect(xmlUtils.isExpired('foobar.xml')).toBeTruthy();
-    });
-
-    it('should return true if the file is zero', () => {
-      let mtime = Date.now() - (60 * 60 * 1000) + 5000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 1000,
-        mtime: mtime
-      });
-      expect(xmlUtils.isExpired('foobar.xml')).toBeFalsy();
+    it('should return null when the method to read an xml file returns null', () => {
+      let versionList = xmlUtils.convertXmlToVersionList('foo');
+      expect(versionList).toBeNull();
     });
   });
 });

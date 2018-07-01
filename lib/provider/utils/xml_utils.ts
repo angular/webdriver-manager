@@ -2,7 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as request from 'request';
 import * as xml2js from 'xml2js';
+
+import { isExpired } from './file_utils';
 import { curlCommand, initOptions, JsonObject } from './http_utils';
+import { VersionList } from './version_list';
 
 /**
  * Read the xml file from cache. If the cache time has been exceeded or the
@@ -24,22 +27,6 @@ export async function updateXml(
     return convertXml2js(contents);
   } else {
     return readXml(fileName);
-  }
-}
-
-export function isExpired(fileName: string): boolean {
-  try {
-    let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
-    let size = fs.statSync(fileName).size;
-    let now = Date.now();
-
-    if (size > 0 && (now - (60 * 60 * 1000) < timestamp)) {
-      return false;
-    } else {
-      return true;
-    }
-  } catch (err) {
-    return true;
   }
 }
 
@@ -100,4 +87,33 @@ export function convertXml2js(
     retResult = result;
   });
   return retResult;
+}
+
+/**
+ * Returns a list of versions and the partial url paths.
+ * @param fileName the location of the xml file to read.
+ * @returns the version list from the xml file.
+ */
+export function convertXmlToVersionList(fileName: string): VersionList | null {
+  let xmlJs = readXml(fileName);
+  if (!xmlJs) {
+    return null;
+  }
+  let versionList: VersionList = {};
+  for (let content of xmlJs['ListBucketResult']['Contents']) {
+    let key = content['Key'][0] as string;
+    if (key.includes('.zip')) {
+      let version = key.split('/')[0] + '.0';
+      let name = key.split('/')[1];
+      let size = +content['Size'][0];
+      if (!versionList[version]) {
+        versionList[version] = {};
+      }
+      versionList[version][name] = {
+        url: key,
+        size: size
+      };
+    }
+  }
+  return versionList;
 }

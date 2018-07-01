@@ -1,5 +1,4 @@
 import * as childProcess from 'child_process';
-import * as path from 'path';
 import { requestJson, requestRateLimit } from './github_json_utils';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 

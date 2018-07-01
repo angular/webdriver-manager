@@ -1,6 +1,5 @@
 import * as path from 'path';
 import { convertJsonToVersionList } from './geckodriver';
-import { toASCII } from 'punycode';
 
 const fileName = path.resolve('spec/support/files/gecko.json');
 
