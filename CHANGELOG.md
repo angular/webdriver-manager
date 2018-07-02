@@ -1,3 +1,34 @@
+# 12.1.0
+
+## Bug Fix
+
+- ([f17b226](https://github.com/angular/webdriver-manager/commit/f17b226342173e59b4d2fac54632185c26ca7086))
+  Fix(types): Operator '==' cannot be applied to types 'string | string[]' and 'number' (#297)
+
+  - build-enforced style changes
+  - add package-lock.json
+
+- ([7dbc1df](https://github.com/angular/webdriver-manager/commit/7dbc1dfbccc60c8836e7c1d390fd5562e0af5b9d))
+  fix(clean): remove existing chrome meta files from update on clean command (#279)
+
+  - change file name from chromedriver-response.xml to chrome-response.xml
+- ([0a4c065](https://github.com/angular/webdriver-manager/commit/0a4c0658b0725154cba07ad6e7125c1dd504fa3d))
+  fix(appium): change appiumPort to seleniumPort for selenium server request (#228)
+
+## Dependencies
+
+- ([6775421](https://github.com/angular/webdriver-manager/commit/6775421ea9e40db1bf547bcedcb716ba35106a80))
+  deps(package): update npm audit.
+
+  - Updates to vulnerable to zipslip.
+  - Update all dependencies with `npm audit fix --force`.
+
+  closes #314
+
+- ([a80ccd2](https://github.com/angular/webdriver-manager/commit/a80ccd22d494e10e8c3c6ef9af22abf38496cb14))
+  deps(appium): bump up the appium version (#258)
+
+
 # 12.0.6
 
 ## Bug Fix
