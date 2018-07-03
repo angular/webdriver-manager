@@ -2,7 +2,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { requestBinary } from './binary_utils';
+import { requestBinary } from './binary_downloader';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');

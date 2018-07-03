@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as request from 'request';
 import * as xml2js from 'xml2js';
 
-import { isExpired } from './file_utils';
+import { isExpired } from './file_manager';
 import { curlCommand, initOptions, JsonObject } from './http_utils';
 import { VersionList } from './version_list';
 

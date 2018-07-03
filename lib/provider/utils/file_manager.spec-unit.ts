@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { isExpired } from './file_utils';
+import { isExpired } from './file_manager';
 
 describe('isExpired', () => {
   it('should return true if the file is zero', () => {

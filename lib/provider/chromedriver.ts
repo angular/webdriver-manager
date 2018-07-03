@@ -2,7 +2,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { Flag } from '../flags';
-import * as binaryUtils from './utils/binary_utils';
+import * as binaryUtils from './utils/binary_downloader';
 import * as xmlUtils from './utils/xml_utils';
 import { getVersion, getVersionObj, VersionList } from './utils/version_list';
 
