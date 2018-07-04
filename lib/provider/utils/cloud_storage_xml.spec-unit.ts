@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as xmlUtils from './xml_utils';
+import { convertXmlToVersionList } from './cloud_storage_xml';
 
 const contents = `
 <?xml version='1.0' encoding='UTF-8'?>
@@ -15,30 +15,11 @@ const contents = `
   </Contents>
 </ListBucketResult>`
 
-describe('xml utils', () => {
-  describe('readXml', () => {
-    it('should read the file', () => {
-      spyOn(fs, 'readFileSync').and.returnValue(contents);
-      let xmlContent = xmlUtils.readXml('foobar');
-      expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
-      expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
-        .toBe('2.0/foobar.zip');
-    });
-  });
-
-  describe('convertXml2js', () => {
-    it('should convert the content to json', () => {
-      let xmlContent = xmlUtils.convertXml2js(contents);
-      expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
-      expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
-        .toBe('2.0/foobar.zip');
-    });
-  });
-
+describe('cloud_storage_xml', () => {
   describe('convertXmlToVersionList', () => {
     it ('should convert an xml file an object from the xml file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(contents);
-      let versionList = xmlUtils.convertXmlToVersionList('foobar');
+      let versionList = convertXmlToVersionList('foobar');
       expect(Object.keys(versionList).length).toBe(2);
       expect(versionList['2.0.0']['foobar.zip'].url).toBe('2.0/foobar.zip');
       expect(versionList['2.0.0']['foobar.zip'].size).toBe(10);
@@ -47,7 +28,7 @@ describe('xml utils', () => {
     });
 
     it('should return null when the method to read an xml file returns null', () => {
-      let versionList = xmlUtils.convertXmlToVersionList('foo');
+      let versionList = convertXmlToVersionList('foo');
       expect(versionList).toBeNull();
     });
   });

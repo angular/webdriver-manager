@@ -2,9 +2,9 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { Flag } from '../flags';
-import * as binaryUtils from './utils/binary_downloader';
-import * as xmlUtils from './utils/xml_utils';
-import { getVersion, getVersionObj, VersionList } from './utils/version_list';
+import { requestBinary } from './utils/http_utils';
+import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
+import { getVersion, getVersionObj } from './utils/version_list';
 
 
 export const CHROME_VERSION: Flag = {
@@ -28,14 +28,13 @@ export class ChromeDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<boolean> {
-    await xmlUtils.updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
-    let versionList = xmlUtils.convertXmlToVersionList(path.resolve(this.outDir, this.fileName));
+    await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
+    let versionList = convertXmlToVersionList(path.resolve(this.outDir, this.fileName));
     let versionObjMap = getVersion(versionList, version);
     let versionObj = getVersionObj(versionObjMap, osHelper(this.osType, this.osArch));
     let chromeDriverUrl = this.requestUrl + versionObj.url;
     let chromeDriverZip = path.resolve(this.outDir, 'chromedriver.zip');
-    return await binaryUtils.requestBinary(chromeDriverUrl,
-      chromeDriverZip, 0);
+    return await requestBinary(chromeDriverUrl, chromeDriverZip, 0);
   }
 }
 

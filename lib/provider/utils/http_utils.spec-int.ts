@@ -2,7 +2,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { requestBinary } from './binary_downloader';
+import { requestBinary, requestBody } from './http_utils';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');
@@ -60,6 +60,32 @@ describe('binary_utils', () => {
       }).catch(err => {
         done.fail(err);
       });
+    });
+  });
+
+  describe('requestBody', () => {
+    it('should download a json object file', async() => {
+      let foo  = await requestBody(
+        'http://127.0.0.1:8812/spec/support/files/foo_json.json');
+      let fooJson = JSON.parse(foo);
+      expect(fooJson["foo"]).toBe("abc");
+      expect(fooJson["bar"]).toBe(123);
+    });
+
+    it('should download a json array file', async() => {
+      let foo  = await requestBody(
+        'http://127.0.0.1:8812/spec/support/files/foo_array.json');
+      let fooJson = JSON.parse(foo);
+      expect(fooJson.length).toBe(3);
+      expect(fooJson[0]['foo']).toBe('abc');
+      expect(fooJson[1]['foo']).toBe('def');
+      expect(fooJson[2]['foo']).toBe('ghi');
+    });
+  
+    it('should get the xml file', async() => {
+      let text = await requestBody(
+        'http://127.0.0.1:8812/spec/support/files/foo.xml');
+      expect(text.length).toBeGreaterThan(0);
     });
   });
 });

@@ -1,7 +1,9 @@
-import {OptionsWithUrl} from 'request';
 import * as url from 'url';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as request from 'request';
 
-export interface RequestOptionsValue extends OptionsWithUrl {
+export interface RequestOptionsValue extends request.OptionsWithUrl {
   proxy?: string;
   ignoreSSL?: boolean;
 }
@@ -151,4 +153,97 @@ export function addHeader(options: RequestOptionsValue, name: string,
   }
   options.headers[name] = value;
   return options;
+}
+
+/**
+ * The request to download the binary.
+ * @param binaryUrl The download url for the binary.
+ * @param fileName The file path to save the binary.
+ * @param fileSize The file size used for validation.
+ */
+export function requestBinary(binaryUrl: string,
+    fileName: string, fileSize: number): Promise<boolean> {
+  let options = initOptions(binaryUrl);
+  console.log(curlCommand(options, fileName));
+
+  return new Promise<boolean>((resolve, reject) => {
+    let req = request(options);
+    req.on('response', response => {
+      let contentLength: number;
+      if (response.statusCode === 200) {
+        // Check to see if the size is the same.
+        // If the file size is the same, do not download and stop here.
+        contentLength = +response.headers['content-length'];
+        if (contentLength === fileSize) {
+          response.destroy();
+          resolve(false);
+        } else {
+          // Only pipe if the headers are different length.
+          let dir = path.dirname(fileName);
+          try {
+            fs.mkdirSync(dir);
+          } catch (err) {}
+          let file = fs.createWriteStream(fileName);
+          req.pipe(file);
+          file.on('close', () => {
+            fs.stat(fileName, (error, stats) => {
+              if (error) {
+                reject(error);
+              }
+              if (stats.size != contentLength) {
+                fs.unlinkSync(fileName);
+                reject(error);
+              }
+              resolve(true);
+            });
+          });
+        }
+      } else {
+        reject(new Error('response status code is not 200'));
+      }
+    });
+    req.on('error', error => {
+      reject(error);
+    });
+  });
+}
+
+/**
+ * Request the body from the url and log the curl.
+ * @param requestUrl The request url.
+ * @param fileName An optional json filename.
+ * @param headers Optional headers object of key-values.
+ * @returns A promise string of the response body.
+ */
+export function requestBody(
+    requestUrl: string,
+    fileName?: string,
+    headers?: {[key:string]: string|number}): Promise<string> {
+  let options = initOptions(requestUrl);
+  if (headers) {
+    for(let key of Object.keys(headers)) {
+      addHeader(options, key, headers[key]);
+    }
+  }
+  console.log(curlCommand(options, fileName));
+
+  return new Promise((resolve, reject) => {
+    let req = request(options);
+    req.on('response', response => {
+      if (response.statusCode === 200) {
+        let output = '';
+        response.on('data', (data) => {
+          output += data;
+        });
+        response.on('end', () => {
+          resolve(output);
+        });
+      } else {
+        reject(new Error('response status code is not 200'));
+      }
+    });
+    req.on('error', error => {
+      reject(error);
+    });
+  });
 }

@@ -4,7 +4,7 @@ import {
   optionsProxy,
   optionsSSL,
   resolveProxy,
-  RequestOptionsValue} from './http_utils';
+  RequestOptionsValue } from './http_utils';
 
 describe('http utils', () => {
   describe('initOptions', () => {

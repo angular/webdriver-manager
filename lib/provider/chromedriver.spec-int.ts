@@ -1,11 +1,11 @@
-import * as xmlUtils from './utils/xml_utils';
+import { convertXmlToVersionList } from './utils/cloud_storage_xml';
 
 const fileName = 'spec/support/files/chromedriver.xml';
 
 describe('chromedriver', () => {
   describe('convertXmlToVersionList', () => {
     it('should convert an xml file an object from the xml file', () => {
-      let versionList = xmlUtils.convertXmlToVersionList(fileName);
+      let versionList = convertXmlToVersionList(fileName);
       expect(Object.keys(versionList).length).toBe(3);
       expect(versionList['2.0.0']).toBeTruthy();
       expect(versionList['2.10.0']).toBeTruthy();
@@ -19,7 +19,7 @@ describe('chromedriver', () => {
     });
 
     it('should return a null value if the file does not exist', () => {
-      let versionList = xmlUtils.convertXmlToVersionList('spec/support/files/does_not_exist.xml');
+      let versionList = convertXmlToVersionList('spec/support/files/does_not_exist.xml');
       expect(versionList).toBeNull();
     });
   });

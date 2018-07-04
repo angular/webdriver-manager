@@ -1,6 +1,6 @@
 import { VersionList } from './utils/version_list';
+import { readJson } from './utils/file_utils';
 import { JsonObject } from './utils/http_utils';
-import * as githubJsonUtils from './utils/github_json_utils';
 
 /**
  * Returns a list of versions and the partial url paths.
@@ -8,7 +8,7 @@ import * as githubJsonUtils from './utils/github_json_utils';
  * @returns the version list from the xml file.
  */
 export function convertJsonToVersionList(fileName: string): VersionList | null {
-  let githubJson = githubJsonUtils.readJson(fileName) as JsonObject[];
+  let githubJson = readJson(fileName) as JsonObject[];
   if (!githubJson) {
     return null;
   }
