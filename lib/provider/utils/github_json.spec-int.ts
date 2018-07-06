@@ -1,20 +1,32 @@
-import * as childProcess from 'child_process';
-import { spawnProcess } from '../../../spec/support/helpers/test_utils';
+import * as path from 'path';
+import { convertJsonToVersionList, requestGitHubJson, requestRateLimit } from './github_json';
+import { checkConnectivity } from '../../../spec/support/helpers/test_utils';
+
+const fileName = path.resolve('spec/support/files/gecko.json');
 
 describe('github_json', () => {
-  let proc: childProcess.ChildProcess;
-  let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-  beforeAll((done) => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
-    proc = spawnProcess('node', ['dist/spec/server/http_server.js']);
-    console.log('http-server: ' + proc.pid);
-    setTimeout(done, 3000);
+  describe('requestRateLimit', () => {
+    it('should get rate limit assuming quota exists', async(done) => {
+      if (!await checkConnectivity('rate limit test')) {
+        done();
+      }
+      let rateLimit = await requestRateLimit();
+      expect(rateLimit).toBeTruthy();
+      let rateLimitObj = JSON.parse(rateLimit);
+      expect(rateLimitObj['resources']).toBeTruthy();
+      expect(rateLimitObj['resources']['core']).toBeTruthy();
+      done();
+    });
   });
 
-  afterAll((done) => {
-    spawnProcess('kill', ['-TERM', proc.pid.toString()]);
-    setTimeout(done, 5000);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+  describe('convertJsonToVersionList', () => {
+    it('should convert the json', () => {
+      let geckoVersionList = convertJsonToVersionList(fileName);
+      expect(Object.keys(geckoVersionList).length).toBe(3);
+      expect(geckoVersionList['0.20.0']).toBeTruthy();
+      expect(geckoVersionList['0.20.1']).toBeTruthy();
+      expect(geckoVersionList['0.21.0']).toBeTruthy();
+    });
   });
 });

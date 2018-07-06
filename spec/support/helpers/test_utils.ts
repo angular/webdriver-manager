@@ -1,4 +1,5 @@
 import * as childProcess from 'child_process';
+import { requestBody } from '../../../lib/provider/utils/http_utils';
 
 /**
  * A command line to run. Example 'npm start', the task='npm' and the opt_arg=['start']
@@ -14,4 +15,17 @@ export function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) 
     stdio = 'ignore';
   }
   return childProcess.spawn(task, opt_arg, {stdio: stdio});
+}
+
+/**
+ * Check the connectivity by making a request to https://github.com.
+ * If the request results in an error, return false.
+ */
+export function checkConnectivity(testName: string): Promise<boolean> {
+  return requestBody('https://github.com').then(() => {
+    return true;
+  }).catch(() => {
+    console.warn('[WARN] no connectivity. skipping test ' + testName)
+    return false;
+  });
 }

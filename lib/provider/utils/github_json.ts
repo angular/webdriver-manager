@@ -1,13 +1,27 @@
-import { requestBody } from './http_utils';
+import { readJson } from './file_utils';
+import { JsonObject, requestBody } from './http_utils';
+import { VersionList } from './version_list';
+
+export interface RequestMethod {
+  (jsonUrl: string, fileName?: string, oauthToken?: string):
+    Promise<string|null>;
+}
 
 /**
  * Get the GitHub rate limit with the oauth token.
  * @param oauthToken An optional oauth token.
+ * @param requestMethod An overriding requesting method.
  * @returns A promised string of the response body.
  */
-export function requestRateLimit(oauthToken?: string): Promise<string> {
+export function requestRateLimit(
+    oauthToken?: string,
+    requestMethod?: RequestMethod): Promise<string> {
   let rateLimitUrl = 'https://api.github.com/rate_limit';
-  return requestGitHubJson(rateLimitUrl, null, oauthToken);
+  if (requestMethod) {
+    return requestMethod(rateLimitUrl, null, oauthToken);
+  } else {
+    return requestGitHubJson(rateLimitUrl, null, oauthToken);
+  }
 }
 
 /**
@@ -20,7 +34,7 @@ export function requestRateLimit(oauthToken?: string): Promise<string> {
 export function requestGitHubJson(
     jsonUrl: string,
     fileName?: string,
-    oauthToken?: string): Promise<string> {
+    oauthToken?: string): Promise<string|null> {
   let headers: {[key:string]: string|number} = {};
   headers['User-Agent'] = 'angular/webdriver-manager';
   if (oauthToken) {
@@ -30,4 +44,60 @@ export function requestGitHubJson(
     headers['Authorization'] = 'token ' + token;
   }
   return requestBody(jsonUrl, fileName, headers);
+}
+
+/**
+ * Check quota for remaining GitHub requests.
+ * @param oauthToken An optional oauth token.
+ * @param requestMethod An overriding requesting method.
+ */
+export async function hasQuota(
+    oauthToken?: string,
+    requestMethod?: RequestMethod): Promise<boolean> {
+  try {
+    let rateLimit = JSON.parse(
+      await requestRateLimit(oauthToken, requestMethod));
+    if (rateLimit['resources']['core']['remaining'] === 0) {
+      if (oauthToken) {
+        console.warn('[WARN] No remaining quota for requests to GitHub.');
+      } else {
+        console.warn('[WARN] Provide an oauth token. ' +
+          'See https://github.com/settings/tokens');
+      }
+      console.warn('[WARN] Stopping updates for gecko driver.');
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[ERROR]: ', err);
+    return false;
+  }
+}
+
+/**
+ * Returns a list of versions and the partial url paths.
+ * @param fileName the location of the xml file to read.
+ * @returns the version list from the xml file.
+ */
+export function convertJsonToVersionList(fileName: string): VersionList | null {
+  let githubJson = readJson(fileName) as JsonObject[];
+  if (!githubJson) {
+    return null;
+  }
+  let versionList: VersionList = {};
+  for(let githubObj of githubJson) {
+    let assets = githubObj['assets'];
+    let version = githubObj['tag_name'].replace('v', '');
+    versionList[version] = {};
+    for (let asset of assets) {
+      let name = asset['name'];
+      let downloadUrl = asset['url'];
+      let size = asset['size'];
+      versionList[version][name] = {
+        size: size,
+        url: downloadUrl
+      };
+    }
+  }
+  return versionList;
 }
