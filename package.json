@@ -21,16 +21,20 @@
   },
   "homepage": "https://github.com/cnishina/webderpy-manager#readme",
   "dependencies": {
+    "adm-zip": "^0.4.11",
     "request": "^2.87.0",
     "semver": "^5.5.0",
+    "tar": "^4.4.4",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.4.31",
     "@types/jasmine": "^2.8.8",
     "@types/node": "^10.3.3",
     "@types/request": "^2.47.0",
     "@types/rimraf": "^2.0.2",
     "@types/semver": "^5.5.0",
+    "@types/tar": "^4.0.0",
     "@types/xml2js": "^0.4.3",
     "jasmine": "^3.1.0",
     "rimraf": "^2.6.2",
