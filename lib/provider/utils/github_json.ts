@@ -36,13 +36,7 @@ export async function updateJson(
       fs.writeFileSync(fileName, contents);
       return JSON.parse(contents);
     } else {
-      // No quota, do not make the request.
-      // Let's check the cache if we have something older.
-      if (fs.statSync(fileName)) {
-        return readJson(fileName);
-      } else {
-        return null;
-      }
+      return null;
     }
   } else {
     return readJson(fileName);

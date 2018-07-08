@@ -1,7 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
-
 import { convertXml2js, readXml } from './file_utils';
 import { isExpired } from './file_utils';
 import { requestBody, JsonObject } from './http_utils';
