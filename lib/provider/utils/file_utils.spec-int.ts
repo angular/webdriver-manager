@@ -28,19 +28,22 @@ describe('file_utils', () => {
   });
 
   describe('untarFile', () => {
-    let tmpFolder: string;
+    let tmpDir: string;
 
     beforeAll(() => {
-      tmpFolder = os.tmpdir();
+      tmpDir = path.resolve(os.tmpdir(), 'test');
+      try {
+        fs.mkdirSync(tmpDir)
+      } catch(err) {}
     });
 
     afterAll(() => {
-      rimraf.sync(tmpFolder);
+      rimraf.sync(tmpDir);
     });
 
     it('should uncompress the file', async() => {      
-      let untarFiles = await untarFile(tarballFile, tmpFolder);
-      let untarBar = path.resolve(tmpFolder, 'bar');
+      let untarFiles = await untarFile(tarballFile, tmpDir);
+      let untarBar = path.resolve(tmpDir, 'bar');
       expect(untarFiles).toBeTruthy();
       expect(untarFiles.length).toBe(1);
       expect(untarFiles[0]).toBe(untarBar);
@@ -68,19 +71,22 @@ describe('file_utils', () => {
   });
 
   describe('unzipFile', () => {
-    let tmpFolder: string;
+    let tmpDir: string;
 
     beforeAll(() => {
-      tmpFolder = os.tmpdir();
+      tmpDir = path.resolve(os.tmpdir(), 'test');
+      try {
+        fs.mkdirSync(tmpDir)
+      } catch(err) {}
     });
 
     afterAll(() => {
-      rimraf.sync(tmpFolder);
+      rimraf.sync(tmpDir);
     });
     
     it('should uncompress the file', () => {
-      let zipFiles = unzipFile(zipFile, tmpFolder);
-      let unzipBar = path.resolve(tmpFolder, 'bar');
+      let zipFiles = unzipFile(zipFile, tmpDir);
+      let unzipBar = path.resolve(tmpDir, 'bar');
       expect(zipFiles).toBeTruthy();
       expect(zipFiles.length).toBe(1);
       expect(zipFiles[0]).toBe(unzipBar);

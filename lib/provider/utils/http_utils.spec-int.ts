@@ -9,7 +9,6 @@ const tmpDir = path.resolve(os.tmpdir(), 'test');
 const fileName = path.resolve(tmpDir, 'bar.zip');
 const binaryUrl = 'http://127.0.0.1:8812/spec/support/files/bar.zip';
 const barZipSize = 171;
-const barSize = 30;
 
 describe('binary_utils', () => {
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
