@@ -7,27 +7,54 @@ import * as semver from 'semver';
  * and os type.
  */
 export interface VersionList {
-  // The version is the semver equivalent version of the version number.
-  // An example is 2.9 would translate into 2.9.0
-  [version: string]: {
+  // The forced version is the semver equivalent version of the 
+  // actual version number. An example is 2.9 would translate into 2.9.0
+  [forced_version: string]: {
+
+    // The name of the binary file.
     [name: string]: VersionObj;
   };
 }
 
+/**
+ * Information about the binary file.
+ */
 export interface VersionObj {
-  url?: string;
+  // The file name.
+  name?: string;
+  
+  // The content length of the file.
   size?: number;
+
+  // The full or partial url get the binary.
+  url?: string;
+
+  // The actual version number, not the forced semantic version.
+  version?: string;  
 }
 
 /**
- * Get the version from the version list.
- * 
+ * Encapsulates the getVersionObjs and getVersionObj into a single method.
+ * @param versionList The version list object.
+ * @param osMatch The OS name and architecture.
+ * @param version Optional field for the semver version number or latest.
+ * * @returns Either a VersionObj or null.
+ */
+export function getVersion(
+    versionList: VersionList,
+    osMatch: string,
+    version?: string): VersionObj|null {
+  let versionObjs = getVersionObjs(versionList, version);
+  return getVersionObj(versionObjs, osMatch);
+}
+
+/**
+ * Get the version obj from the version list.
  * @param versionList The version list object.
  * @param version Optional field for the semver version number or latest.
- * 
  * @returns The object with paritial urls associated with the binary size.
  */
-export function getVersion(versionList: VersionList,
+export function getVersionObjs(versionList: VersionList,
       version?: string): { [key: string]: VersionObj } {
   if (version && version !== 'latest') {
     return versionList[version];

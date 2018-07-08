@@ -3,7 +3,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { updateXml } from './cloud_storage_xml';
+import { convertXmlToVersionList, updateXml } from './cloud_storage_xml';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
 describe('cloud_storage_xml', () => {
@@ -109,6 +109,29 @@ describe('cloud_storage_xml', () => {
       } catch (err) {
         done.fail('debugging required');
       }
+    });
+  });
+
+  describe('convertXmlToVersionList', () => {
+    const fileName = 'spec/support/files/chromedriver.xml';
+    
+    it('should convert an xml file an object from the xml file', () => {
+      let versionList = convertXmlToVersionList(fileName);
+      expect(Object.keys(versionList).length).toBe(3);
+      expect(versionList['2.0.0']).toBeTruthy();
+      expect(versionList['2.10.0']).toBeTruthy();
+      expect(versionList['2.20.0']).toBeTruthy();
+      expect(Object.keys(versionList['2.0.0']).length).toBe(4);
+      expect(Object.keys(versionList['2.10.0']).length).toBe(4);
+      expect(Object.keys(versionList['2.20.0']).length).toBe(4);
+      expect(versionList['2.0.0']['chromedriver_linux32.zip']['size']).toBe(7262134);
+      expect(versionList['2.10.0']['chromedriver_linux32.zip']['size']).toBe(2439424);
+      expect(versionList['2.20.0']['chromedriver_linux32.zip']['size']).toBe(2612186);
+    });
+
+    it('should return a null value if the file does not exist', () => {
+      let versionList = convertXmlToVersionList('spec/support/files/does_not_exist.xml');
+      expect(versionList).toBeNull();
     });
   });
 });

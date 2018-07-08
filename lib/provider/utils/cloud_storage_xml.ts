@@ -43,15 +43,18 @@ export function convertXmlToVersionList(fileName: string): VersionList | null {
   for (let content of xmlJs['ListBucketResult']['Contents']) {
     let key = content['Key'][0] as string;
     if (key.includes('.zip')) {
-      let version = key.split('/')[0] + '.0';
+      let version = key.split('/')[0]
+      let forcedVersion = version + '.0';
       let name = key.split('/')[1];
       let size = +content['Size'][0];
-      if (!versionList[version]) {
-        versionList[version] = {};
+      if (!versionList[forcedVersion]) {
+        versionList[forcedVersion] = {};
       }
-      versionList[version][name] = {
+      versionList[forcedVersion][name] = {
+        name: name,
+        size: size,
         url: key,
-        size: size
+        version: version
       };
     }
   }

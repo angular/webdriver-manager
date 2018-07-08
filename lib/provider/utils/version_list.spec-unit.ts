@@ -1,4 +1,4 @@
-import { getVersion, getVersionObj, VersionList } from './version_list';
+import { getVersionObj, getVersionObjs, VersionList } from './version_list';
 
 const versionList: VersionList = {
   '1.0.0': {
@@ -62,7 +62,7 @@ const versionList: VersionList = {
 describe('version_list', () => {
   describe('getVersion', () => {
     it('should return the latest version when no version provided', () => {
-      let version = getVersion(versionList);
+      let version = getVersionObjs(versionList);
       expect(Object.keys(version).length).toBe(3);
       expect(version['foo_mac32']['size']).toBe(30100);
       expect(version['foo_win32']['size']).toBe(30101);
@@ -70,7 +70,7 @@ describe('version_list', () => {
     });
 
     it('should return the latest version with latest option', () => {
-      let version = getVersion(versionList, 'latest');
+      let version = getVersionObjs(versionList, 'latest');
       expect(Object.keys(version).length).toBe(3);
       expect(version['foo_mac32']['size']).toBe(30100);
       expect(version['foo_win32']['size']).toBe(30101);
@@ -78,7 +78,7 @@ describe('version_list', () => {
     });
 
     it('should return version 1.0.1', () => {
-      let version = getVersion(versionList, '1.0.1');
+      let version = getVersionObjs(versionList, '1.0.1');
       expect(Object.keys(version).length).toBe(3);
       expect(version['foo_mac32']['size']).toBe(10100);
       expect(version['foo_win32']['size']).toBe(10101);
@@ -88,21 +88,21 @@ describe('version_list', () => {
 
   describe('getVersionObj', () => {
     it('should get the partial url for mac', () => {
-      let versionObjMap = getVersion(versionList);
+      let versionObjMap = getVersionObjs(versionList);
       let versionObj = getVersionObj(versionObjMap, 'mac32');
       expect(versionObj.url).toBe('3.0.1/foo_mac32');
       expect(versionObj.size).toBe(30100);
     });
 
     it('should get the partial url for windows', () => {
-      let versionObjMap = getVersion(versionList);
+      let versionObjMap = getVersionObjs(versionList);
       let versionObj = getVersionObj(versionObjMap, 'win32');
       expect(versionObj.url).toBe('3.0.1/foo_win32');
       expect(versionObj.size).toBe(30101);
     });
 
     it('should get the partial url for linux', () => {
-      let versionObjMap = getVersion(versionList);
+      let versionObjMap = getVersionObjs(versionList);
       let versionObj = getVersionObj(versionObjMap, 'linux64');
       expect(versionObj.url).toBe('3.0.1/foo_linux64');
       expect(versionObj.size).toBe(30102);
