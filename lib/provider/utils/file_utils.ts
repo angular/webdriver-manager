@@ -1,6 +1,7 @@
 import * as AdmZip from 'adm-zip';
 import * as tar from 'tar';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import { JsonObject } from './http_utils';
@@ -69,13 +70,15 @@ export function convertXml2js(
  * Renames a file with a semantic version.
  * @param srcFileName The full path to the original file name.
  * @param versionNumber The semver number.
+ * @returns The renamed file name.
  */
-export function renameFileWithVersion(srcFileName: string, versionNumber: string) {
+export function renameFileWithVersion(srcFileName: string, versionNumber: string): string {
   let dirName = path.dirname(srcFileName);
   let extName = path.extname(srcFileName);
   let baseName = path.basename(srcFileName, extName);
   let dstFileName = path.resolve(dirName, baseName + versionNumber + extName);
   fs.renameSync(srcFileName, dstFileName);
+  return dstFileName;
 }
 
 /**
@@ -148,4 +151,25 @@ export async function untarFile(tarball: string, dstDir: string): Promise<string
     }
     return dstFiles;
   });
+}
+
+/**
+ * Change the permissions for Linux and MacOS with chmod.
+ * @param fileName The full path to the filename to change permissions.
+ * @param mode The number to modify.
+ * @param osType The OS type to decide if we need to change permissions on the file.
+ */
+export function changeFilePermissions(fileName: string, mode: string, osType: string) {
+  if (osType === 'Darwin' || osType === 'Linux') {
+    fs.chmodSync(path.resolve(fileName), mode);
+  }
+}
+
+/**
+ * Create a symbolic link to the file name.
+ * @param fileName The full path to the filename.
+ * @param symLink The symbolic link to point to the filename.
+ */
+export function symbolicLink(fileName: string, symLink: string) {
+  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
 }

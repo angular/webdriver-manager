@@ -1,8 +1,138 @@
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
 import { ChromeDriver } from './chromedriver';
+import { convertXmlToVersionList } from './utils/cloud_storage_xml';
+import { getVersion } from './utils/version_list';
+import { checkConnectivity } from '../../spec/support/helpers/test_utils';
 
 describe('chromedriver', () => {
-  it('should work?', async() => {
-    let chromedriver = new ChromeDriver();
-    await chromedriver.updateBinary();
+  let tmpDir = path.resolve(os.tmpdir(), 'test');
+
+  describe('class ChromeDriver', () => {
+    let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+    describe('updateBinary', () => {
+      beforeEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+        try {
+          fs.mkdirSync(tmpDir);
+        } catch (err) {}
+      });
+    
+      afterEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+        try {
+          rimraf.sync(tmpDir);
+        } catch (err) {}
+      });
+
+      it('should download the latest for MacOS',  async(done) => {
+        if (!await checkConnectivity('update binary for mac test')) {
+          done();
+        }
+        let chromedriver = new ChromeDriver();
+        chromedriver.outDir = tmpDir;
+        chromedriver.osType = 'Darwin';
+        await chromedriver.updateBinary();
+
+        let symLink = path.resolve(tmpDir, 'chromedriver');
+        let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
+        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
+
+        let versionList = convertXmlToVersionList(xmlFile);
+        let versionObj = getVersion(versionList, 'mac');
+        let executableFile = path.resolve(tmpDir,
+          'chromedriver_' + versionObj.version);
+        expect(fs.statSync(executableFile).size).toBeTruthy();
+        done();
+      });
+
+      it('should download the latest for Windows x64',  async(done) => {
+        if (!await checkConnectivity('update binary for win x64 test')) {
+          done();
+        }
+        let chromedriver = new ChromeDriver();
+        chromedriver.outDir = tmpDir;
+        chromedriver.osType = 'Windows_NT';
+        chromedriver.osArch = 'x64'
+        await chromedriver.updateBinary();
+
+        let symLink = path.resolve(tmpDir, 'chromedriver.exe');
+        let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
+        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
+
+        let versionList = convertXmlToVersionList(xmlFile);
+        let versionObj = getVersion(versionList, 'win32');
+        let executableFile = path.resolve(tmpDir,
+          'chromedriver_' + versionObj.version + '.exe');
+        expect(fs.statSync(executableFile).size).toBeTruthy();
+        done();
+      });
+
+      it('should download the latest for Windows x32',  async(done) => {
+        if (!await checkConnectivity('update binary for win x32 test')) {
+          done();
+        }
+        let chromedriver = new ChromeDriver();
+        chromedriver.outDir = tmpDir;
+        chromedriver.osType = 'Windows_NT';
+        chromedriver.osArch = 'x32'
+        await chromedriver.updateBinary();
+
+        let symLink = path.resolve(tmpDir, 'chromedriver.exe');
+        let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
+        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
+
+        let versionList = convertXmlToVersionList(xmlFile);
+        let versionObj = getVersion(versionList, 'win32');
+        let executableFile = path.resolve(tmpDir,
+          'chromedriver_' + versionObj.version + '.exe');
+        expect(fs.statSync(executableFile).size).toBeTruthy();
+        done();
+      });
+
+      it('should download the latest for Linux x64',  async(done) => {
+        if (!await checkConnectivity('update binary for linux x64 test')) {
+          done();
+        }
+        let chromedriver = new ChromeDriver();
+        chromedriver.outDir = tmpDir;
+        chromedriver.osType = 'Linux';
+        chromedriver.osArch = 'x64'
+        await chromedriver.updateBinary();
+
+        let symLink = path.resolve(tmpDir, 'chromedriver');
+        let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
+        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
+
+        let versionList = convertXmlToVersionList(xmlFile);
+        let versionObj = getVersion(versionList, 'linux64');
+        let executableFile = path.resolve(tmpDir,
+          'chromedriver_' + versionObj.version);
+        expect(fs.statSync(executableFile).size).toBeTruthy();
+        done();
+      });
+
+      it('should not download for Linux x32', async(done) => {
+        if (!await checkConnectivity('update binary for linux x32 test')) {
+          done();
+        }
+        let chromedriver = new ChromeDriver();
+        chromedriver.outDir = tmpDir;
+        chromedriver.osType = 'Linux';
+        chromedriver.osArch = 'x32'
+        chromedriver.updateBinary().then(() => {
+          done.fail();
+        }).catch(() => {
+          done();
+        });
+      });
+    });
   });
 });

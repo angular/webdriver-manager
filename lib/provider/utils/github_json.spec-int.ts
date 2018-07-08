@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { convertJsonToVersionList, requestGitHubJson, requestRateLimit } from './github_json';
+import { convertJsonToVersionList, requestRateLimit } from './github_json';
 import { checkConnectivity } from '../../../spec/support/helpers/test_utils';
 
 const fileName = path.resolve('spec/support/files/gecko.json');
