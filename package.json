@@ -2,7 +2,8 @@
   "name": "webdriver-manager",
   "version": "0.0.0",
   "description": "not the webdriver-manager cli",
-  "main": "index.js",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
     "http-server": "tsc && node dist/spec/server/http_server.js",
     "jasmine": "jasmine",
