@@ -180,10 +180,12 @@ export function symbolicLink(fileName: string, symLink: string) {
   console.log(path.resolve(fileName));
   console.log(path.resolve(symLink));
   try {
-    fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
-  } catch (err) { 
-    // If the file exists already, remove it and create a new symlink.
-    fs.unlinkSync(path.resolve(symLink));
-    fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
+    // Remove the symbolic link.
+    if (fs.statSync(path.resolve(symLink)).isSymbolicLink()) {
+      fs.unlinkSync(path.resolve(symLink));
+    }
+  } catch (err) {
+    // Do nothing if we can't unlink it.
   }
+  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
 }
