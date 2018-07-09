@@ -164,6 +164,7 @@ export function addHeader(options: RequestOptionsValue, name: string,
 export function requestBinary(binaryUrl: string,
     fileName: string, fileSize: number): Promise<boolean> {
   let options = initOptions(binaryUrl);
+  options.followRedirect = true;
   console.log(curlCommand(options, fileName));
 
   return new Promise<boolean>((resolve, reject) => {

@@ -1,7 +1,6 @@
 import * as AdmZip from 'adm-zip';
 import * as tar from 'tar';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import { JsonObject } from './http_utils';
@@ -72,7 +71,9 @@ export function convertXml2js(
  * @param versionNumber The semver number.
  * @returns The renamed file name.
  */
-export function renameFileWithVersion(srcFileName: string, versionNumber: string): string {
+export function renameFileWithVersion(
+    srcFileName: string,
+    versionNumber: string): string {
   let dirName = path.dirname(srcFileName);
   let extName = path.extname(srcFileName);
   let baseName = path.basename(srcFileName, extName);
@@ -134,7 +135,9 @@ export function tarFileList(tarball: string): Promise<string[]> {
  * @param dstDir The destination directory for the contents of the zip file.
  * @returns A list of uncompressed files.
  */
-export async function untarFile(tarball: string, dstDir: string): Promise<string[]> {
+export async function uncompressTarball(
+    tarball: string,
+    dstDir: string): Promise<string[]> {
   try {
     fs.mkdirSync(path.resolve(dstDir));
   } catch (err) { }
@@ -159,7 +162,10 @@ export async function untarFile(tarball: string, dstDir: string): Promise<string
  * @param mode The number to modify.
  * @param osType The OS type to decide if we need to change permissions on the file.
  */
-export function changeFilePermissions(fileName: string, mode: string, osType: string) {
+export function changeFilePermissions(
+    fileName: string,
+    mode: string,
+    osType: string) {
   if (osType === 'Darwin' || osType === 'Linux') {
     fs.chmodSync(path.resolve(fileName), mode);
   }

@@ -2,7 +2,12 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import { tarFileList, untarFile, unzipFile, zipFileList } from './file_utils';
+import {
+  tarFileList,
+  uncompressTarball,
+  unzipFile,
+  zipFileList
+} from './file_utils';
 
 const tarballFile = path.resolve('spec/support/files/bar.tar.gz');
 const zipFile = path.resolve('spec/support/files/bar.zip');
@@ -42,7 +47,7 @@ describe('file_utils', () => {
     });
 
     it('should uncompress the file', async() => {      
-      let untarFiles = await untarFile(tarballFile, tmpDir);
+      let untarFiles = await uncompressTarball(tarballFile, tmpDir);
       let untarBar = path.resolve(tmpDir, 'bar');
       expect(untarFiles).toBeTruthy();
       expect(untarFiles.length).toBe(1);

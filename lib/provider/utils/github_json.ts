@@ -128,7 +128,7 @@ export function convertJsonToVersionList(fileName: string): VersionList | null {
     versionList[version] = {};
     for (let asset of assets) {
       let name = asset['name'];
-      let downloadUrl = asset['url'];
+      let downloadUrl = asset['browser_download_url'];
       let size = asset['size'];
       versionList[version][name] = {
         name: name,
