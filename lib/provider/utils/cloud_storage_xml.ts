@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as semver from 'semver';
 import { convertXml2js, readXml } from './file_utils';
 import { isExpired } from './file_utils';
 import { requestBody, JsonObject } from './http_utils';
@@ -34,7 +35,9 @@ export async function updateXml(
  * @param fileName the location of the xml file to read.
  * @returns the version list from the xml file.
  */
-export function convertXmlToVersionList(fileName: string): VersionList | null {
+export function convertXmlToVersionList(
+    fileName: string,
+    matchFile: string): VersionList|null {
   let xmlJs = readXml(fileName);
   if (!xmlJs) {
     return null;
@@ -42,9 +45,12 @@ export function convertXmlToVersionList(fileName: string): VersionList | null {
   let versionList: VersionList = {};
   for (let content of xmlJs['ListBucketResult']['Contents']) {
     let key = content['Key'][0] as string;
-    if (key.includes('.zip')) {
-      let version = key.split('/')[0]
+    if (key.includes(matchFile)) {
+      let version = key.split('/')[0];
       let forcedVersion = version + '.0';
+      if (!semver.valid(forcedVersion)) {
+        continue;
+      }
       let name = key.split('/')[1];
       let size = +content['Size'][0];
       if (!versionList[forcedVersion]) {

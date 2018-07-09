@@ -116,7 +116,7 @@ describe('cloud_storage_xml', () => {
     const fileName = 'spec/support/files/chromedriver.xml';
     
     it('should convert an xml file an object from the xml file', () => {
-      let versionList = convertXmlToVersionList(fileName);
+      let versionList = convertXmlToVersionList(fileName, '.zip');
       expect(Object.keys(versionList).length).toBe(3);
       expect(versionList['2.0.0']).toBeTruthy();
       expect(versionList['2.10.0']).toBeTruthy();
@@ -130,7 +130,8 @@ describe('cloud_storage_xml', () => {
     });
 
     it('should return a null value if the file does not exist', () => {
-      let versionList = convertXmlToVersionList('spec/support/files/does_not_exist.xml');
+      let versionList = convertXmlToVersionList(
+        'spec/support/files/does_not_exist.xml', '.zip');
       expect(versionList).toBeNull();
     });
   });

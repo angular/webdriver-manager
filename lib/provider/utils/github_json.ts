@@ -52,7 +52,7 @@ export async function updateJson(
  */
 export function requestRateLimit(
     oauthToken?: string,
-    requestMethod?: RequestMethod): Promise<string> {
+    requestMethod?: RequestMethod): Promise<string|null> {
   let rateLimitUrl = 'https://api.github.com/rate_limit';
   if (requestMethod) {
     return requestMethod(rateLimitUrl, null, oauthToken);
@@ -92,8 +92,11 @@ export async function hasQuota(
     oauthToken?: string,
     requestMethod?: RequestMethod): Promise<boolean> {
   try {
-    let rateLimit = JSON.parse(
-      await requestRateLimit(oauthToken, requestMethod));
+    let requesteRateLimit = await requestRateLimit(oauthToken, requestMethod);
+    if (!requesteRateLimit) {
+      throw new Error('Request encountered an error. Received null, expecting json.')
+    }
+    let rateLimit = JSON.parse(requesteRateLimit);
     if (rateLimit['resources']['core']['remaining'] === 0) {
       if (oauthToken) {
         console.warn('[WARN] No remaining quota for requests to GitHub.');

@@ -19,7 +19,7 @@ describe('cloud_storage_xml', () => {
   describe('convertXmlToVersionList', () => {
     it ('should convert an xml file an object from the xml file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(contents);
-      let versionList = convertXmlToVersionList('foobar');
+      let versionList = convertXmlToVersionList('foobar', '.zip');
       expect(Object.keys(versionList).length).toBe(2);
       expect(versionList['2.0.0']['foobar.zip'].url).toBe('2.0/foobar.zip');
       expect(versionList['2.0.0']['foobar.zip'].size).toBe(10);
@@ -28,7 +28,7 @@ describe('cloud_storage_xml', () => {
     });
 
     it('should return null when the method to read an xml file returns null', () => {
-      let versionList = convertXmlToVersionList('foo');
+      let versionList = convertXmlToVersionList('foo', '.zip');
       expect(versionList).toBeNull();
     });
   });

@@ -177,5 +177,13 @@ export function changeFilePermissions(
  * @param symLink The symbolic link to point to the filename.
  */
 export function symbolicLink(fileName: string, symLink: string) {
-  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
+  console.log(path.resolve(fileName));
+  console.log(path.resolve(symLink));
+  try {
+    fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
+  } catch (err) { 
+    // If the file exists already, remove it and create a new symlink.
+    fs.unlinkSync(path.resolve(symLink));
+    fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
+  }
 }

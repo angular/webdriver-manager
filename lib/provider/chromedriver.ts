@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
 import { Flag } from '../flags';
 import {
   changeFilePermissions,
@@ -45,7 +44,7 @@ export class ChromeDriver {
   async updateBinary(version?: string): Promise<any> {
     await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName));
+      path.resolve(this.outDir, this.fileName), '.zip');
     let versionObj = getVersion(
       versionList, osHelper(this.osType, this.osArch), version);
 

@@ -42,7 +42,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile);
+        let versionList = convertXmlToVersionList(xmlFile, '.zip');
         let versionObj = getVersion(versionList, 'mac');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version);
@@ -65,7 +65,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile);
+        let versionList = convertXmlToVersionList(xmlFile, '.zip');
         let versionObj = getVersion(versionList, 'win32');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version + '.exe');
@@ -88,7 +88,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile);
+        let versionList = convertXmlToVersionList(xmlFile, '.zip');
         let versionObj = getVersion(versionList, 'win32');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version + '.exe');
@@ -111,7 +111,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile);
+        let versionList = convertXmlToVersionList(xmlFile, '.zip');
         let versionObj = getVersion(versionList, 'linux64');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version);

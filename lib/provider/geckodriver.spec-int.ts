@@ -9,10 +9,9 @@ import { checkConnectivity } from '../../spec/support/helpers/test_utils';
 
 describe('geckodriver', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
+  let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   
   describe('class GeckoDriver', () => {
-    let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-
     describe('updateBinary', () => {
       beforeEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
