@@ -1,5 +1,5 @@
 {
-  "name": "webdriver-manager",
+  "name": "webdriver-manager-replacement",
   "version": "0.0.0",
   "description": "not the webdriver-manager cli",
   "main": "dist/lib/index.js",
