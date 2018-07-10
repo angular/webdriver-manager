@@ -1,0 +1,8 @@
+.circleci/
+dist/spec/
+lib/
+spec/
+
+.gitignore
+.npmignore
+tsconfig.json
