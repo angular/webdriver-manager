@@ -7,7 +7,6 @@ jobs:
     steps:
       - checkout
       
-      - run: export IS_CIRCLE=true
       - run: node --version
       - run: npm --version
 
