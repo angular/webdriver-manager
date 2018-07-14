@@ -47,3 +47,13 @@ export class SeleniumServer {
     return Promise.resolve();
   }
 }
+
+export function versionParser(xmlKey: string) {
+  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*.*).jar/g
+  return regex.exec(xmlKey)[1];
+}
+
+export function semanticVersionParser(xmlKey: string) {
+  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*).*/g
+  return regex.exec(xmlKey)[1];
+}

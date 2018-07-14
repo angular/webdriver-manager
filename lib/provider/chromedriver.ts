@@ -103,3 +103,13 @@ export function osHelper(ostype: string, osarch: string): string {
   }
   return null;
 }
+
+export function versionParser(xmlKey: string) {
+  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  return regex.exec(xmlKey)[1];
+}
+
+export function semanticVersionParser(xmlKey: string) {
+  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  return regex.exec(xmlKey)[1] + '.0';
+}
