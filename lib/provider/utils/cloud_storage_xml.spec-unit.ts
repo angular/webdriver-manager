@@ -15,11 +15,30 @@ const contents = `
   </Contents>
 </ListBucketResult>`
 
+export function versionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/foobar.*.zip/g
+  try {
+    return regex.exec(key)[1];
+  } catch (err) {
+    return null;
+  }
+}
+
+export function semanticVersionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/foobar.*.zip/g
+  try {
+    return regex.exec(key)[1] + '.0';
+  } catch (err) {
+    return null;
+  }
+}
+
 describe('cloud_storage_xml', () => {
   describe('convertXmlToVersionList', () => {
     it ('should convert an xml file an object from the xml file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(contents);
-      let versionList = convertXmlToVersionList('foobar', '.zip');
+      let versionList = convertXmlToVersionList('foobar', '.zip',
+        versionParser, semanticVersionParser);
       expect(Object.keys(versionList).length).toBe(2);
       expect(versionList['2.0.0']['foobar.zip'].url).toBe('2.0/foobar.zip');
       expect(versionList['2.0.0']['foobar.zip'].size).toBe(10);
@@ -28,7 +47,8 @@ describe('cloud_storage_xml', () => {
     });
 
     it('should return null when the method to read an xml file returns null', () => {
-      let versionList = convertXmlToVersionList('foo', '.zip');
+      let versionList = convertXmlToVersionList('foo', '.zip',
+        versionParser, semanticVersionParser);
       expect(versionList).toBeNull();
     });
   });

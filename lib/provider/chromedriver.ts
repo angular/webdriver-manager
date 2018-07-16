@@ -44,7 +44,9 @@ export class ChromeDriver {
   async updateBinary(version?: string): Promise<any> {
     await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName), '.zip');
+      path.resolve(this.outDir, this.fileName), '.zip',
+      versionParser,
+      semanticVersionParser);
     let versionObj = getVersion(
       versionList, osHelper(this.osType, this.osArch), version);
 
@@ -104,12 +106,32 @@ export function osHelper(ostype: string, osarch: string): string {
   return null;
 }
 
+/**
+ * Captures the version name which includes the semantic version and extra
+ * metadata. So an example for 12.34/chromedriver_linux64.zip,
+ * the version is 12.34.
+ * @param xmlKey The xml key including the partial url.
+ */
 export function versionParser(xmlKey: string) {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
-  return regex.exec(xmlKey)[1];
+  try {
+    return regex.exec(xmlKey)[1];
+  } catch (err) {
+    return null;
+  }
 }
 
+/**
+ * Captures the version name which includes the semantic version and extra
+ * metadata. So an example for 12.34/chromedriver_linux64.zip,
+ * the version is 12.34.00.
+ * @param xmlKey The xml key including the partial url.
+ */
 export function semanticVersionParser(xmlKey: string) {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
-  return regex.exec(xmlKey)[1] + '.0';
+  try {
+    return regex.exec(xmlKey)[1] + '.0';
+  } catch (err) {
+    return null;
+  }
 }

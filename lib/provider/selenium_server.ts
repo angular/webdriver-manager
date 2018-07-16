@@ -26,7 +26,9 @@ export class SeleniumServer {
   async updateBinary(version?: string): Promise<any> {
     await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName), 'standalone');
+      path.resolve(this.outDir, this.fileName), 'selenium-server-standalone',
+      versionParser,
+      semanticVersionParser);
     let versionObj = getVersion(
       versionList, '', version);
 
@@ -48,12 +50,36 @@ export class SeleniumServer {
   }
 }
 
+/**
+ * Captures the version name which includes the semantic version and extra
+ * metadata. So an example for 12.34/selenium-server-standalone-12.34.56.jar,
+ * the version is 12.34.56. For metadata, 
+ * 12.34/selenium-server-standalone-12.34.56-beta.jar is 12.34.56-beta.
+ * @param xmlKey The xml key including the partial url.
+ */
 export function versionParser(xmlKey: string) {
+  // Capture the version name 12.34.56 or 12.34.56-beta
   let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*.*).jar/g
-  return regex.exec(xmlKey)[1];
+  try {
+    return regex.exec(xmlKey)[1];
+  } catch(_) {
+    return null;
+  }
 }
 
+/**
+ * Captures the version name which includes the semantic version and extra
+ * metadata. So an example for 12.34/selenium-server-standalone-12.34.56.jar,
+ * the version is 12.34.56. For metadata, 
+ * 12.34/selenium-server-standalone-12.34.56-beta.jar is still 12.34.56.
+ * @param xmlKey The xml key including the partial url.
+ */
 export function semanticVersionParser(xmlKey: string) {
-  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*).*/g
-  return regex.exec(xmlKey)[1];
+  // Only capture numbers 12.34.56
+  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*).*.jar/g
+  try {
+    return regex.exec(xmlKey)[1];
+  } catch(_) {
+    return null;
+  }
 }

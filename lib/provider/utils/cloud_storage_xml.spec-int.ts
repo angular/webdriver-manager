@@ -6,6 +6,42 @@ import * as path from 'path';
 import { convertXmlToVersionList, updateXml } from './cloud_storage_xml';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
 
+function foobarVersionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/foobar.zip/g
+  try {
+    return regex.exec(key)[1];
+  } catch(_) {
+    return null;
+  }
+}
+
+function foobarSemanticVersionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/foobar.zip/g
+  try {
+    return regex.exec(key)[1] + '.0';
+  } catch(_) {
+    return null;
+  }
+}
+
+function chromedriverVersionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  try {
+    return regex.exec(key)[1];
+  } catch(_) {
+    return null;
+  }
+}
+
+function chromedriverSemanticVersionParser(key: string): string {
+  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  try {
+    return regex.exec(key)[1] + '.0';
+  } catch(_) {
+    return null;
+  }
+}
+
 describe('cloud_storage_xml', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
   let proc: childProcess.ChildProcess;
@@ -54,7 +90,7 @@ describe('cloud_storage_xml', () => {
           expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
             .toBe('2.0/foobar.zip');
           done();
-        }).catch(err => {
+        }).catch(_ => {
           done.fail('thrown error from update xml');
         });
       }
@@ -78,7 +114,7 @@ describe('cloud_storage_xml', () => {
           expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
             .toBe('2.0/foobar.zip');
           done();
-        }).catch(err => {
+        }).catch(_ => {
           done.fail('thrown error from update xml');
         });
       } catch (err) {
@@ -116,7 +152,8 @@ describe('cloud_storage_xml', () => {
     const fileName = 'spec/support/files/chromedriver.xml';
     
     it('should convert an xml file an object from the xml file', () => {
-      let versionList = convertXmlToVersionList(fileName, '.zip');
+      let versionList = convertXmlToVersionList(fileName, '.zip',
+        chromedriverVersionParser, chromedriverSemanticVersionParser);
       expect(Object.keys(versionList).length).toBe(3);
       expect(versionList['2.0.0']).toBeTruthy();
       expect(versionList['2.10.0']).toBeTruthy();
@@ -131,7 +168,8 @@ describe('cloud_storage_xml', () => {
 
     it('should return a null value if the file does not exist', () => {
       let versionList = convertXmlToVersionList(
-        'spec/support/files/does_not_exist.xml', '.zip');
+        'spec/support/files/does_not_exist.xml', '.zip',
+        chromedriverVersionParser, chromedriverSemanticVersionParser);
       expect(versionList).toBeNull();
     });
   });

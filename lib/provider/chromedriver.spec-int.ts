@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import { ChromeDriver } from './chromedriver';
+import {
+  ChromeDriver,
+  semanticVersionParser,
+  versionParser
+} from './chromedriver';
 import { convertXmlToVersionList } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 import { checkConnectivity } from '../../spec/support/helpers/test_utils';
@@ -42,7 +46,8 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip');
+        let versionList = convertXmlToVersionList(xmlFile, '.zip', 
+          versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'mac');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version);
@@ -65,7 +70,8 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip');
+        let versionList = convertXmlToVersionList(xmlFile, '.zip',
+          versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'win32');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version + '.exe');
@@ -88,7 +94,8 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip');
+        let versionList = convertXmlToVersionList(xmlFile, '.zip',
+          versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'win32');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version + '.exe');
@@ -111,7 +118,8 @@ describe('chromedriver', () => {
         expect(fs.statSync(symLink).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip');
+        let versionList = convertXmlToVersionList(xmlFile, '.zip',
+          versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'linux64');
         let executableFile = path.resolve(tmpDir,
           'chromedriver_' + versionObj.version);

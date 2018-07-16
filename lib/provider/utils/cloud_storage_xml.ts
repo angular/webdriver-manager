@@ -37,7 +37,9 @@ export async function updateXml(
  */
 export function convertXmlToVersionList(
     fileName: string,
-    matchFile: string): VersionList|null {
+    matchFile: string,
+    versionParser: (key: string) => string|null,
+    semanticVersionParser: (key: string) => string): VersionList|null {
   let xmlJs = readXml(fileName);
   if (!xmlJs) {
     return null;
@@ -46,22 +48,24 @@ export function convertXmlToVersionList(
   for (let content of xmlJs['ListBucketResult']['Contents']) {
     let key = content['Key'][0] as string;
     if (key.includes(matchFile)) {
-      let version = key.split('/')[0];
-      let forcedVersion = version + '.0';
-      if (!semver.valid(forcedVersion)) {
-        continue;
+      let version = versionParser(key);
+      if (version) {
+        let semanticVersion = semanticVersionParser(key);
+        if (!semver.valid(semanticVersion)) {
+          continue;
+        }
+        let name = key.split('/')[1];
+        let size = +content['Size'][0];
+        if (!versionList[semanticVersion]) {
+          versionList[semanticVersion] = {};
+        }
+        versionList[semanticVersion][name] = {
+          name: name,
+          size: size,
+          url: key,
+          version: version
+        };
       }
-      let name = key.split('/')[1];
-      let size = +content['Size'][0];
-      if (!versionList[forcedVersion]) {
-        versionList[forcedVersion] = {};
-      }
-      versionList[forcedVersion][name] = {
-        name: name,
-        size: size,
-        url: key,
-        version: version
-      };
     }
   }
   return versionList;

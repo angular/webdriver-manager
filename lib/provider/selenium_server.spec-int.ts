@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import { SeleniumServer } from './selenium_server';
+import {
+  SeleniumServer,
+  semanticVersionParser,
+  versionParser
+} from './selenium_server';
 import { convertXmlToVersionList } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 import { checkConnectivity } from '../../spec/support/helpers/test_utils';
@@ -39,10 +43,11 @@ describe('selenium_server', () => {
       expect(fs.statSync(symLink).size).toBeTruthy();
       expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-      let versionList = convertXmlToVersionList(xmlFile, 'standalone');
+      let versionList = convertXmlToVersionList(xmlFile,
+        'selenium-server-standalone', versionParser, semanticVersionParser);
       let versionObj = getVersion(versionList, '');
       let executableFile = path.resolve(tmpDir,
-        'selenium-server-standalone-' + versionObj.version + '.0.jar');
+        'selenium-server-standalone-' + versionObj.version + '.jar');
       expect(fs.statSync(executableFile).size).toBeTruthy();
       done();
     });
