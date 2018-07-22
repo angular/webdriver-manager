@@ -1,13 +1,13 @@
 {
   "name": "webdriver-manager-replacement",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "not the webdriver-manager cli",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "scripts": {
     "http-server": "tsc && node dist/spec/server/http_server.js",
     "jasmine": "jasmine",
-    "prepublish": "tsc",
+    "prepare": "tsc",
     "test": "tsc && npm run test-unit && npm run test-int",
     "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-int.json",
     "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",
