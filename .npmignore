@@ -1,6 +1,6 @@
 .circleci/
 dist/spec/
-dist/*.spec-*
+dist/**/*.spec-*
 lib/
 spec/
 
