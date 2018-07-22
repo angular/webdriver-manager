@@ -177,8 +177,17 @@ export function changeFilePermissions(
  * @param symLink The symbolic link to point to the filename.
  */
 export function symbolicLink(fileName: string, symLink: string) {
-  console.log(path.resolve(fileName));
-  console.log(path.resolve(symLink));
+  console.log('add symbolic link: ' + path.resolve(symLink));
+  console.log('for: ' + path.resolve(fileName));
+  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
+}
+
+/**
+ * Remove the symbolic link to the file name.
+ * @param symLink The symbolic link that points to the filename.
+ */
+export function removeSymbolicLink(symLink: string) {
+  console.log('unlink: ' + path.resolve(symLink));
   try {
     // Remove the symbolic link.
     if (fs.statSync(path.resolve(symLink)).isSymbolicLink()) {
@@ -187,5 +196,4 @@ export function symbolicLink(fileName: string, symLink: string) {
   } catch (err) {
     // Do nothing if we can't unlink it.
   }
-  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
 }

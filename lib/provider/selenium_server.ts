@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {
-  symbolicLink,
+  symbolicLink, removeSymbolicLink,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
@@ -42,10 +42,11 @@ export class SeleniumServer {
     try {
       size = fs.statSync(seleniumServerJar).size;
     } catch (err) {}
+    let seleniumServerJarSymLink = path.resolve(
+      this.outDir, 'selenium-server-standalone.jar');
+    removeSymbolicLink(seleniumServerJarSymLink);
     await requestBinary(seleniumServerUrl, seleniumServerJar, size);
-
-    symbolicLink(seleniumServerJar,
-      path.resolve(this.outDir, 'selenium-server-standalone.jar'));
+    symbolicLink(seleniumServerJar, seleniumServerJarSymLink);
     return Promise.resolve();
   }
 }

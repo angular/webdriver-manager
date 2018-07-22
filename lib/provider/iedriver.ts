@@ -1,29 +1,18 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { Flag } from '../flags';
+import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import {
-  changeFilePermissions,
   renameFileWithVersion,
+  removeSymbolicLink,
   symbolicLink,
   unzipFile,
-  zipFileList,
-  removeSymbolicLink
+  zipFileList
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
-import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
-
-export const CHROME_VERSION: Flag = {
-  flagName: 'versions.chrome',
-  type: 'string',
-  description: 'Optional chrome driver version (use \'latest\' ' +
-    'to get the most recent version)',
-  default: 'latest'
-};
-
-export class ChromeDriver {
+export class IEDriver {
   requestUrl: string;
   outDir: string;
   fileName: string;
@@ -31,8 +20,8 @@ export class ChromeDriver {
   osArch: string;
 
   constructor() {
-    this.requestUrl = 'https://chromedriver.storage.googleapis.com/';
-    this.fileName = 'chromedriver.xml'
+    this.requestUrl = 'https://selenium-release.storage.googleapis.com/';
+    this.fileName = 'iedriver.xml'
     this.osType = os.type();
     this.osArch = os.arch();
     this.outDir = path.resolve('.');
@@ -68,19 +57,14 @@ export class ChromeDriver {
     // permissions.
     let fileList = zipFileList(chromeDriverZip);
     let fileItem = path.resolve(this.outDir, fileList[0]);
+
     removeSymbolicLink(fileItem);
     unzipFile(chromeDriverZip, this.outDir);
     let renamedFilename = renameFileWithVersion(
       fileItem, '_' + versionObj.version);
-
-    changeFilePermissions(renamedFilename, '0755', this.osType);
     symbolicLink(renamedFilename, fileItem);
     return Promise.resolve();
   }
-
-  // TODO(cnishina): A list of chromedriver versions downloaded
-
-  // TODO(cnishina): Remove files downloaded
 }
 
 /**
@@ -91,20 +75,12 @@ export class ChromeDriver {
  * @returns The download name associated with composing the download link. 
  */
 export function osHelper(ostype: string, osarch: string): string {
-  if (ostype === 'Darwin') {
-    return 'mac';
-  } else if (ostype === 'Windows_NT') {
+  if (ostype === 'Windows_NT') {
     if (osarch === 'x64')  {
-      return 'win32';
+      return 'Win32';
     }
     else if (osarch === 'x32') {
-      return 'win32';
-    }
-  } else if (ostype == 'Linux') {
-    if (osarch === 'x64') {
-      return 'linux64';
-    } else if (osarch === 'x32') {
-      return null;
+      return 'Win32';
     }
   }
   return null;
@@ -112,30 +88,30 @@ export function osHelper(ostype: string, osarch: string): string {
 
 /**
  * Captures the version name which includes the semantic version and extra
- * metadata. So an example for 12.34/chromedriver_linux64.zip,
- * the version is 12.34.
+ * metadata. So an example for 12.34/IEDriverServer_win32_12.34.56.zip,
+ * the version is 12.34.56.
  * @param xmlKey The xml key including the partial url.
  */
 export function versionParser(xmlKey: string) {
-  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  let regex = /.*\/IEDriverServer_[a-zA-Z0-9]*_([0-9]*.[0-9]*.[0-9]*).zip/g
   try {
     return regex.exec(xmlKey)[1];
-  } catch (err) {
+  } catch(_) {
     return null;
   }
 }
 
 /**
- * Captures the version name which includes the semantic version and extra
- * metadata. So an example for 12.34/chromedriver_linux64.zip,
- * the version is 12.34.00.
+ * Captures the semantic version name which includes the semantic version and
+ * extra metadata. So an example for 12.34/IEDriverServer_win32_12.34.56.zip,
+ * the version is 12.34.56.
  * @param xmlKey The xml key including the partial url.
  */
 export function semanticVersionParser(xmlKey: string) {
-  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  let regex = /.*\/IEDriverServer_[a-zA-Z0-9]*_([0-9]*.[0-9]*.[0-9]*).zip/g
   try {
-    return regex.exec(xmlKey)[1] + '.0';
-  } catch (err) {
+    return regex.exec(xmlKey)[1];
+  } catch(_) {
     return null;
   }
 }

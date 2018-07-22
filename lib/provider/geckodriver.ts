@@ -6,7 +6,10 @@ import {
   renameFileWithVersion,
   symbolicLink,
   uncompressTarball,
-  unzipFile
+  unzipFile,
+  tarFileList,
+  zipFileList,
+  removeSymbolicLink
 } from './utils/file_utils';
 import { convertJsonToVersionList, updateJson } from './utils/github_json';
 import { requestBinary } from './utils/http_utils';
@@ -56,13 +59,20 @@ export class GeckoDriver {
     // Uncompress tarball (for linux and mac) or unzip the file for Windows.
     // Rename all the files (a grand total of 1) and set the permissions.
     let fileList: string[];
-    let fileItem: string;
     if (this.osType === 'Windows_NT') {
-      fileList = unzipFile(geckoDriverCompressed, this.outDir);
+      fileList = zipFileList(geckoDriverCompressed);
     } else {
-      fileList = await uncompressTarball(geckoDriverCompressed, this.outDir);
+      fileList = await tarFileList(geckoDriverCompressed);
     }
-    fileItem = fileList[0];
+    let fileItem = path.resolve(this.outDir, fileList[0]);
+    removeSymbolicLink(fileItem);
+
+    if (this.osType === 'Windows_NT') {
+      unzipFile(geckoDriverCompressed, this.outDir);
+    } else {
+      await uncompressTarball(geckoDriverCompressed, this.outDir);
+    }
+    
     let renamedFilename = renameFileWithVersion(
       fileItem, '_' + versionObj.version);
 
