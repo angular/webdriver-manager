@@ -171,6 +171,8 @@ export function changeFilePermissions(
   }
 }
 
+
+// TODO(cnishina): deprecate / remove.
 /**
  * Create a symbolic link to the file name.
  * @param fileName The full path to the filename.
@@ -182,6 +184,7 @@ export function symbolicLink(fileName: string, symLink: string) {
   fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
 }
 
+// TODO(cnishina): deprecate / remove.
 /**
  * Remove the symbolic link to the file name.
  * @param symLink The symbolic link that points to the filename.
@@ -196,4 +199,42 @@ export function removeSymbolicLink(symLink: string) {
   } catch (err) {
     // Do nothing if we can't unlink it.
   }
+}
+
+/**
+ * Writes a config file that matches the regex pattern.
+ * @param outDir The output directory.
+ * @param fileName The full path to the file name.
+ * @param fileBinaryPathRegex The regExp to match files in the outDir.
+ * @param lastFileBinaryPath The full path to the last binary file downloaded.
+ */
+export function generateConfigFile(
+    outDir: string,
+    fileName: string,
+    fileBinaryPathRegex: RegExp,
+    lastFileBinaryPath?: string) {
+  let configData: JsonObject = {};
+  if (lastFileBinaryPath) {
+    configData['last'] = lastFileBinaryPath;
+  }
+  configData['all'] = getMatchingFiles(outDir, fileBinaryPathRegex);
+  fs.writeFileSync(fileName, JSON.stringify(configData));
+}
+
+/**
+ * Gets matching files form the outDir and returns it as an array.
+ * @param outDir The output directory.
+ * @param fileBinaryPathRegex The regExp to match files in the outDir.
+ */
+export function getMatchingFiles(
+    outDir: string,
+    fileBinaryPathRegex: RegExp): string[] {
+  let existFiles = fs.readdirSync(outDir);
+  let matchingFiles: string[] = [];
+  for (let existFile of existFiles) {
+    if (existFile.match(fileBinaryPathRegex)) {
+      matchingFiles.push(path.resolve(outDir, existFile));
+    }
+  }
+  return matchingFiles;
 }

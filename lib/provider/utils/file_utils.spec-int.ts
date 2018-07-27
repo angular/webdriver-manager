@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import {
+  generateConfigFile,
   tarFileList,
   uncompressTarball,
   unzipFile,
@@ -96,6 +97,50 @@ describe('file_utils', () => {
       expect(zipFiles.length).toBe(1);
       expect(zipFiles[0]).toBe(unzipBar);
       expect(fs.statSync(unzipBar).size).toBe(30);
+    });
+  });
+
+  describe('generateConfigFile', () => {
+    let tmpDir: string;
+    
+    beforeAll(() => {
+      tmpDir = path.resolve(os.tmpdir(), 'test');
+      try {
+        fs.mkdirSync(tmpDir)
+      } catch(err) {}
+    });
+
+    afterAll(() => {
+      rimraf.sync(tmpDir);
+    });
+
+    it('should write the file', () => {
+      // Creates empty files in the temp directory.
+      [
+        'foo.zip',
+        'foo_.zip',
+        'foo_12.2',
+        'foo_12.4',
+        'foo.xml',
+        'foo_.xml',
+        'bar.tar.gz',
+        'bar_10.1.1',
+        'bar_10.1.2',
+        'bar.json',
+      ].forEach(fileName => {
+        fs.closeSync(fs.openSync(path.resolve(tmpDir, fileName), 'w'));
+      });
+      let tmpFile = path.resolve(tmpDir, 'foobar.config.json');
+      let lastBinary = path.resolve(tmpDir, 'foo_12.4');
+
+      let fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
+      generateConfigFile(tmpDir, tmpFile, fileBinaryPathRegex, lastBinary);
+
+      let contents = fs.readFileSync(tmpFile).toString();
+      console.log(contents);
+      let jsonContents = JSON.parse(contents);
+      expect(jsonContents['last']).toBe(lastBinary);
+      expect(jsonContents['all'].length).toBe(2);
     });
   });
 });

@@ -1,5 +1,10 @@
 import * as fs from 'fs';
-import { convertXml2js, isExpired, readJson, readXml } from './file_utils';
+import {
+  convertXml2js,
+  isExpired,
+  getMatchingFiles,
+  readJson,
+  readXml} from './file_utils';
 import { JsonObject } from './http_utils';
 
 const xmlContents = `
@@ -112,6 +117,28 @@ describe('file_utils', () => {
     it('should get null if reading the file fails', () => {
       let jsoNContent = readJson('foobar');
       expect(jsoNContent).toBeNull();
+    });
+  });
+
+  describe('getMatchingFiles', () => {
+    it('should find a set of matching files', () => {
+      let existingFiles = [
+        'foo.zip',
+        'foo_.zip',
+        'foo_12.2',
+        'foo_12.4',
+        'foo.xml',
+        'foo_.xml',
+        'bar.tar.gz',
+        'bar_10.1.1',
+        'bar_10.1.2',
+        'bar.json',
+      ];
+      let fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
+      spyOn(fs, 'readdirSync').and.returnValue(existingFiles);
+      let matchedFiles = getMatchingFiles('/path/to', fileBinaryPathRegex);
+      expect(matchedFiles[0]).toContain('foo_12.2');
+      expect(matchedFiles[1]).toContain('foo_12.4');
     });
   });
 });
