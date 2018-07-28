@@ -4,10 +4,9 @@ import * as path from 'path';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import {
   renameFileWithVersion,
-  removeSymbolicLink,
-  symbolicLink,
   unzipFile,
-  zipFileList
+  zipFileList,
+  generateConfigFile,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
@@ -15,13 +14,15 @@ import { getVersion } from './utils/version_list';
 export class IEDriver {
   requestUrl: string;
   outDir: string;
-  fileName: string;
+  cacheFileName: string;
+  configFileName: string;
   osType: string;
   osArch: string;
 
   constructor() {
     this.requestUrl = 'https://selenium-release.storage.googleapis.com/';
-    this.fileName = 'iedriver.xml'
+    this.cacheFileName = 'iedriver.xml';
+    this.configFileName = 'iedriver.config.json';
     this.osType = os.type();
     this.osArch = os.arch();
     this.outDir = path.resolve('.');
@@ -33,9 +34,9 @@ export class IEDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
+    await updateXml(this.requestUrl, path.resolve(this.outDir, this.cacheFileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName), '.zip',
+      path.resolve(this.outDir, this.cacheFileName), '.zip',
       versionParser,
       semanticVersionParser);
     let versionObj = getVersion(
@@ -58,11 +59,12 @@ export class IEDriver {
     let fileList = zipFileList(chromeDriverZip);
     let fileItem = path.resolve(this.outDir, fileList[0]);
 
-    removeSymbolicLink(fileItem);
     unzipFile(chromeDriverZip, this.outDir);
-    let renamedFilename = renameFileWithVersion(
+    let renamedFileName = renameFileWithVersion(
       fileItem, '_' + versionObj.version);
-    symbolicLink(renamedFilename, fileItem);
+    generateConfigFile(this.outDir,
+      path.resolve(this.outDir, this.configFileName),
+      matchBinaries(this.osType), renamedFileName);
     return Promise.resolve();
   }
 }
@@ -114,4 +116,15 @@ export function semanticVersionParser(xmlKey: string) {
   } catch(_) {
     return null;
   }
+}
+
+/**
+ * Matches the installed binaries depending on the operating system.
+ * @param ostype The operating stystem type.
+ */
+export function matchBinaries(ostype: string): RegExp | null {
+  if (ostype === 'Windows_NT') {
+    return /IEDriverServer_\d+.\d+.\d+.exe/g
+  }
+  return null;
 }

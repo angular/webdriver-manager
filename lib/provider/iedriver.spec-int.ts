@@ -31,7 +31,7 @@ describe('iedriver', () => {
     });
 
     it('should download the file', async(done) => {
-      if (!await checkConnectivity('update binary for mac test')) {
+      if (!await checkConnectivity('update binary for windows test')) {
         done();
       }
       let ieDriver = new IEDriver();
@@ -40,9 +40,9 @@ describe('iedriver', () => {
       ieDriver.osArch = 'x64';
       await ieDriver.updateBinary();
 
-      // let symLink = path.resolve(tmpDir, 'IEDriverServer.exe');
+      let configFile = path.resolve(tmpDir, 'iedriver.config.json');
       let xmlFile = path.resolve(tmpDir, 'iedriver.xml');
-      // expect(fs.statSync(symLink).size).toBeTruthy();
+      expect(fs.statSync(configFile).size).toBeTruthy();
       expect(fs.statSync(xmlFile).size).toBeTruthy();
 
       let versionList = convertXmlToVersionList(xmlFile,

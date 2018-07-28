@@ -171,36 +171,6 @@ export function changeFilePermissions(
   }
 }
 
-
-// TODO(cnishina): deprecate / remove.
-/**
- * Create a symbolic link to the file name.
- * @param fileName The full path to the filename.
- * @param symLink The symbolic link to point to the filename.
- */
-export function symbolicLink(fileName: string, symLink: string) {
-  console.log('add symbolic link: ' + path.resolve(symLink));
-  console.log('for: ' + path.resolve(fileName));
-  fs.symlinkSync(path.resolve(fileName), path.resolve(symLink));
-}
-
-// TODO(cnishina): deprecate / remove.
-/**
- * Remove the symbolic link to the file name.
- * @param symLink The symbolic link that points to the filename.
- */
-export function removeSymbolicLink(symLink: string) {
-  console.log('unlink: ' + path.resolve(symLink));
-  try {
-    // Remove the symbolic link.
-    if (fs.statSync(path.resolve(symLink)).isSymbolicLink()) {
-      fs.unlinkSync(path.resolve(symLink));
-    }
-  } catch (err) {
-    // Do nothing if we can't unlink it.
-  }
-}
-
 /**
  * Writes a config file that matches the regex pattern.
  * @param outDir The output directory.

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {
-  symbolicLink, removeSymbolicLink,
+  generateConfigFile,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
@@ -10,11 +10,13 @@ import { getVersion } from './utils/version_list';
 export class SeleniumServer {
   requestUrl: string;
   outDir: string;
-  fileName: string;
+  cacheFileName: string;
+  configFileName: string;
 
   constructor() {
     this.requestUrl = 'https://selenium-release.storage.googleapis.com/';
-    this.fileName = 'selenium-server.xml'
+    this.cacheFileName = 'selenium-server.xml';
+    this.configFileName = 'selenium-server.config.json';
     this.outDir = path.resolve('.');
   }
 
@@ -24,9 +26,9 @@ export class SeleniumServer {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
+    await updateXml(this.requestUrl, path.resolve(this.outDir, this.cacheFileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName), 'selenium-server-standalone',
+      path.resolve(this.outDir, this.cacheFileName), 'selenium-server-standalone',
       versionParser,
       semanticVersionParser);
     let versionObj = getVersion(
@@ -42,11 +44,10 @@ export class SeleniumServer {
     try {
       size = fs.statSync(seleniumServerJar).size;
     } catch (err) {}
-    let seleniumServerJarSymLink = path.resolve(
-      this.outDir, 'selenium-server-standalone.jar');
-    removeSymbolicLink(seleniumServerJarSymLink);
     await requestBinary(seleniumServerUrl, seleniumServerJar, size);
-    symbolicLink(seleniumServerJar, seleniumServerJarSymLink);
+    generateConfigFile(this.outDir,
+      path.resolve(this.outDir, this.configFileName),
+      matchBinaries(), seleniumServerJar);
     return Promise.resolve();
   }
 }
@@ -60,7 +61,7 @@ export class SeleniumServer {
  */
 export function versionParser(xmlKey: string) {
   // Capture the version name 12.34.56 or 12.34.56-beta
-  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*.*).jar/g
+  let regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g
   try {
     return regex.exec(xmlKey)[1];
   } catch(_) {
@@ -77,10 +78,17 @@ export function versionParser(xmlKey: string) {
  */
 export function semanticVersionParser(xmlKey: string) {
   // Only capture numbers 12.34.56
-  let regex = /.*selenium-server-standalone-([0-9]*.[0-9]*.[0-9]*).*.jar/g
+  let regex = /.*selenium-server-standalone-(\d+.\d+.\d+).*.jar/g
   try {
     return regex.exec(xmlKey)[1];
   } catch(_) {
     return null;
   }
+}
+
+/**
+ * Matches the installed binaries.
+ */
+export function matchBinaries(): RegExp | null {
+  return /selenium-server-standalone-\d+.\d+.\d+.*.jar/g;
 }

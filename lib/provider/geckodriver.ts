@@ -3,13 +3,12 @@ import * as os from 'os';
 import * as path from 'path';
 import {
   changeFilePermissions,
+  generateConfigFile,
   renameFileWithVersion,
-  symbolicLink,
   uncompressTarball,
   unzipFile,
   tarFileList,
   zipFileList,
-  removeSymbolicLink
 } from './utils/file_utils';
 import { convertJsonToVersionList, updateJson } from './utils/github_json';
 import { requestBinary } from './utils/http_utils';
@@ -18,14 +17,16 @@ import { getVersion } from './utils/version_list';
 export class GeckoDriver {
   requestUrl: string;
   outDir: string;
-  fileName: string;
+  cacheFileName: string;
+  configFileName: string;
   osType: string;
   osArch: string;
   oauthToken: string;
 
   constructor() {
     this.requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
-    this.fileName = 'geckodriver.json'
+    this.cacheFileName = 'geckodriver.json';
+    this.configFileName = 'geckodriver.config.json';
     this.osType = os.type();
     this.osArch = os.arch();
     this.outDir = path.resolve('.');
@@ -37,10 +38,10 @@ export class GeckoDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateJson(this.requestUrl, path.resolve(this.outDir, this.fileName),
+    await updateJson(this.requestUrl, path.resolve(this.outDir, this.cacheFileName),
       this.oauthToken);
     let versionList = convertJsonToVersionList(
-      path.resolve(this.outDir, this.fileName));
+      path.resolve(this.outDir, this.cacheFileName));
     let versionObj = getVersion(
       versionList, osHelper(this.osType, this.osArch), version);
 
@@ -65,7 +66,6 @@ export class GeckoDriver {
       fileList = await tarFileList(geckoDriverCompressed);
     }
     let fileItem = path.resolve(this.outDir, fileList[0]);
-    removeSymbolicLink(fileItem);
 
     if (this.osType === 'Windows_NT') {
       unzipFile(geckoDriverCompressed, this.outDir);
@@ -73,11 +73,13 @@ export class GeckoDriver {
       await uncompressTarball(geckoDriverCompressed, this.outDir);
     }
     
-    let renamedFilename = renameFileWithVersion(
+    let renamedFileName = renameFileWithVersion(
       fileItem, '_' + versionObj.version);
 
-    changeFilePermissions(renamedFilename, '0755', this.osType);
-    symbolicLink(renamedFilename, fileItem);
+    changeFilePermissions(renamedFileName, '0755', this.osType);
+    generateConfigFile(this.outDir,
+      path.resolve(this.outDir, this.configFileName),
+      matchBinaries(this.osType), renamedFileName);
     return Promise.resolve();
   }
 }
@@ -95,8 +97,7 @@ export function osHelper(ostype: string, osarch: string): string {
   } else if (ostype === 'Windows_NT') {
     if (osarch === 'x64')  {
       return 'win64';
-    }
-    else if (osarch === 'x32') {
+    } else if (osarch === 'x32') {
       return 'win32';
     }
   } else if (ostype == 'Linux') {
@@ -105,6 +106,19 @@ export function osHelper(ostype: string, osarch: string): string {
     } else if (osarch === 'x32') {
       return 'linux32';
     }
+  }
+  return null;
+}
+
+/**
+ * Matches the installed binaries depending on the operating system.
+ * @param ostype The operating stystem type.
+ */
+export function matchBinaries(ostype: string): RegExp | null {
+  if (ostype === 'Darwin' || ostype == 'Linux') {
+    return /geckodriver_\d+.\d+.\d+/g
+  } else if (ostype === 'Windows_NT') {
+    return /geckodriver_\d+.\d+.\d+.exe/g
   }
   return null;
 }

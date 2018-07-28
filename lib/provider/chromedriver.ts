@@ -5,10 +5,9 @@ import { Flag } from '../flags';
 import {
   changeFilePermissions,
   renameFileWithVersion,
-  symbolicLink,
   unzipFile,
   zipFileList,
-  removeSymbolicLink
+  generateConfigFile,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
@@ -26,13 +25,15 @@ export const CHROME_VERSION: Flag = {
 export class ChromeDriver {
   requestUrl: string;
   outDir: string;
-  fileName: string;
+  cacheFileName: string;
+  configFileName: string;
   osType: string;
   osArch: string;
 
   constructor() {
     this.requestUrl = 'https://chromedriver.storage.googleapis.com/';
-    this.fileName = 'chromedriver.xml'
+    this.cacheFileName = 'chromedriver.xml'
+    this.configFileName = 'chromedriver.config.json';
     this.osType = os.type();
     this.osArch = os.arch();
     this.outDir = path.resolve('.');
@@ -44,9 +45,9 @@ export class ChromeDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl, path.resolve(this.outDir, this.fileName));
+    await updateXml(this.requestUrl, path.resolve(this.outDir, this.cacheFileName));
     let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.fileName), '.zip',
+      path.resolve(this.outDir, this.cacheFileName), '.zip',
       versionParser,
       semanticVersionParser);
     let versionObj = getVersion(
@@ -68,13 +69,14 @@ export class ChromeDriver {
     // permissions.
     let fileList = zipFileList(chromeDriverZip);
     let fileItem = path.resolve(this.outDir, fileList[0]);
-    removeSymbolicLink(fileItem);
     unzipFile(chromeDriverZip, this.outDir);
-    let renamedFilename = renameFileWithVersion(
+    let renamedFileName = renameFileWithVersion(
       fileItem, '_' + versionObj.version);
+    changeFilePermissions(renamedFileName, '0755', this.osType);
 
-    changeFilePermissions(renamedFilename, '0755', this.osType);
-    symbolicLink(renamedFilename, fileItem);
+    generateConfigFile(this.outDir,
+      path.resolve(this.outDir, this.configFileName),
+      matchBinaries(this.osType), renamedFileName);
     return Promise.resolve();
   }
 
@@ -138,4 +140,17 @@ export function semanticVersionParser(xmlKey: string) {
   } catch (err) {
     return null;
   }
+}
+
+/**
+ * Matches the installed binaries depending on the operating system.
+ * @param ostype The operating stystem type.
+ */
+export function matchBinaries(ostype: string): RegExp | null {
+  if (ostype === 'Darwin' || ostype == 'Linux') {
+    return /chromedriver_\d+.\d+/g
+  } else if (ostype === 'Windows_NT') {
+    return /chromedriver_\d+.\d+.exe/g
+  }
+  return null;
 }

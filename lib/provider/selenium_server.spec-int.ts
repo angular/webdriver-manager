@@ -38,9 +38,9 @@ describe('selenium_server', () => {
       seleniumServer.outDir = tmpDir;
       await seleniumServer.updateBinary();
 
-      let symLink = path.resolve(tmpDir, 'selenium-server-standalone.jar');
+      let configFile = path.resolve(tmpDir, 'selenium-server.config.json');
       let xmlFile = path.resolve(tmpDir, 'selenium-server.xml');
-      expect(fs.statSync(symLink).size).toBeTruthy();
+      expect(fs.statSync(configFile).size).toBeTruthy();
       expect(fs.statSync(xmlFile).size).toBeTruthy();
 
       let versionList = convertXmlToVersionList(xmlFile,

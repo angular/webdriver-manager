@@ -36,9 +36,9 @@ describe('geckodriver', () => {
         geckodriver.osType = 'Darwin';
         await geckodriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'geckodriver');
+        let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
         let jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(jsonFile).size).toBeTruthy();
 
         let versionList = convertJsonToVersionList(jsonFile);
@@ -59,9 +59,9 @@ describe('geckodriver', () => {
         geckodriver.osArch = 'x64';
         await geckodriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'geckodriver.exe');
+        let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
         let jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(jsonFile).size).toBeTruthy();
 
         let versionList = convertJsonToVersionList(jsonFile);
@@ -82,9 +82,9 @@ describe('geckodriver', () => {
         geckodriver.osArch = 'x32';
         await geckodriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'geckodriver.exe');
+        let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
         let jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(jsonFile).size).toBeTruthy();
 
         let versionList = convertJsonToVersionList(jsonFile);
@@ -105,9 +105,9 @@ describe('geckodriver', () => {
         geckodriver.osArch = 'x64';
         await geckodriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'geckodriver');
+        let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
         let jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(jsonFile).size).toBeTruthy();
 
         let versionList = convertJsonToVersionList(jsonFile);
@@ -128,9 +128,9 @@ describe('geckodriver', () => {
         geckodriver.osArch = 'x32';
         await geckodriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'geckodriver');
+        let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
         let jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(jsonFile).size).toBeTruthy();
 
         let versionList = convertJsonToVersionList(jsonFile);

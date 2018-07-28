@@ -41,9 +41,9 @@ describe('chromedriver', () => {
         chromedriver.osType = 'Darwin';
         await chromedriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'chromedriver');
+        let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
         let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
         let versionList = convertXmlToVersionList(xmlFile, '.zip', 
@@ -65,9 +65,9 @@ describe('chromedriver', () => {
         chromedriver.osArch = 'x64'
         await chromedriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'chromedriver.exe');
+        let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
         let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
         let versionList = convertXmlToVersionList(xmlFile, '.zip',
@@ -89,9 +89,9 @@ describe('chromedriver', () => {
         chromedriver.osArch = 'x32'
         await chromedriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'chromedriver.exe');
+        let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
         let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
         let versionList = convertXmlToVersionList(xmlFile, '.zip',
@@ -113,9 +113,9 @@ describe('chromedriver', () => {
         chromedriver.osArch = 'x64'
         await chromedriver.updateBinary();
 
-        let symLink = path.resolve(tmpDir, 'chromedriver');
+        let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
         let xmlFile = path.resolve(tmpDir, 'chromedriver.xml');
-        expect(fs.statSync(symLink).size).toBeTruthy();
+        expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
         let versionList = convertXmlToVersionList(xmlFile, '.zip',
