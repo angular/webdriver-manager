@@ -8,8 +8,10 @@
     "http-server": "tsc && node dist/spec/server/http_server.js",
     "jasmine": "jasmine",
     "prepare": "tsc",
+    "proxy-server": "tsc && node dist/spec/server/proxy_server.js",
     "test": "tsc && npm run test-unit && npm run test-int",
     "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-int.json",
+    "test-proxy": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-proxy.json",
     "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",
     "tsc": "tsc"
   },
@@ -32,6 +34,7 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.31",
+    "@types/http-proxy": "^1.16.2",
     "@types/jasmine": "^2.8.8",
     "@types/node": "^10.3.3",
     "@types/request": "^2.47.0",
@@ -39,6 +42,7 @@
     "@types/semver": "^5.5.0",
     "@types/tar": "^4.0.0",
     "@types/xml2js": "^0.4.3",
+    "http-proxy": "^1.17.0",
     "jasmine": "^3.1.0",
     "rimraf": "^2.6.2",
     "typescript": "^2.9.2"

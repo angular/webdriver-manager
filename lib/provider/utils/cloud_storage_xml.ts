@@ -17,7 +17,7 @@ export async function updateXml(
     fileName: string): Promise<JsonObject> {
 
   if (isExpired(fileName)) {
-    let contents = await requestBody(xmlUrl, fileName);
+    let contents = await requestBody(xmlUrl, null, fileName);
     let dir = path.dirname(fileName);
     try {
       fs.mkdirSync(dir);

@@ -80,7 +80,7 @@ export function requestGitHubJson(
     let token = process.env['GITHUB_TOKEN'] || process.env['github_token'];
     headers['Authorization'] = 'token ' + token;
   }
-  return requestBody(jsonUrl, fileName, headers);
+  return requestBody(jsonUrl, headers, fileName);
 }
 
 /**

@@ -4,25 +4,8 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { convertXmlToVersionList, updateXml } from './cloud_storage_xml';
+import { httpBaseUrl } from '../../../spec/server/env';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
-
-function foobarVersionParser(key: string): string {
-  let regex = /([0-9]*.[0-9]*)\/foobar.zip/g
-  try {
-    return regex.exec(key)[1];
-  } catch(_) {
-    return null;
-  }
-}
-
-function foobarSemanticVersionParser(key: string): string {
-  let regex = /([0-9]*.[0-9]*)\/foobar.zip/g
-  try {
-    return regex.exec(key)[1] + '.0';
-  } catch(_) {
-    return null;
-  }
-}
 
 function chromedriverVersionParser(key: string): string {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
@@ -62,7 +45,7 @@ describe('cloud_storage_xml', () => {
 
   describe('updateXml', () => {
     let fileName = path.resolve(tmpDir, 'foo.xml');
-    let xmlUrl = 'http://127.0.0.1:8812/spec/support/files/foo.xml';
+    let xmlUrl = httpBaseUrl + '/spec/support/files/foo.xml';
 
     beforeAll(() => {
       try {
