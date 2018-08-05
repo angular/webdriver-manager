@@ -9,7 +9,7 @@
     "jasmine": "jasmine",
     "prepare": "tsc",
     "proxy-server": "tsc && node dist/spec/server/proxy_server.js",
-    "test": "tsc && npm run test-unit && npm run test-int",
+    "test": "tsc && npm run test-unit && npm run test-int && npm run test-proxy",
     "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-int.json",
     "test-proxy": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-proxy.json",
     "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",

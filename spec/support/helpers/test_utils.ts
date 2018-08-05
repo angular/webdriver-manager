@@ -22,7 +22,7 @@ export function spawnProcess(task: string, opt_arg?: string[], opt_io?: string) 
  * If the request results in an error, return false.
  */
 export function checkConnectivity(testName: string): Promise<boolean> {
-  return requestBody('https://github.com').then(() => {
+  return requestBody('https://github.com', {}).then(() => {
     return true;
   }).catch(() => {
     console.warn('[WARN] no connectivity. skipping test ' + testName)

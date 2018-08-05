@@ -46,7 +46,7 @@ describe('binary_utils', () => {
   describe('requestBinary', () => {
     it('should download the file if no file exists or ' +
         'the content lenght is different', (done) => {
-      requestBinary(binaryUrl, fileName, 0).then((result) => {
+      requestBinary(binaryUrl, { fileName, fileSize: 0 }).then((result) => {
         expect(result).toBeTruthy();
         expect(fs.statSync(fileName).size).toBe(barZipSize);
         done();
@@ -56,7 +56,8 @@ describe('binary_utils', () => {
     });
 
     it('should not download the file if the file exists', (done) => {
-      requestBinary(binaryUrl, fileName, barZipSize).then((result) => {
+      requestBinary(binaryUrl, { fileName, fileSize: barZipSize })
+          .then((result) => {
         expect(result).toBeFalsy();
         expect(fs.statSync(fileName).size).toBe(barZipSize);
         done();
@@ -68,14 +69,14 @@ describe('binary_utils', () => {
 
   describe('requestBody', () => {
     it('should download a json object file', async() => {
-      let foo  = await requestBody(fooJsonUrl);
+      let foo = await requestBody(fooJsonUrl, {});
       let fooJson = JSON.parse(foo);
       expect(fooJson["foo"]).toBe("abc");
       expect(fooJson["bar"]).toBe(123);
     });
 
     it('should download a json array file', async() => {
-      let foo  = await requestBody(fooArrayUrl);
+      let foo = await requestBody(fooArrayUrl, {});
       let fooJson = JSON.parse(foo);
       expect(fooJson.length).toBe(3);
       expect(fooJson[0]['foo']).toBe('abc');
@@ -84,7 +85,7 @@ describe('binary_utils', () => {
     });
   
     it('should get the xml file', async() => {
-      let text = await requestBody(fooXmlUrl);
+      let text = await requestBody(fooXmlUrl, {});
       expect(text.length).toBeGreaterThan(0);
     });
   });

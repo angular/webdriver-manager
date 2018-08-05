@@ -3,29 +3,29 @@ import * as path from 'path';
 import * as semver from 'semver';
 import { convertXml2js, readXml } from './file_utils';
 import { isExpired } from './file_utils';
-import { requestBody, JsonObject } from './http_utils';
+import { HttpOptions, JsonObject, requestBody } from './http_utils';
 import { VersionList } from './version_list';
 
 /**
  * Read the xml file from cache. If the cache time has been exceeded or the
  * file does not exist, make an http request and write it to the file.
  * @param xmlUrl The xml url.
- * @param fileName The xml filename.
+ * @param httpOptions The http options for the request.
  */
 export async function updateXml(
     xmlUrl: string,
-    fileName: string): Promise<JsonObject> {
+    httpOptions: HttpOptions): Promise<JsonObject> {
 
-  if (isExpired(fileName)) {
-    let contents = await requestBody(xmlUrl, null, fileName);
-    let dir = path.dirname(fileName);
+  if (isExpired(httpOptions.fileName)) {
+    let contents = await requestBody(xmlUrl, httpOptions);
+    let dir = path.dirname(httpOptions.fileName);
     try {
       fs.mkdirSync(dir);
     } catch (err) {}
-    fs.writeFileSync(fileName, contents);
+    fs.writeFileSync(httpOptions.fileName, contents);
     return convertXml2js(contents);
   } else {
-    return readXml(fileName);
+    return readXml(httpOptions.fileName);
   }
 }
 

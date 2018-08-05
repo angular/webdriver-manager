@@ -137,7 +137,6 @@ describe('file_utils', () => {
       generateConfigFile(tmpDir, tmpFile, fileBinaryPathRegex, lastBinary);
 
       let contents = fs.readFileSync(tmpFile).toString();
-      console.log(contents);
       let jsonContents = JSON.parse(contents);
       expect(jsonContents['last']).toBe(lastBinary);
       expect(jsonContents['all'].length).toBe(2);

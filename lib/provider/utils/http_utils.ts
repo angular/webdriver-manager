@@ -3,13 +3,37 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as request from 'request';
 
+/**
+ * The request options that extend the request. This is not exported
+ * in preference to build an HttpOptions object with extra metadata
+ * and the http_utils methods will help build this object.
+ */
 export interface RequestOptionsValue extends request.OptionsWithUrl {
   proxy?: string;
   ignoreSSL?: boolean;
 }
 
+/**
+ * A json object interface.
+ */
 export interface JsonObject {
   [key:string]: any;
+}
+
+/**
+ * The http option interface to build the request.
+ */
+export interface HttpOptions {
+  // The full file path.
+  fileName?: string;
+  // The file size or content length fo the file.
+  fileSize?: number;
+  // Headers to send with the request.
+  headers?: { [key:string]: string|number };
+  // When making the request, to ignore SSL.
+  ignoreSSL?: boolean;
+  // When making the request, use the proxy url provided.
+  proxy?: string;
 }
 
 /**
@@ -126,8 +150,10 @@ export function curlCommand(requestOptions: RequestOptionsValue,
       curl = `'${modifiedUrl}' -H 'host: ${host}'`;
     }
     
-    for (let headerName in Object.keys(requestOptions.headers)) {
-      curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}`;
+    if (requestOptions.headers) {
+      for (let headerName in Object.keys(requestOptions.headers)) {
+        curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}`;
+      }
     }
   }
   if (requestOptions.ignoreSSL) {
@@ -158,21 +184,19 @@ export function addHeader(options: RequestOptionsValue, name: string,
 /**
  * The request to download the binary.
  * @param binaryUrl The download url for the binary.
- * @param fileName The file path to save the binary.
- * @param fileSize The file size used for validation.
- * @param headers Optional headers object of key-values.
+ * @param httpOptions The http options for the request.
  */
-export function requestBinary(binaryUrl: string,
-    fileName: string, fileSize: number,
-    headers?: {[key:string]: string|number}): Promise<boolean> {
+export function requestBinary(
+    binaryUrl: string,
+    httpOptions: HttpOptions): Promise<boolean> {
   let options = initOptions(binaryUrl);
-  if (headers) {
-    for(let key of Object.keys(headers)) {
-      addHeader(options, key, headers[key]);
+  if (httpOptions.headers) {
+    for(let key of Object.keys(httpOptions.headers)) {
+      addHeader(options, key, httpOptions.headers[key]);
     }
   }
   options.followRedirect = true;
-  console.log(curlCommand(options, fileName));
+  console.log(curlCommand(options, httpOptions.fileName));
 
   return new Promise<boolean>((resolve, reject) => {
     let req = request(options);
@@ -182,24 +206,24 @@ export function requestBinary(binaryUrl: string,
         // Check to see if the size is the same.
         // If the file size is the same, do not download and stop here.
         contentLength = +response.headers['content-length'];
-        if (contentLength === fileSize) {
+        if (contentLength === httpOptions.fileSize) {
           response.destroy();
           resolve(false);
         } else {
           // Only pipe if the headers are different length.
-          let dir = path.dirname(fileName);
+          let dir = path.dirname(httpOptions.fileName);
           try {
             fs.mkdirSync(dir);
           } catch (err) {}
-          let file = fs.createWriteStream(fileName);
+          let file = fs.createWriteStream(httpOptions.fileName);
           req.pipe(file);
           file.on('close', () => {
-            fs.stat(fileName, (error, stats) => {
+            fs.stat(httpOptions.fileName, (error, stats) => {
               if (error) {
                 reject(error);
               }
               if (stats.size != contentLength) {
-                fs.unlinkSync(fileName);
+                fs.unlinkSync(httpOptions.fileName);
                 reject(error);
               }
               resolve(true);
@@ -219,21 +243,19 @@ export function requestBinary(binaryUrl: string,
 /**
  * Request the body from the url and log the curl.
  * @param requestUrl The request url.
- * @param headers Optional headers object of key-values.
- * @param fileName An optional json filename.
+ * @param httpOptions The http options for the request.
  * @returns A promise string of the response body.
  */
 export function requestBody(
     requestUrl: string,
-    headers?: {[key:string]: string|number},
-    fileName?: string,): Promise<string> {
+    httpOptions: HttpOptions): Promise<string> {
   let options = initOptions(requestUrl);
-  if (headers) {
-    for(let key of Object.keys(headers)) {
-      addHeader(options, key, headers[key]);
+  if (httpOptions.headers) {
+    for(let key of Object.keys(httpOptions.headers)) {
+      addHeader(options, key, httpOptions.headers[key]);
     }
   }
-  console.log(curlCommand(options, fileName));
+  console.log(curlCommand(options, httpOptions.fileName));
 
   return new Promise((resolve, reject) => {
     let req = request(options);

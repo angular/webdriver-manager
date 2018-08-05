@@ -68,7 +68,7 @@ describe('cloud_storage_xml', () => {
         fs.statSync(fileName);
         done.fail('file should not exist.');
       } catch (err) {
-        updateXml(xmlUrl, fileName).then(xmlContent => {
+        updateXml(xmlUrl, { fileName }).then(xmlContent => {
           expect(fs.statSync(fileName).size).toBeGreaterThan(0);
           expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
             .toBe('2.0/foobar.zip');
@@ -89,7 +89,7 @@ describe('cloud_storage_xml', () => {
       spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime: mtime});
 
       try {
-        updateXml(xmlUrl, fileName).then(xmlContent => {
+        updateXml(xmlUrl, { fileName }).then(xmlContent => {
           expect(fsStatSync(fileName).size).toBeGreaterThan(0);
           expect(fsStatSync(fileName).size).not.toBe(1000);
           expect(fsStatSync(fileName).mtime.getMilliseconds())
@@ -115,7 +115,7 @@ describe('cloud_storage_xml', () => {
       spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime: mtime});
 
       try {
-        updateXml(xmlUrl, fileName).then(xmlContent => {
+        updateXml(xmlUrl, { fileName }).then(xmlContent => {
           expect(fsStatSync(fileName).size).toBe(initialStats.size);
           expect(fsStatSync(fileName).mtime.getMilliseconds())
             .toBe(initialStats.mtime.getMilliseconds());
