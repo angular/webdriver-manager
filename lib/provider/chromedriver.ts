@@ -3,6 +3,11 @@ import * as os from 'os';
 import * as path from 'path';
 import { Flag } from '../flags';
 import {
+  OUT_DIR,
+  Provider,
+  ProviderConfig
+} from './provider';
+import {
   changeFilePermissions,
   renameFileWithVersion,
   unzipFile,
@@ -22,21 +27,39 @@ export const CHROME_VERSION: Flag = {
   default: 'latest'
 };
 
-export class ChromeDriver {
-  requestUrl: string;
-  outDir: string;
-  cacheFileName: string;
-  configFileName: string;
-  osType: string;
-  osArch: string;
+export class ChromeDriver implements Provider {
+  requestUrl = 'https://chromedriver.storage.googleapis.com/';
+  outDir = OUT_DIR;
+  cacheFileName = 'chromedriver.xml';
+  configFileName = 'chromedriver.config.json';
+  osType = os.type();
+  osArch = os.arch();
+  proxy: string = null;
 
-  constructor() {
-    this.requestUrl = 'https://chromedriver.storage.googleapis.com/';
-    this.cacheFileName = 'chromedriver.xml'
-    this.configFileName = 'chromedriver.config.json';
-    this.osType = os.type();
-    this.osArch = os.arch();
-    this.outDir = path.resolve('.');
+  constructor(providerConfig?: ProviderConfig) {
+    if (providerConfig) {
+      if (providerConfig.cacheFileName) {
+        this.cacheFileName = providerConfig.cacheFileName;
+      }
+      if (providerConfig.configFileName) {
+        this.configFileName = providerConfig.configFileName;
+      }
+      if (providerConfig.osArch) {
+        this.osArch = providerConfig.osArch;
+      }
+      if (providerConfig.osType) {
+        this.osType = providerConfig.osType;
+      }
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+    }
   }
 
   /**
@@ -45,8 +68,9 @@ export class ChromeDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl,
-      { fileName: path.resolve(this.outDir, this.cacheFileName) });
+    await updateXml(this.requestUrl, { 
+      fileName: path.resolve(this.outDir, this.cacheFileName),
+      proxy: this.proxy });
 
     let versionList = convertXmlToVersionList(
       path.resolve(this.outDir, this.cacheFileName), '.zip',
@@ -66,7 +90,7 @@ export class ChromeDriver {
       fileSize = fs.statSync(chromeDriverZip).size;
     } catch (err) {}
     await requestBinary(chromeDriverUrl,
-      { fileName: chromeDriverZip, fileSize });
+      { fileName: chromeDriverZip, fileSize, proxy: this.proxy });
 
     // Unzip and rename all the files (a grand total of 1) and set the
     // permissions.
@@ -124,7 +148,11 @@ export function osHelper(ostype: string, osarch: string): string {
 export function versionParser(xmlKey: string) {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
   try {
-    return regex.exec(xmlKey)[1];
+    let exec = regex.exec(xmlKey);
+    if (exec) {
+      return exec[1];
+    }
+    return null;
   } catch (err) {
     return null;
   }
@@ -136,10 +164,14 @@ export function versionParser(xmlKey: string) {
  * the version is 12.34.00.
  * @param xmlKey The xml key including the partial url.
  */
-export function semanticVersionParser(xmlKey: string) {
+export function semanticVersionParser(xmlKey: string): string | null {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
   try {
-    return regex.exec(xmlKey)[1] + '.0';
+    let exec = regex.exec(xmlKey);
+    if (exec) {
+      return exec[1] + '.0';
+    }
+    return null;
   } catch (err) {
     return null;
   }

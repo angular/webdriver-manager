@@ -38,23 +38,26 @@ export interface HttpOptions {
 
 /**
  * Initialize the request options.
- * @param url 
- * @param opt_ignoreSSL 
- * @param opt_proxy 
+ * @param requestUrl The request url.
+ * @param httpOptions The http options for the request.
  */
 export function initOptions(
-    url: string,
-    opt_ignoreSSL?: boolean,
-    opt_proxy?: string): RequestOptionsValue {
+  requestUrl: string,
+    httpOptions: HttpOptions): RequestOptionsValue {
 
   let options: RequestOptionsValue = {
-    url: url,
+    url: requestUrl,
     // default Linux can be anywhere from 20-120 seconds
     // increasing this arbitrarily to 4 minutes
     timeout: 240000
   };
-  options = optionsSSL(options, opt_ignoreSSL);
-  options = optionsProxy(options, url, opt_proxy);
+  options = optionsSSL(options, httpOptions.ignoreSSL);
+  options = optionsProxy(options, requestUrl, httpOptions.proxy);
+  if (httpOptions.headers) {
+    for(let key of Object.keys(httpOptions.headers)) {
+      options = addHeader(options, key, httpOptions.headers[key]);
+    }
+  }
   return options;
 }
 
@@ -189,12 +192,7 @@ export function addHeader(options: RequestOptionsValue, name: string,
 export function requestBinary(
     binaryUrl: string,
     httpOptions: HttpOptions): Promise<boolean> {
-  let options = initOptions(binaryUrl);
-  if (httpOptions.headers) {
-    for(let key of Object.keys(httpOptions.headers)) {
-      addHeader(options, key, httpOptions.headers[key]);
-    }
-  }
+  let options = initOptions(binaryUrl, httpOptions);
   options.followRedirect = true;
   console.log(curlCommand(options, httpOptions.fileName));
 
@@ -249,14 +247,9 @@ export function requestBinary(
 export function requestBody(
     requestUrl: string,
     httpOptions: HttpOptions): Promise<string> {
-  let options = initOptions(requestUrl);
-  if (httpOptions.headers) {
-    for(let key of Object.keys(httpOptions.headers)) {
-      addHeader(options, key, httpOptions.headers[key]);
-    }
-  }
+  let options = initOptions(requestUrl, httpOptions);
   console.log(curlCommand(options, httpOptions.fileName));
-
+  options.followRedirect = true;
   return new Promise((resolve, reject) => {
     let req = request(options);
     req.on('response', response => {

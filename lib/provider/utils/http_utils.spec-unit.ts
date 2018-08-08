@@ -10,7 +10,7 @@ describe('http utils', () => {
   describe('initOptions', () => {
     it('should create options', () => {
       let requestUrl = 'http://foobar.com';
-      let options = initOptions(requestUrl);
+      let options = initOptions(requestUrl, {});
       expect(options['url']).toBe(requestUrl);
       expect(options['timeout']).toBe(240000);
       expect(options['proxy']).toBeUndefined();
@@ -21,7 +21,7 @@ describe('http utils', () => {
     it('should create options with a proxy', () => {
       let requestUrl = 'http://foobar.com';
       let proxy = 'http://baz.com';
-      let options = initOptions(requestUrl, undefined, proxy);
+      let options = initOptions(requestUrl, { proxy });
       expect(options['url']).toBe(requestUrl);
       expect(options['timeout']).toBe(240000);
       expect(options['proxy']).toBe(proxy);
@@ -31,7 +31,7 @@ describe('http utils', () => {
 
     it('should create options with SSL', () => {
       let requestUrl = 'http://foobar.com';
-      let options = initOptions(requestUrl, true, undefined);
+      let options = initOptions(requestUrl, { ignoreSSL: true });
       expect(options['url']).toBe(requestUrl);
       expect(options['timeout']).toBe(240000);
       expect(options['proxy']).toBeUndefined();
@@ -42,7 +42,7 @@ describe('http utils', () => {
     it('should create options with SSL and proxy', () => {
       let requestUrl = 'http://foobar.com';
       let proxy = 'http://baz.com';
-      let options = initOptions(requestUrl, true, proxy);
+      let options = initOptions(requestUrl, { ignoreSSL: true, proxy });
       expect(options['url']).toBe(requestUrl);
       expect(options['timeout']).toBe(240000);
       expect(options['proxy']).toBe(proxy);

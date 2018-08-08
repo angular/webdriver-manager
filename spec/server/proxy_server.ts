@@ -6,6 +6,9 @@ const proxy = http.createServer((request, response) => {
   let hostHeader = request.headers['host'];
   console.log('request made to proxy: ' + request.url + ', ' +
     'target: ' + hostHeader);
+  if (!hostHeader.startsWith('http://')) {
+    hostHeader = 'http://' + hostHeader;
+  }
   httpProxy
     .createProxyServer({target: hostHeader})
     .web(request, response);
