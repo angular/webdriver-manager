@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { OUT_DIR, Provider, ProviderConfig } from './provider';
 import {
   changeFilePermissions,
   generateConfigFile,
@@ -14,22 +15,42 @@ import { convertJsonToVersionList, updateJson } from './utils/github_json';
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
 
-export class GeckoDriver {
-  requestUrl: string;
-  outDir: string;
-  cacheFileName: string;
-  configFileName: string;
-  osType: string;
-  osArch: string;
+export class GeckoDriver implements Provider {
+  cacheFileName = 'geckodriver.json';
+  configFileName = 'geckodriver.config.json';
+  ignoreSSL: boolean = false;
   oauthToken: string;
+  osType = os.type();
+  osArch = os.arch();
+  outDir = OUT_DIR;
+  proxy: string = null;
+  requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
 
-  constructor() {
-    this.requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
-    this.cacheFileName = 'geckodriver.json';
-    this.configFileName = 'geckodriver.config.json';
-    this.osType = os.type();
-    this.osArch = os.arch();
-    this.outDir = path.resolve('.');
+  constructor(providerConfig?: ProviderConfig) {
+    if (providerConfig) {
+      if (providerConfig.cacheFileName) {
+        this.cacheFileName = providerConfig.cacheFileName;
+      }
+      if (providerConfig.configFileName) {
+        this.configFileName = providerConfig.configFileName;
+      }
+      this.ignoreSSL = providerConfig.ignoreSSL;
+      if (providerConfig.osArch) {
+        this.osArch = providerConfig.osArch;
+      }
+      if (providerConfig.osType) {
+        this.osType = providerConfig.osType;
+      }
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+    }
   }
 
   /**
@@ -38,9 +59,11 @@ export class GeckoDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateJson(this.requestUrl,
-      { fileName: path.resolve(this.outDir, this.cacheFileName) },
-      this.oauthToken);
+    await updateJson(this.requestUrl, {
+      fileName: path.resolve(this.outDir, this.cacheFileName),
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy
+    }, this.oauthToken);
 
     let versionList = convertJsonToVersionList(
       path.resolve(this.outDir, this.cacheFileName));
@@ -57,8 +80,9 @@ export class GeckoDriver {
     try {
       fileSize = fs.statSync(geckoDriverCompressed).size;
     } catch (err) {}
-    await requestBinary(geckoDriverUrl,
-      { fileName: geckoDriverCompressed, fileSize });
+    await requestBinary(geckoDriverUrl, {
+      fileName: geckoDriverCompressed, fileSize, ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy });
 
     // Uncompress tarball (for linux and mac) or unzip the file for Windows.
     // Rename all the files (a grand total of 1) and set the permissions.

@@ -36,9 +36,8 @@ describe('chromedriver', () => {
         if (!await checkConnectivity('update binary for mac test')) {
           done();
         }
-        let chromedriver = new ChromeDriver();
-        chromedriver.outDir = tmpDir;
-        chromedriver.osType = 'Darwin';
+        let chromedriver = new ChromeDriver(
+          { outDir: tmpDir, osType: 'Darwin' });
         await chromedriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'chromedriver.config.json');

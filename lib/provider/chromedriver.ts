@@ -28,13 +28,14 @@ export const CHROME_VERSION: Flag = {
 };
 
 export class ChromeDriver implements Provider {
-  requestUrl = 'https://chromedriver.storage.googleapis.com/';
-  outDir = OUT_DIR;
   cacheFileName = 'chromedriver.xml';
   configFileName = 'chromedriver.config.json';
+  ignoreSSL: boolean = false;
   osType = os.type();
   osArch = os.arch();
+  outDir = OUT_DIR;
   proxy: string = null;
+  requestUrl = 'https://chromedriver.storage.googleapis.com/';
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
@@ -44,6 +45,7 @@ export class ChromeDriver implements Provider {
       if (providerConfig.configFileName) {
         this.configFileName = providerConfig.configFileName;
       }
+      this.ignoreSSL = providerConfig.ignoreSSL;
       if (providerConfig.osArch) {
         this.osArch = providerConfig.osArch;
       }
@@ -70,6 +72,7 @@ export class ChromeDriver implements Provider {
   async updateBinary(version?: string): Promise<any> {
     await updateXml(this.requestUrl, { 
       fileName: path.resolve(this.outDir, this.cacheFileName),
+      ignoreSSL: this.ignoreSSL,
       proxy: this.proxy });
 
     let versionList = convertXmlToVersionList(
@@ -90,7 +93,8 @@ export class ChromeDriver implements Provider {
       fileSize = fs.statSync(chromeDriverZip).size;
     } catch (err) {}
     await requestBinary(chromeDriverUrl,
-      { fileName: chromeDriverZip, fileSize, proxy: this.proxy });
+      { fileName: chromeDriverZip, fileSize, ignoreSSL: this.ignoreSSL,
+        proxy: this.proxy });
 
     // Unzip and rename all the files (a grand total of 1) and set the
     // permissions.

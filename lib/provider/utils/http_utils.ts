@@ -29,7 +29,7 @@ export interface HttpOptions {
   // The file size or content length fo the file.
   fileSize?: number;
   // Headers to send with the request.
-  headers?: { [key:string]: string|number };
+  headers?: { [key:string]: string|number|string[] };
   // When making the request, to ignore SSL.
   ignoreSSL?: boolean;
   // When making the request, use the proxy url provided.
@@ -42,7 +42,7 @@ export interface HttpOptions {
  * @param httpOptions The http options for the request.
  */
 export function initOptions(
-  requestUrl: string,
+    requestUrl: string,
     httpOptions: HttpOptions): RequestOptionsValue {
 
   let options: RequestOptionsValue = {
@@ -55,7 +55,8 @@ export function initOptions(
   options = optionsProxy(options, requestUrl, httpOptions.proxy);
   if (httpOptions.headers) {
     for(let key of Object.keys(httpOptions.headers)) {
-      options = addHeader(options, key, httpOptions.headers[key]);
+      options = addHeader(options, key,
+        httpOptions.headers[key]);
     }
   }
   return options;
@@ -71,7 +72,6 @@ export function optionsSSL(
     opt_ignoreSSL: boolean): RequestOptionsValue {
 
   if (opt_ignoreSSL) {
-    // console.log('ignoring SSL certificate');
     options.strictSSL = !opt_ignoreSSL;
     (options as any).rejectUnauthorized = !opt_ignoreSSL;
   }
@@ -150,13 +150,12 @@ export function curlCommand(requestOptions: RequestOptionsValue,
     let host = url.parse(requestOptions.url.toString()).host;
     if (requestOptions.proxy) {
       let modifiedUrl = url.resolve(requestOptions.proxy, pathUrl);
-      curl = `'${modifiedUrl}' -H 'host: ${host}'`;
+      curl = `"${modifiedUrl}" -H "host: ${host}"`;
     }
-    
-    if (requestOptions.headers) {
-      for (let headerName in Object.keys(requestOptions.headers)) {
-        curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}`;
-      }
+  }
+  if (requestOptions.headers) {
+    for (let headerName of Object.keys(requestOptions.headers)) {
+      curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}"`;
     }
   }
   if (requestOptions.ignoreSSL) {
@@ -176,7 +175,7 @@ export function curlCommand(requestOptions: RequestOptionsValue,
  * @returns The modified options object.
  */
 export function addHeader(options: RequestOptionsValue, name: string,
-    value: string|number): RequestOptionsValue {
+    value: string|number|string[]): RequestOptionsValue {
   if (!options.headers) {
     options.headers = {};
   }
@@ -193,7 +192,8 @@ export function requestBinary(
     binaryUrl: string,
     httpOptions: HttpOptions): Promise<boolean> {
   let options = initOptions(binaryUrl, httpOptions);
-  options.followRedirect = true;
+  options.followRedirect = false;
+  options.followAllRedirects = false;
   console.log(curlCommand(options, httpOptions.fileName));
 
   return new Promise<boolean>((resolve, reject) => {
@@ -215,6 +215,7 @@ export function requestBinary(
           } catch (err) {}
           let file = fs.createWriteStream(httpOptions.fileName);
           req.pipe(file);
+
           file.on('close', () => {
             fs.stat(httpOptions.fileName, (error, stats) => {
               if (error) {
@@ -227,7 +228,19 @@ export function requestBinary(
               resolve(true);
             });
           });
+          file.on('error', (error) => {
+            reject(error);
+          });
         }
+      } else if (response.statusCode === 302) {
+        let location = response.headers['location'] as string;
+        if (!httpOptions.headers) {
+          httpOptions.headers = {};
+        }
+        for (let header of Object.keys(response.headers)) {
+          httpOptions.headers[header] = response.headers[header];
+        }
+        resolve(requestBinary(location, httpOptions));
       } else {
         reject(new Error('response status code is not 200'));
       }

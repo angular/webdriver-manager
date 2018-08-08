@@ -31,9 +31,8 @@ describe('geckodriver', () => {
         if (!await checkConnectivity('update binary for mac test')) {
           done();
         }
-        let geckodriver = new GeckoDriver();
-        geckodriver.outDir = tmpDir;
-        geckodriver.osType = 'Darwin';
+        let geckodriver = new GeckoDriver(
+          { outDir: tmpDir, osType: 'Darwin' });
         await geckodriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
