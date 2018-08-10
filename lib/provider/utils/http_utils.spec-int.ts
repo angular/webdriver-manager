@@ -18,7 +18,7 @@ describe('binary_utils', () => {
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   let proc: childProcess.ChildProcess;
 
-  beforeAll((done) => {  
+  beforeAll((done) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
     proc = spawnProcess('node', ['dist/spec/server/http_server.js']);
     console.log('http-server: ' + proc.pid);
@@ -38,7 +38,7 @@ describe('binary_utils', () => {
       fs.rmdirSync(tmpDir);
     } catch (err) {}
 
-    spawnProcess('kill', ['-TERM', proc.pid.toString()]);
+    process.kill(proc.pid);
     setTimeout(done, 5000);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
   });
@@ -83,7 +83,7 @@ describe('binary_utils', () => {
       expect(fooJson[1]['foo']).toBe('def');
       expect(fooJson[2]['foo']).toBe('ghi');
     });
-  
+
     it('should get the xml file', async() => {
       let text = await requestBody(fooXmlUrl, {});
       expect(text.length).toBeGreaterThan(0);

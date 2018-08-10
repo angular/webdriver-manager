@@ -29,9 +29,9 @@ describe('geckodriver', () => {
           fs.mkdirSync(tmpDir);
         } catch (err) {}
       });
-    
+
       afterEach((done) => {
-        spawnProcess('kill', ['-TERM', proxyProc.pid.toString()]);
+        process.kill(proxyProc.pid);
         setTimeout(done, 5000);
         jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {

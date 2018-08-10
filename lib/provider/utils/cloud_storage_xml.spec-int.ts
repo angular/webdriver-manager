@@ -38,7 +38,7 @@ describe('cloud_storage_xml', () => {
   });
 
   afterAll((done) => {
-    spawnProcess('kill', ['-TERM', proc.pid.toString()]);
+    process.kill(proc.pid);
     setTimeout(done, 5000);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
   });
@@ -133,7 +133,7 @@ describe('cloud_storage_xml', () => {
 
   describe('convertXmlToVersionList', () => {
     const fileName = 'spec/support/files/chromedriver.xml';
-    
+
     it('should convert an xml file an object from the xml file', () => {
       let versionList = convertXmlToVersionList(fileName, '.zip',
         chromedriverVersionParser, chromedriverSemanticVersionParser);

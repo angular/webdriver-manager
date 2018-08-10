@@ -31,9 +31,9 @@ describe('chromedriver', () => {
           fs.mkdirSync(tmpDir);
         } catch (err) {}
       });
-    
+
       afterEach((done) => {
-        spawnProcess('kill', ['-TERM', proxyProc.pid.toString()]);
+        process.kill(proxyProc.pid);
         setTimeout(done, 5000);
         jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {
@@ -54,7 +54,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip', 
+        let versionList = convertXmlToVersionList(xmlFile, '.zip',
           versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'mac');
         let executableFile = path.resolve(tmpDir,
