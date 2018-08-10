@@ -1,7 +1,13 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as request from 'request';
 import * as path from 'path';
+import {
+  OUT_DIR,
+  Provider,
+  ProviderConfig,
+} from './provider';
 import {
   generateConfigFile,
   getBinaryPathFromConfig,
@@ -10,17 +16,41 @@ import { curlCommand, initOptions, requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
-export class SeleniumServer {
-  requestUrl: string;
-  outDir: string;
-  cacheFileName: string;
-  configFileName: string;
+export class SeleniumServer implements Provider {
+  cacheFileName = 'selenium-server.xml';
+  configFileName = 'selenium-server.config.json';
+  ignoreSSL: boolean = false;
+  osType = os.type();
+  osArch = os.arch();
+  outDir = OUT_DIR;
+  proxy: string = null;
+  requestUrl = 'https://selenium-release.storage.googleapis.com/';
 
-  constructor() {
-    this.requestUrl = 'https://selenium-release.storage.googleapis.com/';
-    this.cacheFileName = 'selenium-server.xml';
-    this.configFileName = 'selenium-server.config.json';
-    this.outDir = path.resolve('.');
+  constructor(providerConfig?: ProviderConfig) {
+    if (providerConfig) {
+      if (providerConfig.cacheFileName) {
+        this.cacheFileName = providerConfig.cacheFileName;
+      }
+      if (providerConfig.configFileName) {
+        this.configFileName = providerConfig.configFileName;
+      }
+      this.ignoreSSL = providerConfig.ignoreSSL;
+      if (providerConfig.osArch) {
+        this.osArch = providerConfig.osArch;
+      }
+      if (providerConfig.osType) {
+        this.osType = providerConfig.osType;
+      }
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+    }
   }
 
   /**
@@ -29,8 +59,10 @@ export class SeleniumServer {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl,
-      { fileName: path.resolve(this.outDir, this.cacheFileName) });
+    await updateXml(this.requestUrl, {
+      fileName: path.resolve(this.outDir, this.cacheFileName),
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy });
     let versionList = convertXmlToVersionList(
       path.resolve(this.outDir, this.cacheFileName), 'selenium-server-standalone',
       versionParser,
@@ -48,8 +80,10 @@ export class SeleniumServer {
     try {
       fileSize = fs.statSync(seleniumServerJar).size;
     } catch (err) {}
-    await requestBinary(seleniumServerUrl,
-      { fileName: seleniumServerJar, fileSize });
+    await requestBinary(seleniumServerUrl, {
+      fileName: seleniumServerJar, fileSize,
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy });
     generateConfigFile(this.outDir,
       path.resolve(this.outDir, this.configFileName),
       matchBinaries(), seleniumServerJar);

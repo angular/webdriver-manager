@@ -41,9 +41,9 @@ describe('selenium_server', () => {
       spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
       let seleniumServer = new SeleniumServer();
       expect(seleniumServer.getCmdStartServer(null))
-        .toContain('java -jar path/to/selenium-server-3.0.jar ' + javaArgs);
+        .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgs);
       expect(seleniumServer.getCmdStartServer({}))
-        .toContain('java -jar path/to/selenium-server-3.0.jar ' + javaArgs);
+        .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgs);
     });
 
     it('should use a selenium server with options', () => {
@@ -52,7 +52,7 @@ describe('selenium_server', () => {
       let cmd = seleniumServer.getCmdStartServer(
         {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'});
       expect(cmd).toContain(
-        'java -Dwebdriver.chrome.driver=path/to/chromedriver ' +
+        '-Dwebdriver.chrome.driver=path/to/chromedriver ' +
         '-jar path/to/selenium-server-3.0.jar ' + javaArgs);
     });
   });

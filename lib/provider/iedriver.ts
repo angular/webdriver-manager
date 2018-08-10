@@ -1,7 +1,15 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
+import {
+  OUT_DIR,
+  Provider,
+  ProviderConfig,
+} from './provider';
+import {
+  convertXmlToVersionList,
+  updateXml,
+} from './utils/cloud_storage_xml';
 import {
   renameFileWithVersion,
   unzipFile,
@@ -11,21 +19,41 @@ import {
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
 
-export class IEDriver {
-  requestUrl: string;
-  outDir: string;
-  cacheFileName: string;
-  configFileName: string;
-  osType: string;
-  osArch: string;
+export class IEDriver implements Provider {
+  cacheFileName = 'iedriver.xml';
+  configFileName = 'iedriver.config.json';
+  ignoreSSL: boolean = false;
+  osType = os.type();
+  osArch = os.arch();
+  outDir = OUT_DIR;
+  proxy: string = null;
+  requestUrl = 'https://selenium-release.storage.googleapis.com/';
 
-  constructor() {
-    this.requestUrl = 'https://selenium-release.storage.googleapis.com/';
-    this.cacheFileName = 'iedriver.xml';
-    this.configFileName = 'iedriver.config.json';
-    this.osType = os.type();
-    this.osArch = os.arch();
-    this.outDir = path.resolve('.');
+  constructor(providerConfig?: ProviderConfig) {
+    if (providerConfig) {
+      if (providerConfig.cacheFileName) {
+        this.cacheFileName = providerConfig.cacheFileName;
+      }
+      if (providerConfig.configFileName) {
+        this.configFileName = providerConfig.configFileName;
+      }
+      this.ignoreSSL = providerConfig.ignoreSSL;
+      if (providerConfig.osArch) {
+        this.osArch = providerConfig.osArch;
+      }
+      if (providerConfig.osType) {
+        this.osType = providerConfig.osType;
+      }
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+    }
   }
 
   /**
@@ -34,8 +62,10 @@ export class IEDriver {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl,
-      { fileName: path.resolve(this.outDir, this.cacheFileName) });
+    await updateXml(this.requestUrl, {
+      fileName: path.resolve(this.outDir, this.cacheFileName),
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy });
     let versionList = convertXmlToVersionList(
       path.resolve(this.outDir, this.cacheFileName), '.zip',
       versionParser,
@@ -53,8 +83,10 @@ export class IEDriver {
     try {
       fileSize = fs.statSync(chromeDriverZip).size;
     } catch (err) {}
-    await requestBinary(chromeDriverUrl,
-      { fileName: chromeDriverZip, fileSize });
+    await requestBinary(chromeDriverUrl, {
+      fileName: chromeDriverZip, fileSize,
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy });
 
     // Unzip and rename all the files (a grand total of 1) and set the
     // permissions.
@@ -76,7 +108,7 @@ export class IEDriver {
  * with composing the download link.
  * @param ostype The operating stystem type.
  * @param osarch The chip architecture.
- * @returns The download name associated with composing the download link. 
+ * @returns The download name associated with composing the download link.
  */
 export function osHelper(ostype: string, osarch: string): string {
   if (ostype === 'Windows_NT') {
