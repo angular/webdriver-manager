@@ -9,6 +9,7 @@ import {
 } from './provider';
 import {
   changeFilePermissions,
+  getBinaryPathFromConfig,
   renameFileWithVersion,
   unzipFile,
   zipFileList,
@@ -70,7 +71,7 @@ export class ChromeDriver implements Provider {
    * @param version Optional to provide the version number or latest.
    */
   async updateBinary(version?: string): Promise<any> {
-    await updateXml(this.requestUrl, { 
+    await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
       proxy: this.proxy });
@@ -111,6 +112,15 @@ export class ChromeDriver implements Provider {
     return Promise.resolve();
   }
 
+  /**
+   * Gets the Chromedriver binary file path.
+   * @param version Optional to provide the version number or latest.
+   */
+  getBinaryPath(version?: string): string {
+    let configFilePath = path.resolve(this.outDir, this.configFileName);
+    return getBinaryPathFromConfig(configFilePath, version);
+  }
+
   // TODO(cnishina): A list of chromedriver versions downloaded
 
   // TODO(cnishina): Remove files downloaded
@@ -121,7 +131,7 @@ export class ChromeDriver implements Provider {
  * with composing the download link.
  * @param ostype The operating stystem type.
  * @param osarch The chip architecture.
- * @returns The download name associated with composing the download link. 
+ * @returns The download name associated with composing the download link.
  */
 export function osHelper(ostype: string, osarch: string): string {
   if (ostype === 'Darwin') {

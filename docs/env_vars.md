@@ -1,5 +1,7 @@
 # Environment variables
 
+**`JAVA_HOME`** - If the java home variable is set as an environment variable, use it when starting the selenium server. The java executable is assumed to be found in `JAVA_HOME/bin/java`.
+
 **`NO_PROXY`** - If the no proxy environment variable exists and matches the host name, to ignore the resolve proxy.
 
 **`HTTPS_PROXY`** - If the https proxy environment variable exists and the url protocol is https, use this proxy.

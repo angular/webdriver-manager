@@ -1,9 +1,12 @@
+import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as request from 'request';
 import * as path from 'path';
 import {
   generateConfigFile,
+  getBinaryPathFromConfig,
 } from './utils/file_utils';
-import { requestBinary } from './utils/http_utils';
+import { curlCommand, initOptions, requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
@@ -52,12 +55,96 @@ export class SeleniumServer {
       matchBinaries(), seleniumServerJar);
     return Promise.resolve();
   }
+
+  /**
+   * Starts selenium standalone server and handles emitted exit events.
+   * @param opts The options to pass to the jar file.
+   * @param version The optional version of the selenium jar file.
+   * @returns A promise so the server can run while awaiting its completion.
+   */
+  startServer(opts: {[key:string]: string}, version?: string): Promise<any> {
+    let cmd = this.getCmdStartServer(opts, version);
+    console.log(cmd);
+    return new Promise<any>((resolve, reject) => {
+      let seleniumProcess = childProcess.exec(cmd);
+      console.log(`selenium process id: ${seleniumProcess.pid}`);
+      seleniumProcess.on('exit', async(code: number) => {
+        console.log(`Selenium Standalone has exited with code: ${code}`);
+        process.exit(process.exitCode || code);
+      });
+      seleniumProcess.on('error', (err: Error) => {
+        console.log(`Selenium Standalone server encountered an error: ${err}`);
+      });
+      process.stdin.resume();
+      process.on('SIGINT', async() => {
+        process.kill(seleniumProcess.pid);
+        process.exit(process.exitCode);
+      });
+    });
+  }
+
+  /**
+   * Get the selenium server start command (not including the java command)
+   * @param opts The options to pass to the jar file.
+   * @param version The optional version of the selenium jar file.
+   * @returns The java command to start the selenium standalone server.
+   */
+  getCmdStartServer(opts: {[key:string]: string}, version?: string): string {
+    let configFilePath = path.resolve(this.outDir, this.configFileName);
+    let jarFile = getBinaryPathFromConfig(configFilePath, version);
+    let options = '';
+    if (opts) {
+      for (let opt of Object.keys(opts)) {
+        options += `${opt}=${opts[opt]} `;
+      }
+    }
+    let java = 'java';
+    if (process.env.JAVA_HOME) {
+      java = path.resolve(process.env.JAVA_HOME, 'bin', 'java');
+      if (java.match(' ')) {
+        java = `"${java}"`;
+      }
+    }
+    let args = '-role node ' +
+      '-servlet org.openqa.grid.web.servlet.LifecycleServlet ' +
+      '-registerCycle 0 -port 4444';
+
+    return `${java} ${options}-jar ${jarFile} ${args}`;
+  }
+
+  /**
+   * Sends the command to stop the server via http get request. Reference:
+   * https://github.com/SeleniumHQ/selenium/issues/2852#issuecomment-268324091
+   * @param host The protocol and ip address, default http://127.0.0.1
+   * @param port The port number, default 4444
+   * @returns A promise of the http get request completing.
+   */
+  stopServer(host?: string, port?: number): Promise<void> {
+    if (!host) {
+      host = 'http://127.0.0.1';
+    }
+    if (!port) {
+      port = 4444;
+    }
+    let stopUrl = host + ':' + port +
+      '/extra/LifecycleServlet?action=shutdown';
+    let options = initOptions(stopUrl, {});
+    console.log(curlCommand(options));
+    return new Promise<void>((resolve, _) => {
+      let req = request(options);
+      req.on('response', response => {
+        response.on('end', () => {
+          resolve();
+        });
+      });
+    });
+  }
 }
 
 /**
  * Captures the version name which includes the semantic version and extra
  * metadata. So an example for 12.34/selenium-server-standalone-12.34.56.jar,
- * the version is 12.34.56. For metadata, 
+ * the version is 12.34.56. For metadata,
  * 12.34/selenium-server-standalone-12.34.56-beta.jar is 12.34.56-beta.
  * @param xmlKey The xml key including the partial url.
  */
@@ -74,7 +161,7 @@ export function versionParser(xmlKey: string) {
 /**
  * Captures the version name which includes the semantic version and extra
  * metadata. So an example for 12.34/selenium-server-standalone-12.34.56.jar,
- * the version is 12.34.56. For metadata, 
+ * the version is 12.34.56. For metadata,
  * 12.34/selenium-server-standalone-12.34.56-beta.jar is still 12.34.56.
  * @param xmlKey The xml key including the partial url.
  */

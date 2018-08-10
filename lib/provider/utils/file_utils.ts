@@ -208,3 +208,28 @@ export function getMatchingFiles(
   }
   return matchingFiles;
 }
+
+/**
+ * Get the binary path from the configuration file. The configuration file
+ * should be formatted as { 'last': string, 'all': string[] }. In the 'all'
+ * array, we should match the 'version'. The version does not necessarily have
+ * to be a valid semantic version.
+ * @param cacheFilePath The cache file path.
+ * @param version An optional version that is not necessarily semver.
+ */
+export function getBinaryPathFromConfig(
+    cacheFilePath: string,
+    version?: string): string|null {
+  let cacheJson = JSON.parse(fs.readFileSync(cacheFilePath).toString());
+  let binaryPath = null;
+  if (!version) {
+    binaryPath = cacheJson['last'];
+  } else {
+    for (let cachePath of cacheJson['all']) {
+      if (cachePath.match(version)) {
+        binaryPath = cachePath;
+      }
+    }
+  }
+  return binaryPath;
+}

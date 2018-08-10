@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import {
   convertXml2js,
+  getBinaryPathFromConfig,
   isExpired,
   getMatchingFiles,
   readJson,
@@ -139,6 +140,26 @@ describe('file_utils', () => {
       let matchedFiles = getMatchingFiles('/path/to', fileBinaryPathRegex);
       expect(matchedFiles[0]).toContain('foo_12.2');
       expect(matchedFiles[1]).toContain('foo_12.4');
+    });
+  });
+
+  describe('getBinaryPathFromConfig', () => {
+    let configBinaries = `{
+      "last": "foo-1.0",
+      "all": ["foo-1.0", "bar-1.1", "baz-1.2"]
+    }`;   
+    it('should find the latest download', () => {
+      spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
+      let last = getBinaryPathFromConfig('path-does-not-exist');
+      expect(last).toBe('foo-1.0');
+    });
+
+    it('should find the download from a version', () => {
+      spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
+      expect(getBinaryPathFromConfig('path-does-not-exist', '1.0'))
+        .toBe('foo-1.0');
+        expect(getBinaryPathFromConfig('path-does-not-exist', '1.2'))
+        .toBe('baz-1.2');
     });
   });
 });
