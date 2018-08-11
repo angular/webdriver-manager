@@ -7,9 +7,10 @@ export const OUT_DIR = path.resolve('.');
  * The provider updateBinary interface implemented by all providers.
  */
 export interface Provider {
-  updateBinary: (version?: string) => Promise<any>;
+  cleanFiles?: () => string;
   getBinaryPath?: (version?: string) => string;
   getStatus?: () => string;
+  updateBinary: (version?: string) => Promise<any>;
   seleniumFlag?: string;
 }
 

@@ -28,7 +28,7 @@ export function isExpired(fileName: string): boolean {
 /**
  * Reads the json file from file.
  * @param fileName The json filename to read.
- * @returns 
+ * @returns
  */
 export function readJson(fileName: string): JsonObject[] | JsonObject | null {
   try {
@@ -141,7 +141,7 @@ export async function uncompressTarball(
   try {
     fs.mkdirSync(path.resolve(dstDir));
   } catch (err) { }
-  
+
   let fileList = await tarFileList(tarball);
   return tar.extract({
     file: tarball
@@ -232,4 +232,24 @@ export function getBinaryPathFromConfig(
     }
   }
   return binaryPath;
+}
+
+/**
+ * Removes the files that match the regular expressions and returns a string
+ * of removed files.
+ * @param outDir The output directory.
+ * @param fileRegexes The regExp to match files to remove in the outDir.
+ */
+export function removeFiles(outDir: string, fileRegexes: RegExp[]): string {
+  let existFiles = fs.readdirSync(outDir);
+  let removedFiles: string[] = [];
+  for (let fileRegex of fileRegexes) {
+    for (let existFile of existFiles) {
+      if (existFile.match(fileRegex)) {
+        removedFiles.push(existFile);
+        fs.unlinkSync(path.resolve(outDir, existFile));
+      }
+    }
+  }
+  return (removedFiles.sort()).join('\n');
 }

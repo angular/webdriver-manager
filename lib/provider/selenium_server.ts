@@ -11,6 +11,7 @@ import {
 import {
   generateConfigFile,
   getBinaryPathFromConfig,
+  removeFiles,
 } from './utils/file_utils';
 import { curlCommand, initOptions, requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
@@ -198,6 +199,13 @@ export class SeleniumServer implements Provider {
       versions.push(version);
     }
     return versions.join(', ');
+  }
+
+  /**
+   * Get a line delimited list of files removed.
+   */
+  cleanFiles(): string {
+    return removeFiles(this.outDir, [/selenium-server.*/g]);
   }
 }
 

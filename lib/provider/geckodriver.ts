@@ -6,6 +6,7 @@ import {
   changeFilePermissions,
   generateConfigFile,
   getBinaryPathFromConfig,
+  removeFiles,
   renameFileWithVersion,
   uncompressTarball,
   unzipFile,
@@ -148,6 +149,13 @@ export class GeckoDriver implements Provider {
       versions.push(version);
     }
     return versions.join(', ');
+  }
+
+    /**
+   * Get a line delimited list of files removed.
+   */
+  cleanFiles(): string {
+    return removeFiles(this.outDir, [/geckodriver.*/g]);
   }
 }
 

@@ -13,6 +13,7 @@ import {
 import {
   generateConfigFile,
   getBinaryPathFromConfig,
+  removeFiles,
   renameFileWithVersion,
   unzipFile,
   zipFileList,
@@ -137,6 +138,15 @@ export class IEDriver implements Provider {
       versions.push(version);
     }
     return versions.join(', ');
+  }
+
+  /**
+   * Get a line delimited list of files removed.
+   */
+  cleanFiles(): string {
+    return removeFiles(this.outDir, [
+      /IEDriverServer.*/g,
+      /iedriver.*/g]);
   }
 }
 

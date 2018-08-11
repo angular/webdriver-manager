@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 import {
   generateConfigFile,
+  removeFiles,
   tarFileList,
   uncompressTarball,
   unzipFile,
@@ -47,7 +48,7 @@ describe('file_utils', () => {
       rimraf.sync(tmpDir);
     });
 
-    it('should uncompress the file', async() => {      
+    it('should uncompress the file', async() => {
       let untarFiles = await uncompressTarball(tarballFile, tmpDir);
       let untarBar = path.resolve(tmpDir, 'bar');
       expect(untarFiles).toBeTruthy();
@@ -89,7 +90,7 @@ describe('file_utils', () => {
     afterAll(() => {
       rimraf.sync(tmpDir);
     });
-    
+
     it('should uncompress the file', () => {
       let zipFiles = unzipFile(zipFile, tmpDir);
       let unzipBar = path.resolve(tmpDir, 'bar');
@@ -102,7 +103,7 @@ describe('file_utils', () => {
 
   describe('generateConfigFile', () => {
     let tmpDir: string;
-    
+
     beforeAll(() => {
       tmpDir = path.resolve(os.tmpdir(), 'test');
       try {
@@ -140,6 +141,51 @@ describe('file_utils', () => {
       let jsonContents = JSON.parse(contents);
       expect(jsonContents['last']).toBe(lastBinary);
       expect(jsonContents['all'].length).toBe(2);
+    });
+  });
+
+  describe('removeFiles', () => {
+    let tmpDir: string;
+
+    beforeEach(() => {
+      tmpDir = path.resolve(os.tmpdir(), 'test');
+      try {
+        fs.mkdirSync(tmpDir)
+      } catch(err) {}
+    });
+
+    afterEach(() => {
+      rimraf.sync(tmpDir);
+    });
+
+    it('should remove files', () => {
+      console.log(tmpDir);
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-123'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-456'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-789'), 'w'));
+
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'baz-123'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'baz-456'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'baz-789'), 'w'));
+
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'foo-123'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'foo-456'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'foo-789'), 'w'));
+
+      expect(removeFiles(tmpDir, [/bar-.*/g])).toBe(
+        'bar-123\nbar-456\nbar-789');
+      expect(fs.readdirSync(tmpDir).length).toBe(6);
+      expect(removeFiles(tmpDir, [/foo-.*/g, /baz-.*/g])).toBe(
+        'baz-123\nbaz-456\nbaz-789\nfoo-123\nfoo-456\nfoo-789');
+      expect(fs.readdirSync(tmpDir).length).toBe(0);
+    });
+
+    it('should not remove files if nothing is matched', () => {
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-123'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-456'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-789'), 'w'));
+      expect(removeFiles(tmpDir, [/zebra-.*/g])).toBe('');
+      expect(fs.readdirSync(tmpDir).length).toBe(3);
     });
   });
 });

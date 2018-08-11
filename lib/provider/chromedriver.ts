@@ -8,11 +8,12 @@ import {
 } from './provider';
 import {
   changeFilePermissions,
+  generateConfigFile,
   getBinaryPathFromConfig,
+  removeFiles,
   renameFileWithVersion,
   unzipFile,
   zipFileList,
-  generateConfigFile,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
@@ -141,7 +142,12 @@ export class ChromeDriver implements Provider {
     return versions.join(', ');
   }
 
-  // TODO(cnishina): Remove files downloaded
+  /**
+   * Get a line delimited list of files removed.
+   */
+  cleanFiles(): string {
+    return removeFiles(this.outDir, [/chromedriver.*/g]);
+  }
 }
 
 /**
