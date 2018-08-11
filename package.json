@@ -2,6 +2,10 @@
   "name": "webdriver-manager-replacement",
   "version": "0.1.4",
   "description": "not the webdriver-manager cli",
+  "bin": {
+    "webdriver-manager": "bin/webdriver-manager",
+    "webdriver-manager-replacement": "bin/webdriver-manager-replacement"
+  },
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "scripts": {
@@ -30,7 +34,8 @@
     "request": "^2.87.0",
     "semver": "^5.5.0",
     "tar": "^4.4.4",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "yargs": "^12.0.1"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.31",
@@ -42,6 +47,7 @@
     "@types/semver": "^5.5.0",
     "@types/tar": "^4.0.0",
     "@types/xml2js": "^0.4.3",
+    "@types/yargs": "^11.1.1",
     "http-proxy": "^1.17.0",
     "jasmine": "^3.1.0",
     "rimraf": "^2.6.2",

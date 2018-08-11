@@ -1,14 +1,10 @@
+import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructProviders } from './utils';
 
-let options: Options = {
-  providers: [
-    { name: 'chromedriver'},
-    { name: 'geckodriver' }
-  ],
-  server: {
-    name: 'selenium',
-  },
+export function handler(argv: yargs.Arguments) {
+  let options = constructProviders(argv);
+  update(options).then(() => {});
 }
 
 export function update(options: Options): Promise<any> {
@@ -19,6 +15,3 @@ export function update(options: Options): Promise<any> {
   promises.push(options.server.binary.updateBinary(options.server.version));
   return Promise.all(promises);
 }
-
-options = constructProviders(options);
-update(options).then(() => {});

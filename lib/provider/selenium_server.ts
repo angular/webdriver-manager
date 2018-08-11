@@ -179,26 +179,30 @@ export class SeleniumServer implements Provider {
    * Gets a comma delimited list of versions downloaded. Also has the "latest"
    * downloaded noted.
    */
-  getStatus(): string {
-    const configFilePath = path.resolve(this.outDir, this.configFileName);
-    const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
-    let versions: string[] = [];
-    for (let binaryPath of configJson['all']) {
-      let version = '';
-      let regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g
-      try {
-        let exec = regex.exec(binaryPath);
-        if (exec && exec[1]) {
-          version = exec[1];
-        }
-      } catch (_) {}
+  getStatus(): string|null {
+    try {
+      const configFilePath = path.resolve(this.outDir, this.configFileName);
+      const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
+      let versions: string[] = [];
+      for (let binaryPath of configJson['all']) {
+        let version = '';
+        let regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g
+        try {
+          let exec = regex.exec(binaryPath);
+          if (exec && exec[1]) {
+            version = exec[1];
+          }
+        } catch (_) {}
 
-      if (configJson['last'] === binaryPath) {
-        version += ' (latest)'
+        if (configJson['last'] === binaryPath) {
+          version += ' (latest)'
+        }
+        versions.push(version);
       }
-      versions.push(version);
+      return versions.join(', ');
+    } catch (_) {
+      return null;
     }
-    return versions.join(', ');
   }
 
   /**

@@ -1,14 +1,10 @@
+import * as yargs from 'yargs';
 import { Options } from './options';
-import { constructProviders } from './utils';
+import { constructAllProviders } from './utils';
 
-let options: Options = {
-  providers: [
-    { name: 'chromedriver'},
-    { name: 'geckodriver' }
-  ],
-  server: {
-    name: 'selenium',
-  },
+export function handler(argv: yargs.Arguments) {
+  let options = constructAllProviders(argv);
+  console.log(clean(options));
 }
 
 export function clean(options: Options): string {
@@ -19,6 +15,3 @@ export function clean(options: Options): string {
   filesCleaned.push(options.server.binary.cleanFiles());
   return (filesCleaned.sort()).join();
 }
-
-options = constructProviders(options);
-console.log(clean(options));

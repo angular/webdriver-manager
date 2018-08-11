@@ -8,8 +8,8 @@ export const OUT_DIR = path.resolve('.');
  */
 export interface Provider {
   cleanFiles?: () => string;
-  getBinaryPath?: (version?: string) => string;
-  getStatus?: () => string;
+  getBinaryPath?: (version?: string) => string|null;
+  getStatus?: () => string|null;
   updateBinary: (version?: string) => Promise<any>;
   seleniumFlag?: string;
 }

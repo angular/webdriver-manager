@@ -16,8 +16,7 @@
     ],
     "types": [
       "jasmine",
-      "node",
-      "request"
+      "node"
     ],
   },
   "exclude": [
