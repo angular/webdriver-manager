@@ -11,10 +11,11 @@ import {
   updateXml,
 } from './utils/cloud_storage_xml';
 import {
+  generateConfigFile,
+  getBinaryPathFromConfig,
   renameFileWithVersion,
   unzipFile,
   zipFileList,
-  generateConfigFile,
 } from './utils/file_utils';
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
@@ -101,6 +102,41 @@ export class IEDriver implements Provider {
       path.resolve(this.outDir, this.configFileName),
       matchBinaries(this.osType), renamedFileName);
     return Promise.resolve();
+  }
+
+  /**
+   * Gets the Chromedriver binary file path.
+   * @param version Optional to provide the version number or latest.
+   */
+  getBinaryPath(version?: string): string {
+    const configFilePath = path.resolve(this.outDir, this.configFileName);
+    return getBinaryPathFromConfig(configFilePath, version);
+  }
+
+  /**
+   * Gets a comma delimited list of versions downloaded. Also has the "latest"
+   * downloaded noted.
+   */
+  getStatus(): string {
+    const configFilePath = path.resolve(this.outDir, this.configFileName);
+    const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
+    let versions: string[] = [];
+    for (let binaryPath of configJson['all']) {
+      let version = '';
+      let regex = /.*IEDriverServer_(\d+.\d+.\d+.*).exe/g
+      try {
+        let exec = regex.exec(binaryPath);
+        if (exec && exec[1]) {
+          version = exec[1];
+        }
+      } catch (_) {}
+
+      if (configJson['last'] === binaryPath) {
+        version += ' (latest)'
+      }
+      versions.push(version);
+    }
+    return versions.join(', ');
   }
 }
 

@@ -108,11 +108,38 @@ export class ChromeDriver implements Provider {
    * @param version Optional to provide the version number or latest.
    */
   getBinaryPath(version?: string): string {
-    let configFilePath = path.resolve(this.outDir, this.configFileName);
+    const configFilePath = path.resolve(this.outDir, this.configFileName);
     return getBinaryPathFromConfig(configFilePath, version);
   }
 
-  // TODO(cnishina): A list of chromedriver versions downloaded
+  /**
+   * Gets a comma delimited list of versions downloaded. Also has the "latest"
+   * downloaded noted.
+   */
+  getStatus(): string {
+    const configFilePath = path.resolve(this.outDir, this.configFileName);
+    const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
+    let versions: string[] = [];
+    for (let binaryPath of configJson['all']) {
+      let version = '';
+      let regex = /.*chromedriver_(\d+.\d+.*)/g
+      if (this.osType === 'Windows_NT') {
+        regex = /.*chromedriver_(\d+.\d+.*).exe/g
+      }
+      try {
+        let exec = regex.exec(binaryPath);
+        if (exec && exec[1]) {
+          version = exec[1];
+        }
+      } catch (_) {}
+
+      if (configJson['last'] === binaryPath) {
+        version += ' (latest)'
+      }
+      versions.push(version);
+    }
+    return versions.join(', ');
+  }
 
   // TODO(cnishina): Remove files downloaded
 }

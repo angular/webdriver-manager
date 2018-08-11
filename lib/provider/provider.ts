@@ -6,9 +6,10 @@ export const OUT_DIR = path.resolve('.');
 /**
  * The provider updateBinary interface implemented by all providers.
  */
-export interface Provider {  
+export interface Provider {
   updateBinary: (version?: string) => Promise<any>;
   getBinaryPath?: (version?: string) => string;
+  getStatus?: () => string;
   seleniumFlag?: string;
 }
 
@@ -26,7 +27,7 @@ export interface ProviderConfig {
   // The file contains the body returned from the request url.
   cacheFileName?: string;
   // The config file name is just the file name and not the full path.
-  // The file contains a json object of the list of all downloaded 
+  // The file contains a json object of the list of all downloaded
   // binaries and the last downloaded binary.
   configFileName?: string;
   // The os type of this system.

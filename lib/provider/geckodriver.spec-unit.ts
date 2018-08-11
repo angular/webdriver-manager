@@ -1,4 +1,8 @@
-import { osHelper } from './geckodriver';
+import * as fs from 'fs';
+import {
+  GeckoDriver,
+  osHelper
+} from './geckodriver';
 
 describe('geckodriver', () => {
   describe('osHelper', () => {
@@ -17,6 +21,40 @@ describe('geckodriver', () => {
       expect(osHelper('FooBarOS', '')).toBeNull();
       expect(osHelper('Windows_NT', 'arm')).toBeNull();
       expect(osHelper('Linux', 'arm64')).toBeNull();
+    });
+  });
+
+  describe('class GeckoDriver', () => {
+    describe('getStatus', () => {
+      it('should get the status from the config file for Windows', () => {
+        const configCache = `{
+          "last": "/path/to/geckodriver_100.1.0.exe",
+          "all": [
+            "/path/to/geckodriver_90.0.0.exe",
+            "/path/to/geckodriver_99.0.0-beta.exe",
+            "/path/to/geckodriver_100.1.0.exe"
+          ]
+        }`;
+        spyOn(fs, 'readFileSync').and.returnValue(configCache);
+        let geckodriver = new GeckoDriver({osType: 'Windows_NT'});
+        expect(geckodriver.getStatus())
+          .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
+      });
+
+      it('should get the status from the config file for not Windows', () => {
+        const configCache = `{
+          "last": "/path/to/geckodriver_100.1.0",
+          "all": [
+            "/path/to/geckodriver_90.0.0",
+            "/path/to/geckodriver_99.0.0-beta",
+            "/path/to/geckodriver_100.1.0"
+          ]
+        }`;
+        spyOn(fs, 'readFileSync').and.returnValue(configCache);
+        let geckodriver = new GeckoDriver({osType: 'Darwin'});
+        expect(geckodriver.getStatus())
+          .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
+      });
     });
   });
 });
