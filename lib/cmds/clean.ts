@@ -10,7 +10,10 @@ export function handler(argv: yargs.Arguments) {
 export function clean(options: Options): string {
   let filesCleaned: string[] = [];
   for (let provider of options.providers) {
-    filesCleaned.push(provider.binary.cleanFiles());
+    let cleanedFiles = provider.binary.cleanFiles();
+    if (cleanedFiles) {
+      filesCleaned.push(cleanedFiles);
+    }
   }
   filesCleaned.push(options.server.binary.cleanFiles());
   return (filesCleaned.sort()).join();
