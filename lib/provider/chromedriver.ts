@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { Flag } from '../flags';
 import {
   OUT_DIR,
   Provider,
@@ -19,15 +18,6 @@ import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
-
-export const CHROME_VERSION: Flag = {
-  flagName: 'versions.chrome',
-  type: 'string',
-  description: 'Optional chrome driver version (use \'latest\' ' +
-    'to get the most recent version)',
-  default: 'latest'
-};
-
 export class ChromeDriver implements Provider {
   cacheFileName = 'chromedriver.xml';
   configFileName = 'chromedriver.config.json';
@@ -37,6 +27,7 @@ export class ChromeDriver implements Provider {
   outDir = OUT_DIR;
   proxy: string = null;
   requestUrl = 'https://chromedriver.storage.googleapis.com/';
+  seleniumFlag = '-Dwebdriver.chrome.driver';
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {

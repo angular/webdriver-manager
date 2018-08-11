@@ -8,6 +8,8 @@ export const OUT_DIR = path.resolve('.');
  */
 export interface Provider {  
   updateBinary: (version?: string) => Promise<any>;
+  getBinaryPath?: (version?: string) => string;
+  seleniumFlag?: string;
 }
 
 /**

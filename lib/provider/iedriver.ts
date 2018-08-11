@@ -28,6 +28,7 @@ export class IEDriver implements Provider {
   outDir = OUT_DIR;
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
+  seleniumFlag = '-Dwebdriver.ie.driver';
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
