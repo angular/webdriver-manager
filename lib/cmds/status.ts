@@ -1,13 +1,20 @@
-import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructAllProviders } from './utils';
 
-
-export function handler(argv: yargs.Arguments) {
+/**
+ * Displays which versions of providers that have been downloaded.
+ * @param argv The argv from yargs.
+ */
+export function handler(argv: any) {
   let options = constructAllProviders(argv);
   console.log(status(options));
 }
 
+/**
+ * Gets a list of versions for server and browser drivers.
+ * @param options The constructed options.
+ * @returns A string of the versions downloaded.
+ */
 export function status(options: Options): string {
   let binaryVersions = [];
   for (let provider of options.providers) {
@@ -16,7 +23,9 @@ export function status(options: Options): string {
       binaryVersions.push(`${provider.name}: ${status}`);
     }
   }
-  binaryVersions.push(
-    `${options.server.name}: ${options.server.binary.getStatus()}`);
+  if (options.server && options.server.binary) {
+    binaryVersions.push(
+      `${options.server.name}: ${options.server.binary.getStatus()}`);
+  }
   return (binaryVersions.sort()).join('\n');
 }

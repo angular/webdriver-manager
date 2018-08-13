@@ -3,10 +3,10 @@ jobs:
   build:
     working_directory: ~/workspace
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:8-browsers
     steps:
       - checkout
-      
+
       - run: node --version
       - run: npm --version
 
@@ -14,4 +14,4 @@ jobs:
       - run: npm run test-unit
       - run: npm run test-int
       - run: npm run test-proxy
-      
+      - run: npm run test-e2e

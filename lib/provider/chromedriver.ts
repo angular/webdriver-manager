@@ -72,6 +72,9 @@ export class ChromeDriver implements Provider {
       path.resolve(this.outDir, this.cacheFileName), '.zip',
       versionParser,
       semanticVersionParser);
+    if (version) {
+      version = version + '.0';
+    }
     let versionObj = getVersion(
       versionList, osHelper(this.osType, this.osArch), version);
 

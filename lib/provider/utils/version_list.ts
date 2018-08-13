@@ -8,7 +8,7 @@ import * as semver from 'semver';
  * and os type.
  */
 export interface VersionList {
-  // The forced version is the semver equivalent version of the 
+  // The forced version is the semver equivalent version of the
   // actual version number. An example is 2.9 would translate into 2.9.0
   [forced_version: string]: {
 
@@ -23,7 +23,7 @@ export interface VersionList {
 export interface VersionObj {
   // The file name.
   name?: string;
-  
+
   // The content length of the file.
   size?: number;
 
@@ -31,7 +31,7 @@ export interface VersionObj {
   url?: string;
 
   // The actual version number, not the forced semantic version.
-  version?: string;  
+  version?: string;
 }
 
 /**

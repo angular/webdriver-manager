@@ -1,12 +1,20 @@
-import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructAllProviders } from './utils';
 
-export function handler(argv: yargs.Arguments) {
+/**
+ * Handles removing files that were downloaded and logs the files.
+ * @param argv The argv from yargs.
+ */
+export function handler(argv: any) {
   let options = constructAllProviders(argv);
   console.log(clean(options));
 }
 
+/**
+ * Goes through all the providers and removes the downloaded files.
+ * @param options The constructed options.
+ * @returns A list of deleted files.
+ */
 export function clean(options: Options): string {
   let filesCleaned: string[] = [];
   for (let provider of options.providers) {
@@ -15,6 +23,8 @@ export function clean(options: Options): string {
       filesCleaned.push(cleanedFiles);
     }
   }
-  filesCleaned.push(options.server.binary.cleanFiles());
-  return (filesCleaned.sort()).join();
+  if (options.server && options.server.binary) {
+    filesCleaned.push(options.server.binary.cleanFiles());
+  }
+  return (filesCleaned.sort()).join('\n');
 }

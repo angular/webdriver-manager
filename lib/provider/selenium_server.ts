@@ -26,6 +26,7 @@ export class SeleniumServer implements Provider {
   outDir = OUT_DIR;
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
+  seleniumProcess: childProcess.ChildProcess;
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
@@ -97,23 +98,18 @@ export class SeleniumServer implements Provider {
    * @param version The optional version of the selenium jar file.
    * @returns A promise so the server can run while awaiting its completion.
    */
-  startServer(opts: {[key:string]: string}, version?: string): Promise<any> {
+  startServer(opts: {[key:string]: string}, version?: string): Promise<number> {
     let cmd = this.getCmdStartServer(opts, version);
     console.log(cmd);
-    return new Promise<any>((resolve, reject) => {
-      let seleniumProcess = childProcess.exec(cmd);
-      console.log(`selenium process id: ${seleniumProcess.pid}`);
-      seleniumProcess.on('exit', async(code: number) => {
+    return new Promise<number>((resolve, reject) => {
+      this.seleniumProcess = childProcess.exec(cmd);
+      console.log(`selenium process id: ${this.seleniumProcess.pid}`);
+      this.seleniumProcess.on('exit', (code: number) => {
         console.log(`Selenium Standalone has exited with code: ${code}`);
-        process.exit(process.exitCode || code);
+        resolve(code);
       });
-      seleniumProcess.on('error', (err: Error) => {
+      this.seleniumProcess.on('error', (err: Error) => {
         console.log(`Selenium Standalone server encountered an error: ${err}`);
-      });
-      process.stdin.resume();
-      process.on('SIGINT', async() => {
-        process.kill(seleniumProcess.pid);
-        process.exit(process.exitCode);
       });
     });
   }
