@@ -1,5 +1,5 @@
 import { Options } from './options';
-import { constructAllProviders } from './utils';
+import { constructProviders } from './utils';
 import { SeleniumServer } from '../provider/selenium_server';
 
 /**
@@ -8,7 +8,7 @@ import { SeleniumServer } from '../provider/selenium_server';
  * @param argv The argv from yargs.
  */
 export function handler(argv: any) {
-  let options = constructAllProviders(argv);
+  let options = constructProviders(argv);
   process.stdin.resume();
   process.on('SIGINT', () => {
     let seleniumServer = options.server.binary as SeleniumServer;
