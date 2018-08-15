@@ -1,3 +1,4 @@
+import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructProviders } from './utils';
 import { SeleniumServer } from '../provider/selenium_server';
@@ -7,7 +8,7 @@ import { SeleniumServer } from '../provider/selenium_server';
  * the SIGINT event when the server is stopped.
  * @param argv The argv from yargs.
  */
-export function handler(argv: any) {
+export function handler(argv: yargs.Arguments) {
   let options = constructProviders(argv);
   process.stdin.resume();
   process.on('SIGINT', () => {

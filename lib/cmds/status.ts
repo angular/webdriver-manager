@@ -1,3 +1,4 @@
+import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructAllProviders } from './utils';
 
@@ -5,7 +6,7 @@ import { constructAllProviders } from './utils';
  * Displays which versions of providers that have been downloaded.
  * @param argv The argv from yargs.
  */
-export function handler(argv: any) {
+export function handler(argv: yargs.Arguments) {
   let options = constructAllProviders(argv);
   console.log(status(options));
 }

@@ -1,3 +1,4 @@
+import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructProviders } from './utils';
 
@@ -5,7 +6,7 @@ import { constructProviders } from './utils';
  * Updates / downloads the providers binaries.
  * @param argv The argv from yargs.
  */
-export function handler(argv: any) {
+export function handler(argv: yargs.Arguments) {
   let options = constructProviders(argv);
   update(options).then(() => {});
 }

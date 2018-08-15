@@ -11,7 +11,6 @@ import { status } from './status';
 import { start } from './start';
 import { clean } from './clean';
 import { SeleniumServer } from '../provider/selenium_server';
-import { resolve } from 'url';
 
 describe('using the cli', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');

@@ -1,11 +1,15 @@
-const yargs = require('yargs');
+import * as yargs from 'yargs';
 import { Options } from './options';
 import { ChromeDriver } from '../provider/chromedriver';
 import { GeckoDriver } from '../provider/geckodriver';
 import { IEDriver } from '../provider/iedriver';
 import { SeleniumServer } from '../provider/selenium_server';
 
-export function constructAllProviders(argv: any): Options {
+/**
+ * Create the options with all providers.
+ * @param argv
+ */
+export function constructAllProviders(argv: yargs.Arguments): Options {
   let providerConfig = {
     ignoreSSL: argv.ignore_ssl,
     outDir: argv.out_dir,
@@ -45,7 +49,11 @@ export function constructAllProviders(argv: any): Options {
   };
 }
 
-export function constructProviders(argv: any): Options {
+/**
+ * Create the options with providers depending on argv's.
+ * @param argv
+ */
+export function constructProviders(argv: yargs.Arguments): Options {
   let options: Options = {
     providers: [],
     server: {},
