@@ -42,14 +42,15 @@ describe('selenium_server', () => {
       }`;
       let javaArgs = '-role node ' +
         '-servlet org.openqa.grid.web.servlet.LifecycleServlet ' +
-        '-registerCycle 0 -port 4444'
+        '-registerCycle 0 -port 4444';
+      let javaArgsPort = '-port 4444';
       it('should use a selenium server with no options', () => {
         spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
         let seleniumServer = new SeleniumServer();
         expect(seleniumServer.getCmdStartServer(null).join(' '))
-          .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgs);
+          .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgsPort);
         expect(seleniumServer.getCmdStartServer({}).join(' '))
-          .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgs);
+          .toContain('-jar path/to/selenium-server-3.0.jar ' + javaArgsPort);
       });
 
       it('should use a selenium server with options', () => {
@@ -57,6 +58,17 @@ describe('selenium_server', () => {
         let seleniumServer = new SeleniumServer();
         let cmd = seleniumServer.getCmdStartServer(
           {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'});
+        expect(cmd.join(' ')).toContain(
+          '-Dwebdriver.chrome.driver=path/to/chromedriver ' +
+          '-jar path/to/selenium-server-3.0.jar ' + javaArgsPort);
+      });
+
+      it('should use a selenium server with node options', () => {
+        spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
+        let seleniumServer = new SeleniumServer();
+        let cmd = seleniumServer.getCmdStartServer(
+          {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'},
+          null, true);
         expect(cmd.join(' ')).toContain(
           '-Dwebdriver.chrome.driver=path/to/chromedriver ' +
           '-jar path/to/selenium-server-3.0.jar ' + javaArgs);

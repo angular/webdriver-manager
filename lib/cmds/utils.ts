@@ -41,7 +41,8 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
     server: {
       name: 'selenium',
       binary: new SeleniumServer(providerConfig),
-      version: versionsStandalone
+      version: versionsStandalone,
+      runAsNode: argv.standalone_node
     },
     ignoreSSL: argv.ignore_ssl,
     outDir: argv.out_dir,
@@ -101,6 +102,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
     options.server.name = 'selenium';
     options.server.binary = new SeleniumServer(providerConfig);
     options.server.version = versionsStandalone;
+    options.server.runAsNode = argv.standalone_node;
   }
   return options;
 }

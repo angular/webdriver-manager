@@ -97,11 +97,15 @@ export class SeleniumServer implements Provider {
    * Starts selenium standalone server and handles emitted exit events.
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
+   * @param runAsNode The option to run the selenium jar with role set to node.
    * @returns A promise so the server can run while awaiting its completion.
    */
-  startServer(opts: {[key:string]: string}, version?: string): Promise<number> {
+  startServer(
+      opts: {[key:string]: string},
+      version?: string,
+      runAsNode?: boolean): Promise<number> {
     let java = this.getJava();
-    let cmd = this.getCmdStartServer(opts, version);
+    let cmd = this.getCmdStartServer(opts, version, runAsNode);
     log.info(`${java} ${cmd.join(' ')}`);
     return new Promise<number>((resolve, _) => {
       this.seleniumProcess = childProcess.spawn(java, cmd, {stdio: 'inherit'});
@@ -120,9 +124,13 @@ export class SeleniumServer implements Provider {
    * Get the selenium server start command (not including the java command)
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
+   * @param runAsNode The option to run the selenium jar with role set to node.
    * @returns The spawn arguments array.
    */
-  getCmdStartServer(opts: {[key:string]: string}, version?: string): string[] {
+  getCmdStartServer(
+      opts: {[key:string]: string},
+      version?: string,
+      runAsNode?: boolean): string[] {
     let configFilePath = path.resolve(this.outDir, this.configFileName);
     let jarFile = getBinaryPathFromConfig(configFilePath, version);
     let options: string[] = [];
@@ -134,15 +142,16 @@ export class SeleniumServer implements Provider {
     options.push('-jar');
     options.push(jarFile);
 
-    options.push('-role');
-    options.push('node');
+    if (runAsNode) {
+      options.push('-role');
+      options.push('node');
 
-    options.push('-servlet');
-    options.push('org.openqa.grid.web.servlet.LifecycleServlet');
+      options.push('-servlet');
+      options.push('org.openqa.grid.web.servlet.LifecycleServlet');
 
-    options.push('-registerCycle');
-    options.push('0');
-
+      options.push('-registerCycle');
+      options.push('0');
+    }
     options.push('-port');
     options.push('4444');
 

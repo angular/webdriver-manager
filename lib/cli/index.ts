@@ -50,6 +50,11 @@ const standaloneOption: yargs.Options = {
   default: true,
   type: 'boolean'
 };
+const STANDALONE_NODE = 'standalone_node';
+const standaloneNodeOption: yargs.Options = {
+  describe: 'Start the selenium server standalone with role set to "node".',
+  type: 'boolean'
+};
 const VERSIONS_CHROME = 'versions.chrome';
 const versionsChromeOption: yargs.Options = {
   describe: 'The chromedriver version.',
@@ -89,6 +94,7 @@ yargs
         .option(LOG_LEVEL, logLevelOption)
         .option(OUT_DIR, outDirOption)
         .option(STANDALONE, standaloneOption)
+        .option(STANDALONE_NODE, standaloneNodeOption)
         .option(VERSIONS_CHROME, versionsChromeOption)
         .option(VERSIONS_GECKO, versionsGeckoOption)
         .option(VERSIONS_IE, versionsIeOption)

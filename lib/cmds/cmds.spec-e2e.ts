@@ -70,6 +70,7 @@ describe('using the cli', () => {
         _: ['foobar'],
         chrome: true,
         standalone: true,
+        standalone_node: true,
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };

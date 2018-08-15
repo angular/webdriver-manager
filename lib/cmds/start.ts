@@ -14,7 +14,7 @@ export function handler(argv: yargs.Arguments) {
   let options = constructProviders(argv);
   process.stdin.resume();
   process.on('SIGINT', () => {
-    let seleniumServer = options.server.binary as SeleniumServer;
+    let seleniumServer = (options.server.binary as SeleniumServer);
     process.kill(seleniumServer.seleniumProcess.pid);
     process.exit(process.exitCode);
   });
@@ -37,7 +37,7 @@ export function start(options: Options): Promise<number> {
   }
   if (options.server && options.server.binary) {
     return (options.server.binary as SeleniumServer)
-      .startServer(javaOpts, options.server.version);
+      .startServer(javaOpts, options.server.version, options.server.runAsNode);
   }
   return Promise.reject('Could not start the server');
 }
