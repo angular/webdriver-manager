@@ -22,7 +22,7 @@ describe('iedriver', () => {
         fs.mkdirSync(tmpDir);
       } catch (err) {}
     });
-  
+
     afterEach(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
       try {
@@ -50,7 +50,6 @@ describe('iedriver', () => {
       let versionObj = getVersion(versionList, '');
       let executableFile = path.resolve(tmpDir,
         'IEDriverServer_' + versionObj.version + '.exe');
-      console.log(executableFile);
       expect(fs.statSync(executableFile).size).toBeTruthy();
       done();
     });

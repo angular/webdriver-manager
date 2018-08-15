@@ -1,7 +1,8 @@
-import * as url from 'url';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as path from 'path';
 import * as request from 'request';
+import * as url from 'url';
 
 /**
  * The request options that extend the request. This is not exported
@@ -187,14 +188,21 @@ export function addHeader(options: RequestOptionsValue, name: string,
  * The request to download the binary.
  * @param binaryUrl The download url for the binary.
  * @param httpOptions The http options for the request.
+ * @param isLogInfo Log info or debug
  */
 export function requestBinary(
     binaryUrl: string,
-    httpOptions: HttpOptions): Promise<boolean> {
+    httpOptions: HttpOptions,
+    isLogInfo: boolean = true): Promise<boolean> {
   let options = initOptions(binaryUrl, httpOptions);
   options.followRedirect = false;
   options.followAllRedirects = false;
-  console.log(curlCommand(options, httpOptions.fileName));
+  if (isLogInfo) {
+    log.info(curlCommand(options, httpOptions.fileName));
+  } else {
+    log.debug(curlCommand(options, httpOptions.fileName));
+  }
+
 
   return new Promise<boolean>((resolve, reject) => {
     let req = request(options);
@@ -240,7 +248,7 @@ export function requestBinary(
         for (let header of Object.keys(response.headers)) {
           httpOptions.headers[header] = response.headers[header];
         }
-        resolve(requestBinary(location, httpOptions));
+        resolve(requestBinary(location, httpOptions, false));
       } else {
         reject(new Error('response status code is not 200'));
       }
@@ -261,7 +269,7 @@ export function requestBody(
     requestUrl: string,
     httpOptions: HttpOptions): Promise<string> {
   let options = initOptions(requestUrl, httpOptions);
-  console.log(curlCommand(options, httpOptions.fileName));
+  log.info(curlCommand(options, httpOptions.fileName));
   options.followRedirect = true;
   return new Promise((resolve, reject) => {
     let req = request(options);

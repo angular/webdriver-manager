@@ -32,6 +32,7 @@
   "homepage": "https://github.com/cnishina/webderpy-manager#readme",
   "dependencies": {
     "adm-zip": "^0.4.11",
+    "loglevel": "^1.6.1",
     "request": "^2.87.0",
     "semver": "^5.5.0",
     "tar": "^4.4.4",
@@ -42,6 +43,7 @@
     "@types/adm-zip": "^0.4.31",
     "@types/http-proxy": "^1.16.2",
     "@types/jasmine": "^2.8.8",
+    "@types/loglevel": "^1.5.3",
     "@types/node": "^10.3.3",
     "@types/request": "^2.47.0",
     "@types/rimraf": "^2.0.2",

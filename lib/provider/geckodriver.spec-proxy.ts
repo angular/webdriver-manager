@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -12,6 +13,8 @@ import { checkConnectivity } from '../../spec/support/helpers/test_utils';
 import { convertJsonToVersionList } from './utils/github_json';
 import { getVersion } from './utils/version_list';
 
+log.setLevel('debug');
+
 describe('geckodriver', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
 
@@ -23,7 +26,7 @@ describe('geckodriver', () => {
       beforeEach((done) => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
         proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
-        console.log('proxy-server: ' + proxyProc.pid);
+        log.debug('proxy-server: ' + proxyProc.pid);
         setTimeout(done, 3000);
         try {
           fs.mkdirSync(tmpDir);

@@ -1,3 +1,4 @@
+import * as log from 'loglevel';
 import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructProviders } from './utils';
@@ -9,6 +10,7 @@ import { SeleniumServer } from '../provider/selenium_server';
  * @param argv The argv from yargs.
  */
 export function handler(argv: yargs.Arguments) {
+  log.setLevel(argv.log_level);
   let options = constructProviders(argv);
   process.stdin.resume();
   process.on('SIGINT', () => {

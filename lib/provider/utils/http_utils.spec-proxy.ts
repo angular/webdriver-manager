@@ -1,10 +1,13 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import { requestBinary, requestBody } from './http_utils';
 import { httpBaseUrl, proxyBaseUrl } from '../../../spec/server/env';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
+
+log.setLevel('debug');
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const fileName = path.resolve(tmpDir, 'bar.zip');
@@ -23,9 +26,9 @@ describe('binary_utils', () => {
   beforeAll((done) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
     httpProc = spawnProcess('node', ['dist/spec/server/http_server.js']);
-    console.log('http-server: ' + httpProc.pid);
+    log.debug('http-server: ' + httpProc.pid);
     proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
-    console.log('proxy-server: ' + proxyProc.pid);
+    log.debug('proxy-server: ' + proxyProc.pid);
     setTimeout(done, 3000);
 
     try {

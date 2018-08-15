@@ -1,11 +1,14 @@
 
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import { convertXmlToVersionList, updateXml } from './cloud_storage_xml';
 import { httpBaseUrl } from '../../../spec/server/env';
 import { spawnProcess } from '../../../spec/support/helpers/test_utils';
+
+log.setLevel('debug');
 
 function chromedriverVersionParser(key: string): string {
   let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
@@ -33,7 +36,7 @@ describe('cloud_storage_xml', () => {
   beforeAll((done) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
     proc = spawnProcess('node', ['dist/spec/server/http_server.js']);
-    console.log('http-server: ' + proc.pid);
+    log.debug('http-server: ' + proc.pid);
     setTimeout(done, 3000);
   });
 

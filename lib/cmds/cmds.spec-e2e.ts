@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -11,6 +12,8 @@ import { status } from './status';
 import { start } from './start';
 import { clean } from './clean';
 import { SeleniumServer } from '../provider/selenium_server';
+
+log.setLevel('debug');
 
 describe('using the cli', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
@@ -55,7 +58,7 @@ describe('using the cli', () => {
       };
       let options = constructAllProviders(argv);
       let statusLog = status(options);
-      console.log(statusLog);
+      log.debug(statusLog);
       let lines = statusLog.split('\n');
       expect(lines.length).toBe(2);
     });
@@ -100,7 +103,7 @@ describe('using the cli', () => {
       };
       let options = constructAllProviders(argv);
       let cleanLogs = clean(options);
-      console.log(cleanLogs);
+      log.debug(cleanLogs);
       let lines = cleanLogs.split('\n');
       expect(lines.length).toBe(7);
       const existFiles = fs.readdirSync(tmpDir);

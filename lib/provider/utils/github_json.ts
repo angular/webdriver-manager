@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as path from 'path';
 import { isExpired, readJson } from './file_utils';
 import { HttpOptions, JsonObject, requestBody } from './http_utils';
@@ -101,17 +102,17 @@ export async function hasQuota(
     let rateLimit = JSON.parse(requesteRateLimit);
     if (rateLimit['resources']['core']['remaining'] === 0) {
       if (oauthToken) {
-        console.warn('[WARN] No remaining quota for requests to GitHub.');
+        log.warn('[WARN] No remaining quota for requests to GitHub.');
       } else {
-        console.warn('[WARN] Provide an oauth token. ' +
+        log.warn('[WARN] Provide an oauth token. ' +
           'See https://github.com/settings/tokens');
       }
-      console.warn('[WARN] Stopping updates for gecko driver.');
+      log.warn('[WARN] Stopping updates for gecko driver.');
       return false;
     }
     return true;
   } catch (err) {
-    console.error('[ERROR]: ', err);
+    log.error('[ERROR]: ', err);
     return false;
   }
 }

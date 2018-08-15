@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as request from 'request';
 import * as path from 'path';
@@ -101,16 +102,16 @@ export class SeleniumServer implements Provider {
   startServer(opts: {[key:string]: string}, version?: string): Promise<number> {
     let java = this.getJava();
     let cmd = this.getCmdStartServer(opts, version);
-    console.log(`${java} ${cmd.join(' ')}`);
+    log.info(`${java} ${cmd.join(' ')}`);
     return new Promise<number>((resolve, _) => {
       this.seleniumProcess = childProcess.spawn(java, cmd, {stdio: 'inherit'});
-      console.log(`selenium process id: ${this.seleniumProcess.pid}`);
+      log.info(`selenium process id: ${this.seleniumProcess.pid}`);
       this.seleniumProcess.on('exit', (code: number) => {
-        console.log(`Selenium Standalone has exited with code: ${code}`);
+        log.info(`Selenium Standalone has exited with code: ${code}`);
         resolve(code);
       });
       this.seleniumProcess.on('error', (err: Error) => {
-        console.log(`Selenium Standalone server encountered an error: ${err}`);
+        log.error(`Selenium Standalone server encountered an error: ${err}`);
       });
     });
   }
@@ -180,7 +181,7 @@ export class SeleniumServer implements Provider {
     let stopUrl = host + ':' + port +
       '/extra/LifecycleServlet?action=shutdown';
     let options = initOptions(stopUrl, {});
-    console.log(curlCommand(options));
+    log.info(curlCommand(options));
     return new Promise<void>((resolve, _) => {
       let req = request(options);
       req.on('response', response => {

@@ -27,6 +27,12 @@ const ignoreSSLOption: yargs.Options = {
   describe: 'Ignore SSL certificates.',
   type: 'boolean'
 };
+const LOG_LEVEL = 'log_level';
+const logLevelOption: yargs.Options = {
+  describe: 'The log level of this CLI.',
+  default: 'info',
+  type: 'string'
+}
 const OUT_DIR = 'out_dir';
 let outDirOption: yargs.Options = {
   describe: 'Location of output.',
@@ -68,7 +74,9 @@ const versionsStandaloneOption: yargs.Options = {
 yargs
   .command('clean', 'Removes downloaded files from the out_dir.',
     (yargs: yargs.Argv) => {
-      return yargs.option(OUT_DIR, outDirOption)
+      return yargs
+        .option(LOG_LEVEL, logLevelOption)
+        .option(OUT_DIR, outDirOption)
     }, (argv: yargs.Arguments) => {
       clean.handler(argv);
     })
@@ -78,6 +86,7 @@ yargs
         .option(CHROME, chromeOption)
         .option(GECKO,  geckoOption)
         .option(IEDRIVER, ieOption)
+        .option(LOG_LEVEL, logLevelOption)
         .option(OUT_DIR, outDirOption)
         .option(STANDALONE, standaloneOption)
         .option(VERSIONS_CHROME, versionsChromeOption)
@@ -89,7 +98,9 @@ yargs
     })
   .command('status', 'List the current available binaries.',
     (yargs: yargs.Argv) => {
-      return yargs.option(OUT_DIR, outDirOption)
+      return yargs
+        .option(LOG_LEVEL, logLevelOption)
+        .option(OUT_DIR, outDirOption)
     }, (argv: yargs.Arguments) => {
       status.handler(argv);
     })
@@ -100,6 +111,7 @@ yargs
         .option(GECKO,  geckoOption)
         .option(IEDRIVER, ieOption)
         .option(IGNORE_SSL, ignoreSSLOption)
+        .option(LOG_LEVEL, logLevelOption)
         .option(OUT_DIR, outDirOption)
         .option(PROXY, proxyOption)
         .option(STANDALONE, standaloneOption)

@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -10,6 +11,8 @@ import {
   unzipFile,
   zipFileList
 } from './file_utils';
+
+log.setLevel('debug');
 
 const tarballFile = path.resolve('spec/support/files/bar.tar.gz');
 const zipFile = path.resolve('spec/support/files/bar.zip');
@@ -159,7 +162,7 @@ describe('file_utils', () => {
     });
 
     it('should remove files', () => {
-      console.log(tmpDir);
+      log.debug(tmpDir);
       fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-123'), 'w'));
       fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-456'), 'w'));
       fs.closeSync(fs.openSync(path.resolve(tmpDir, 'bar-789'), 'w'));

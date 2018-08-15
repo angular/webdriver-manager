@@ -1,3 +1,4 @@
+import * as log from 'loglevel';
 import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructAllProviders } from './utils';
@@ -7,8 +8,9 @@ import { constructAllProviders } from './utils';
  * @param argv The argv from yargs.
  */
 export function handler(argv: yargs.Arguments) {
+  log.setLevel(argv.log_level);
   let options = constructAllProviders(argv);
-  console.log(clean(options));
+  log.info(clean(options));
 }
 
 /**

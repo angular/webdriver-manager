@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -14,6 +15,8 @@ import { proxyBaseUrl } from '../../spec/server/env';
 import { spawnProcess } from '../../spec/support/helpers/test_utils';
 import { checkConnectivity } from '../../spec/support/helpers/test_utils';
 
+log.setLevel('debug');
+
 describe('chromedriver', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
 
@@ -25,7 +28,7 @@ describe('chromedriver', () => {
       beforeEach((done) => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
         proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
-        console.log('proxy-server: ' + proxyProc.pid);
+        log.debug('proxy-server: ' + proxyProc.pid);
         setTimeout(done, 3000);
         try {
           fs.mkdirSync(tmpDir);
