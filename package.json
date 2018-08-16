@@ -22,14 +22,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cnishina/webderpy-manager.git"
+    "url": "git+https://github.com/cnishina/webdriver-manager-replacement.git"
   },
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cnishina/webderpy-manager/issues"
+    "url": "https://github.com/cnishina/webdriver-manager-replacement/issues"
   },
-  "homepage": "https://github.com/cnishina/webderpy-manager#readme",
+  "homepage": "https://github.com/cnishina/webdriver-manager-replacement#readme",
   "dependencies": {
     "adm-zip": "^0.4.11",
     "loglevel": "^1.6.1",
