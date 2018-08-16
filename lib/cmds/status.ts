@@ -27,8 +27,12 @@ export function status(options: Options): string {
     }
   }
   if (options.server && options.server.binary) {
-    binaryVersions.push(
-      `${options.server.name}: ${options.server.binary.getStatus()}`);
+    let status = options.server.binary.getStatus();
+    if (status) {
+      binaryVersions.push(
+        `${options.server.name}: ${status}`);
+
+    }
   }
   return (binaryVersions.sort()).join('\n');
 }
