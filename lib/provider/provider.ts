@@ -3,7 +3,7 @@ import * as path from 'path';
 // Change the output directory for all providers.
 // This will download to the webdriver-manager/downloads directory.
 export const OUT_DIR = path.resolve(
-  process.cwd(), '..', '..', '..', 'downloads');
+  __dirname, '..', '..', '..', 'downloads');
 
 /**
  * The provider updateBinary interface implemented by all providers.
