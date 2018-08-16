@@ -28,6 +28,7 @@ export class SeleniumServer implements Provider {
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
+  runAsNode = false;
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
@@ -104,6 +105,7 @@ export class SeleniumServer implements Provider {
       opts: {[key:string]: string},
       version?: string,
       runAsNode?: boolean): Promise<number> {
+    this.runAsNode = runAsNode;
     let java = this.getJava();
     let cmd = this.getCmdStartServer(opts, version, runAsNode);
     log.info(`${java} ${cmd.join(' ')}`);
@@ -174,31 +176,45 @@ export class SeleniumServer implements Provider {
   }
 
   /**
-   * Sends the command to stop the server via http get request. Reference:
+   * If we are running the selenium server role = node, send
+   * the command to stop the server via http get request. Reference:
    * https://github.com/SeleniumHQ/selenium/issues/2852#issuecomment-268324091
+   *
+   * If we are not running as the selenium server role = node, kill the
+   * process with pid.
+   *
    * @param host The protocol and ip address, default http://127.0.0.1
    * @param port The port number, default 4444
    * @returns A promise of the http get request completing.
    */
   stopServer(host?: string, port?: number): Promise<void> {
-    if (!host) {
-      host = 'http://127.0.0.1';
-    }
-    if (!port) {
-      port = 4444;
-    }
-    let stopUrl = host + ':' + port +
-      '/extra/LifecycleServlet?action=shutdown';
-    let options = initOptions(stopUrl, {});
-    log.info(curlCommand(options));
-    return new Promise<void>((resolve, _) => {
-      let req = request(options);
-      req.on('response', response => {
-        response.on('end', () => {
-          resolve();
+    if (this.runAsNode) {
+      if (!host) {
+        host = 'http://127.0.0.1';
+      }
+      if (!port) {
+        port = 4444;
+      }
+      let stopUrl = host + ':' + port +
+        '/extra/LifecycleServlet?action=shutdown';
+      let options = initOptions(stopUrl, {});
+      log.info(curlCommand(options));
+      return new Promise<void>((resolve, _) => {
+        let req = request(options);
+        req.on('response', response => {
+          response.on('end', () => {
+            resolve();
+          });
         });
       });
-    });
+    } else if (this.seleniumProcess) {
+      process.kill(this.seleniumProcess.pid);
+      return Promise.resolve();
+    } else {
+      return Promise.reject(
+        'Could not stop the server, server is not running.');
+    }
+
   }
 
   /**

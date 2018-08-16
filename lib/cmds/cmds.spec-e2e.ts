@@ -65,7 +65,7 @@ describe('using the cli', () => {
   });
 
   describe('a user runs start', () => {
-    it ('should start the selenium server standalone', async() => {
+    it ('should start the selenium server standalone in role=node', async() => {
       let argv = {
         _: ['foobar'],
         chrome: true,
@@ -88,10 +88,40 @@ describe('using the cli', () => {
       expect(seleniumServer.seleniumProcess.pid).toBeTruthy();
 
       // Stop the server using the get request.
+      expect(seleniumServer.runAsNode).toBeTruthy();
       await seleniumServer.stopServer();
 
       // Check to see that the exit code is 0.
       expect(await startProcess).toBe(0);
+    });
+
+    it ('should start the selenium server standalone', async() => {
+      let argv = {
+        _: ['foobar'],
+        chrome: true,
+        standalone: true,
+        out_dir: tmpDir,
+        '$0': 'bin\\webdriver-manager'
+      };
+      let options = constructProviders(argv);
+      // Do not await this promise to start the server since the promise is
+      // never resolved by waiting, it is either killed by pid or get request.
+      let startProcess = start(options);
+
+      // Arbitrarily wait for the server to start.
+      await new Promise((resolve, _) => {
+        setTimeout(resolve, 3000);
+      });
+      let seleniumServer = (options.server.binary as SeleniumServer);
+      expect(seleniumServer.seleniumProcess).toBeTruthy();
+      expect(seleniumServer.seleniumProcess.pid).toBeTruthy();
+
+      // Stop the server using the get request.
+      expect(seleniumServer.runAsNode).toBeFalsy();
+      await seleniumServer.stopServer();
+
+      // Check to see that the exit code is 143.
+      expect(await startProcess).toBe(143);
     });
   });
 
