@@ -36,7 +36,6 @@ const logLevelOption: yargs.Options = {
 const OUT_DIR = 'out_dir';
 let outDirOption: yargs.Options = {
   describe: 'Location of output.',
-  default: 'downloads',
   type: 'string'
 };
 const PROXY = 'proxy';
