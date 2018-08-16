@@ -27,7 +27,10 @@ export function clean(options: Options): string {
     }
   }
   if (options.server && options.server.binary) {
-    filesCleaned.push(options.server.binary.cleanFiles());
+    let cleanedFiles = options.server.binary.cleanFiles();
+    if (cleanedFiles) {
+      filesCleaned.push(cleanedFiles);
+    }
   }
   return (filesCleaned.sort()).join('\n');
 }

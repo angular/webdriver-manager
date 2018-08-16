@@ -241,15 +241,20 @@ export function getBinaryPathFromConfig(
  * @param fileRegexes The regExp to match files to remove in the outDir.
  */
 export function removeFiles(outDir: string, fileRegexes: RegExp[]): string {
-  let existFiles = fs.readdirSync(outDir);
-  let removedFiles: string[] = [];
-  for (let fileRegex of fileRegexes) {
-    for (let existFile of existFiles) {
-      if (existFile.match(fileRegex)) {
-        removedFiles.push(existFile);
-        fs.unlinkSync(path.resolve(outDir, existFile));
+  try {
+    let existFiles = fs.readdirSync(outDir);
+    let removedFiles: string[] = [];
+    for (let fileRegex of fileRegexes) {
+      for (let existFile of existFiles) {
+        if (existFile.match(fileRegex)) {
+          removedFiles.push(existFile);
+          fs.unlinkSync(path.resolve(outDir, existFile));
+        }
       }
     }
+    return (removedFiles.sort()).join('\n');
+  } catch(_) {
+    return null;
   }
-  return (removedFiles.sort()).join('\n');
+
 }
