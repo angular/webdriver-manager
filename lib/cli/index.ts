@@ -15,6 +15,12 @@ const chromeLogsOption: yargs.Options = {
   describe: 'File path to chrome logs.',
   type: 'string'
 };
+const EDGE = 'edge';
+const edgeOption: yargs.Options = {
+  describe: 'Use an installed Microsoft edge driver. Usually installed: ' +
+    '"C:\Program Files (x86)\Microsoft Web Driver\MirosoftWebDriver.exe"',
+  type: 'string'
+};
 const GECKO = 'gecko';
 const geckoOption: yargs.Options = {
   describe: 'Install or update geckodriver.',
@@ -94,6 +100,7 @@ yargs
       return yargs
         .option(CHROME, chromeOption)
         .option(CHROME_LOGS, chromeLogsOption)
+        .option(EDGE, edgeOption)
         .option(GECKO,  geckoOption)
         .option(IEDRIVER, ieOption)
         .option(LOG_LEVEL, logLevelOption)

@@ -42,6 +42,11 @@ export function start(options: Options): Promise<number> {
         .replace('"', '').replace('\'', '');
       javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
     }
+    if (options.server.edge) {
+      let edge = options.server.edge
+        .replace('"', '').replace('\'', '');
+      javaOpts['-Dwebdriver.edge.driver'] = path.resolve(edge);
+    }
     if (options.server.binary) {
       return (options.server.binary as SeleniumServer)
         .startServer(javaOpts, options.server.version,

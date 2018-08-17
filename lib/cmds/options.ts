@@ -26,7 +26,9 @@ export interface Options {
     // Run as role = node option.
     runAsNode?: boolean,
     // The relative or full path to the chrome logs file
-    chrome_logs?: string
+    chrome_logs?: string,
+    // The full path to the edge driver server
+    edge?: string
   },
   // The proxy url (must include protocol with url)
   proxy?: string,
