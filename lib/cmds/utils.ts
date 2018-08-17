@@ -103,6 +103,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
     options.server.binary = new SeleniumServer(providerConfig);
     options.server.version = versionsStandalone;
     options.server.runAsNode = argv.standalone_node;
+    options.server.chrome_logs = argv.chrome_logs;
   }
   return options;
 }

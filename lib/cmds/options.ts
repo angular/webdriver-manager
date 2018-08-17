@@ -24,7 +24,9 @@ export interface Options {
     // The server binary object.
     binary?: Provider,
     // Run as role = node option.
-    runAsNode?: boolean
+    runAsNode?: boolean,
+    // The relative or full path to the chrome logs file
+    chrome_logs?: string
   },
   // The proxy url (must include protocol with url)
   proxy?: string,

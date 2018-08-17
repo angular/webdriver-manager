@@ -10,6 +10,11 @@ const chromeOption: yargs.Options = {
   default: true,
   type: 'boolean'
 };
+const CHROME_LOGS = 'chrome_logs';
+const chromeLogsOption: yargs.Options = {
+  describe: 'File path to chrome logs.',
+  type: 'string'
+};
 const GECKO = 'gecko';
 const geckoOption: yargs.Options = {
   describe: 'Install or update geckodriver.',
@@ -88,6 +93,7 @@ yargs
     (yargs: yargs.Argv) => {
       return yargs
         .option(CHROME, chromeOption)
+        .option(CHROME_LOGS, chromeLogsOption)
         .option(GECKO,  geckoOption)
         .option(IEDRIVER, ieOption)
         .option(LOG_LEVEL, logLevelOption)

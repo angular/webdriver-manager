@@ -1,4 +1,5 @@
 import * as log from 'loglevel';
+import * as path from 'path';
 import * as yargs from 'yargs';
 import { Options } from './options';
 import { constructProviders } from './utils';
@@ -35,9 +36,17 @@ export function start(options: Options): Promise<number> {
         provider.binary.getBinaryPath(provider.version);
     }
   }
-  if (options.server && options.server.binary) {
-    return (options.server.binary as SeleniumServer)
-      .startServer(javaOpts, options.server.version, options.server.runAsNode);
+  if (options.server) {
+    if (options.server.chrome_logs) {
+      let chromeLogs = options.server.chrome_logs
+        .replace('"', '').replace('\'', '');
+      javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
+    }
+    if (options.server.binary) {
+      return (options.server.binary as SeleniumServer)
+        .startServer(javaOpts, options.server.version,
+          options.server.runAsNode);
+    }
   }
   return Promise.reject('Could not start the server');
 }
