@@ -1,5 +1,6 @@
 import * as yargs from 'yargs';
 import * as clean from '../cmds/clean';
+import * as shutdown from '../cmds/shutdown';
 import * as start from '../cmds/start';
 import * as status from '../cmds/status';
 import * as update from '../cmds/update';
@@ -94,6 +95,13 @@ yargs
         .option(OUT_DIR, outDirOption)
     }, (argv: yargs.Arguments) => {
       clean.handler(argv);
+    })
+  .command('shutdown', 'Shutdown a local selenium server with GET request',
+    (yargs: yargs.Argv) => {
+      return yargs
+      .option(LOG_LEVEL, logLevelOption)
+    }, (argv: yargs.Arguments) => {
+      shutdown.handler(argv);
     })
   .command('start', 'Start up the selenium server.',
     (yargs: yargs.Argv) => {

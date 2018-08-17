@@ -19,7 +19,9 @@ export function handler(argv: yargs.Arguments) {
     process.kill(seleniumServer.seleniumProcess.pid);
     process.exit(process.exitCode);
   });
-  start(options).then(() => {});
+  start(options).then(() => {
+    process.exit();
+  });
 }
 
 /**
