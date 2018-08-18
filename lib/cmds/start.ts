@@ -1,3 +1,5 @@
+import * as childProcess from 'child_process';
+
 import * as log from 'loglevel';
 import * as path from 'path';
 import * as yargs from 'yargs';
@@ -10,18 +12,21 @@ import { SeleniumServer } from '../provider/selenium_server';
  * the SIGINT event when the server is stopped.
  * @param argv The argv from yargs.
  */
-export function handler(argv: yargs.Arguments) {
+export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
   let options = constructProviders(argv);
-  process.stdin.resume();
-  process.on('SIGINT', () => {
-    let seleniumServer = (options.server.binary as SeleniumServer);
-    process.kill(seleniumServer.seleniumProcess.pid);
-    process.exit(process.exitCode);
-  });
-  start(options).then(() => {
+  if (options.server.runAsDetach) {
+    await start(options);
     process.exit();
-  });
+  } else {
+    process.stdin.resume();
+    process.on('SIGINT', () => {
+      let seleniumServer = (options.server.binary as SeleniumServer);
+      process.kill(seleniumServer.seleniumProcess.pid);
+      process.exit(process.exitCode);
+    });
+    start(options).then(() => {});
+  }
 }
 
 /**
@@ -52,7 +57,7 @@ export function start(options: Options): Promise<number> {
     if (options.server.binary) {
       return (options.server.binary as SeleniumServer)
         .startServer(javaOpts, options.server.version,
-          options.server.runAsNode);
+          options.server.runAsNode, options.server.runAsDetach);
     }
   }
   return Promise.reject('Could not start the server');

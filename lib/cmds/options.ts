@@ -29,6 +29,8 @@ export interface Options {
     chrome_logs?: string,
     // The full path to the edge driver server
     edge?: string
+    // Detach the server and return the process to the parent.
+    runAsDetach?: boolean
   },
   // The proxy url (must include protocol with url)
   proxy?: string,

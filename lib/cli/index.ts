@@ -16,6 +16,14 @@ const chromeLogsOption: yargs.Options = {
   describe: 'File path to chrome logs.',
   type: 'string'
 };
+const DETACH = 'detach';
+const detachOption: yargs.Options = {
+  describe: 'Once the selenium server is up and running, return ' +
+    'control to the parent process and continue running the server ' +
+    'in the background.',
+  default: false,
+  type: 'boolean'
+};
 const EDGE = 'edge';
 const edgeOption: yargs.Options = {
   describe: 'Use an installed Microsoft edge driver. Usually installed: ' +
@@ -108,6 +116,7 @@ yargs
       return yargs
         .option(CHROME, chromeOption)
         .option(CHROME_LOGS, chromeLogsOption)
+        .option(DETACH, detachOption)
         .option(EDGE, edgeOption)
         .option(GECKO,  geckoOption)
         .option(IEDRIVER, ieOption)

@@ -99,26 +99,48 @@ export class SeleniumServer implements Provider {
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
    * @param runAsNode The option to run the selenium jar with role set to node.
+   * @param runAsDetach The option to detach the server and return to parent.
    * @returns A promise so the server can run while awaiting its completion.
    */
   startServer(
       opts: {[key:string]: string},
       version?: string,
-      runAsNode?: boolean): Promise<number> {
+      runAsNode?: boolean,
+      runAsDetach?: boolean): Promise<number> {
     this.runAsNode = runAsNode;
     let java = this.getJava();
-    let cmd = this.getCmdStartServer(opts, version, runAsNode);
-    log.info(`${java} ${cmd.join(' ')}`);
-    return new Promise<number>((resolve, _) => {
-      this.seleniumProcess = childProcess.spawn(java, cmd, {stdio: 'inherit'});
-      log.info(`selenium process id: ${this.seleniumProcess.pid}`);
-      this.seleniumProcess.on('exit', (code: number) => {
-        log.info(`Selenium Standalone has exited with code: ${code}`);
-        resolve(code);
-      });
-      this.seleniumProcess.on('error', (err: Error) => {
-        log.error(`Selenium Standalone server encountered an error: ${err}`);
-      });
+    return new Promise<number>(async(resolve, _) => {
+
+      if (runAsDetach) {
+        runAsNode = true;
+        let cmd = this.getCmdStartServer(opts, version, runAsNode);
+        log.info(`${java} ${cmd.join(' ')}`);
+        this.seleniumProcess = childProcess.spawn(java, cmd,
+          { detached: true, stdio: 'ignore' });
+        log.info(`selenium process id: ${this.seleniumProcess.pid}`);
+        await new Promise((resolve, _) => {
+          setTimeout(resolve, 2000);
+        });
+        this.seleniumProcess.unref();
+        await new Promise((resolve, _) => {
+          setTimeout(resolve, 500);
+        });
+        resolve();
+      } else {
+        let cmd = this.getCmdStartServer(opts, version, runAsNode);
+        log.info(`${java} ${cmd.join(' ')}`);
+        this.seleniumProcess = childProcess.spawn(java, cmd,
+          { stdio: 'inherit' });
+        log.info(`selenium process id: ${this.seleniumProcess.pid}`);
+
+        this.seleniumProcess.on('exit', (code: number) => {
+          log.info(`Selenium Standalone has exited with code: ${code}`);
+          resolve(code);
+        });
+        this.seleniumProcess.on('error', (err: Error) => {
+          log.error(`Selenium Standalone server encountered an error: ${err}`);
+        });
+      }
     });
   }
 

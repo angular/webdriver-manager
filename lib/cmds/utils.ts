@@ -42,7 +42,8 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
       name: 'selenium',
       binary: new SeleniumServer(providerConfig),
       version: versionsStandalone,
-      runAsNode: argv.standalone_node
+      runAsNode: argv.standalone_node,
+      runAsDetach: argv.detach
     },
     ignoreSSL: argv.ignore_ssl,
     outDir: argv.out_dir,
@@ -105,6 +106,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
     options.server.runAsNode = argv.standalone_node;
     options.server.chrome_logs = argv.chrome_logs;
     options.server.edge = argv.edge;
+    options.server.runAsDetach = argv.detach;
   }
   return options;
 }
