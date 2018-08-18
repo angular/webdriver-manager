@@ -9,6 +9,10 @@ import { SeleniumServer } from '../provider/selenium_server';
  */
 export function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
+}
+
+
+export function shutdown() {
   let seleniumServer = new SeleniumServer({});
   seleniumServer.runAsNode = true;
   seleniumServer.stopServer();
