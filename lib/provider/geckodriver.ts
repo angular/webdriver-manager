@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { OUT_DIR, Provider, ProviderConfig } from './provider';
+import { OUT_DIR, ProviderInterface, ProviderConfig } from './provider';
 import {
   changeFilePermissions,
   generateConfigFile,
@@ -17,7 +17,7 @@ import { convertJsonToVersionList, updateJson } from './utils/github_json';
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
 
-export class GeckoDriver implements Provider {
+export class GeckoDriver implements ProviderInterface {
   cacheFileName = 'geckodriver.json';
   configFileName = 'geckodriver.config.json';
   ignoreSSL: boolean = false;

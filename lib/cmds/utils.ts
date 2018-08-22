@@ -6,6 +6,49 @@ import { IEDriver } from '../provider/iedriver';
 import { SeleniumServer } from '../provider/selenium_server';
 
 /**
+ * A provider name that webdriver-manager can download.
+ */
+export enum Provider {
+  ChromeDriver,
+  GeckoDriver,
+  IEDriver,
+  Selenium,
+}
+
+/**
+ * A helper method to initialize the options object. This is a simplified
+ * way of creating an option. If a full set of options need be generated,
+ * refer to the Options interface.
+ * @param providers A list of enums that represent the providers to construct.
+ * @param runAsDetach To detach and return to the parent process.
+ * @param runAsNode To run the selenium server with role = node.
+ * @returns An options object.
+ */
+export function initOptions(
+    providers: Provider[],
+    runAsDetach?: boolean,
+    runAsNode?: boolean): Options {
+  let options: Options = {
+    providers: [],
+    server: {}
+  };
+  for (let provider of providers) {
+    if (provider === Provider.ChromeDriver) {
+      options.providers.push({binary: new ChromeDriver()});
+    } else if (provider === Provider.GeckoDriver) {
+      options.providers.push({binary: new GeckoDriver()});
+    } else if (provider === Provider.IEDriver) {
+      options.providers.push({binary: new IEDriver()});
+    } else if (provider === Provider.Selenium) {
+      options.server.binary = new SeleniumServer();
+      options.server.runAsDetach = runAsDetach;
+      options.server.runAsNode = runAsNode;
+    }
+  }
+  return options;
+}
+
+/**
  * Create the options with all providers.
  * @param argv
  */

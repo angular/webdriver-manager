@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 import {
   OUT_DIR,
-  Provider,
+  ProviderInterface,
   ProviderConfig
 } from './provider';
 import {
@@ -19,7 +19,7 @@ import { requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
-export class ChromeDriver implements Provider {
+export class ChromeDriver implements ProviderInterface {
   cacheFileName = 'chromedriver.xml';
   configFileName = 'chromedriver.config.json';
   ignoreSSL: boolean = false;

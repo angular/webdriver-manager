@@ -8,7 +8,7 @@ export const OUT_DIR = path.resolve(
 /**
  * The provider updateBinary interface implemented by all providers.
  */
-export interface Provider {
+export interface ProviderInterface {
   cleanFiles?: () => string;
   getBinaryPath?: (version?: string) => string|null;
   getStatus?: () => string|null;

@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 import {
   OUT_DIR,
-  Provider,
+  ProviderInterface,
   ProviderConfig,
 } from './provider';
 import {
@@ -21,7 +21,7 @@ import {
 import { requestBinary } from './utils/http_utils';
 import { getVersion } from './utils/version_list';
 
-export class IEDriver implements Provider {
+export class IEDriver implements ProviderInterface {
   cacheFileName = 'iedriver.xml';
   configFileName = 'iedriver.config.json';
   ignoreSSL: boolean = false;

@@ -6,7 +6,7 @@ import * as request from 'request';
 import * as path from 'path';
 import {
   OUT_DIR,
-  Provider,
+  ProviderInterface,
   ProviderConfig,
 } from './provider';
 import {
@@ -18,7 +18,7 @@ import { curlCommand, initOptions, requestBinary } from './utils/http_utils';
 import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
 import { getVersion } from './utils/version_list';
 
-export class SeleniumServer implements Provider {
+export class SeleniumServer implements ProviderInterface {
   cacheFileName = 'selenium-server.xml';
   configFileName = 'selenium-server.config.json';
   ignoreSSL: boolean = false;
