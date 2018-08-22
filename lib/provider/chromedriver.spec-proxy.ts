@@ -29,19 +29,19 @@ describe('chromedriver', () => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
         proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
         log.debug('proxy-server: ' + proxyProc.pid);
-        setTimeout(done, 3000);
         try {
           fs.mkdirSync(tmpDir);
         } catch (err) {}
+        setTimeout(done, 3000);
       });
 
       afterEach((done) => {
         process.kill(proxyProc.pid);
-        setTimeout(done, 5000);
         jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {
           rimraf.sync(tmpDir);
         } catch (err) {}
+        setTimeout(done, 5000);
       });
 
       it('should download the binary using a proxy', async(done) => {

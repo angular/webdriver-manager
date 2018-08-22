@@ -10,7 +10,7 @@ import { checkConnectivity } from '../../spec/support/helpers/test_utils';
 describe('geckodriver', () => {
   let tmpDir = path.resolve(os.tmpdir(), 'test');
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  
+
   describe('class GeckoDriver', () => {
     describe('updateBinary', () => {
       beforeEach(() => {
@@ -19,7 +19,7 @@ describe('geckodriver', () => {
           fs.mkdirSync(tmpDir);
         } catch (err) {}
       });
-    
+
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {
@@ -52,10 +52,8 @@ describe('geckodriver', () => {
         if (!await checkConnectivity('update binary for win64 test')) {
           done();
         }
-        let geckodriver = new GeckoDriver();
-        geckodriver.outDir = tmpDir;
-        geckodriver.osType = 'Windows_NT';
-        geckodriver.osArch = 'x64';
+        let geckodriver = new GeckoDriver(
+          { outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64' });
         await geckodriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
@@ -75,10 +73,8 @@ describe('geckodriver', () => {
         if (!await checkConnectivity('update binary for win32 test')) {
           done();
         }
-        let geckodriver = new GeckoDriver();
-        geckodriver.outDir = tmpDir;
-        geckodriver.osType = 'Windows_NT';
-        geckodriver.osArch = 'x32';
+        let geckodriver = new GeckoDriver(
+          { outDir: tmpDir, osType: 'Windows_NT', osArch: 'x32' });
         await geckodriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
@@ -98,10 +94,8 @@ describe('geckodriver', () => {
         if (!await checkConnectivity('update binary for linux64 test')) {
           done();
         }
-        let geckodriver = new GeckoDriver();
-        geckodriver.outDir = tmpDir;
-        geckodriver.osType = 'Linux';
-        geckodriver.osArch = 'x64';
+        let geckodriver = new GeckoDriver(
+          { outDir: tmpDir, osType: 'Linux', osArch: 'x64' });
         await geckodriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'geckodriver.config.json');
@@ -121,10 +115,8 @@ describe('geckodriver', () => {
         if (!await checkConnectivity('update binary for linux32 test')) {
           done();
         }
-        let geckodriver = new GeckoDriver();
-        geckodriver.outDir = tmpDir;
-        geckodriver.osType = 'Linux';
-        geckodriver.osArch = 'x32';
+        let geckodriver = new GeckoDriver(
+          { outDir: tmpDir, osType: 'Linux', osArch: 'x32' });
         await geckodriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'geckodriver.config.json');

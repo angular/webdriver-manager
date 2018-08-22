@@ -34,10 +34,8 @@ describe('iedriver', () => {
       if (!await checkConnectivity('update binary for windows test')) {
         done();
       }
-      let ieDriver = new IEDriver();
-      ieDriver.outDir = tmpDir;
-      ieDriver.osType = 'Windows_NT';
-      ieDriver.osArch = 'x64';
+      let ieDriver = new IEDriver(
+        { outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64' });
       await ieDriver.updateBinary();
 
       let configFile = path.resolve(tmpDir, 'iedriver.config.json');

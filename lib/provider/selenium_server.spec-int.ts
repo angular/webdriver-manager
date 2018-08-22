@@ -22,7 +22,7 @@ describe('selenium_server', () => {
         fs.mkdirSync(tmpDir);
       } catch (err) {}
     });
-  
+
     afterEach(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
       try {
@@ -34,8 +34,8 @@ describe('selenium_server', () => {
       if (!await checkConnectivity('update binary for mac test')) {
         done();
       }
-      let seleniumServer = new SeleniumServer();
-      seleniumServer.outDir = tmpDir;
+      let seleniumServer = new SeleniumServer(
+        { outDir: tmpDir });
       await seleniumServer.updateBinary();
 
       let configFile = path.resolve(tmpDir, 'selenium-server.config.json');

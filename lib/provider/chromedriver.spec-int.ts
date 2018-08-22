@@ -24,7 +24,7 @@ describe('chromedriver', () => {
           fs.mkdirSync(tmpDir);
         } catch (err) {}
       });
-    
+
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {
@@ -45,7 +45,7 @@ describe('chromedriver', () => {
         expect(fs.statSync(configFile).size).toBeTruthy();
         expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-        let versionList = convertXmlToVersionList(xmlFile, '.zip', 
+        let versionList = convertXmlToVersionList(xmlFile, '.zip',
           versionParser, semanticVersionParser);
         let versionObj = getVersion(versionList, 'mac');
         let executableFile = path.resolve(tmpDir,
@@ -58,10 +58,8 @@ describe('chromedriver', () => {
         if (!await checkConnectivity('update binary for win x64 test')) {
           done();
         }
-        let chromedriver = new ChromeDriver();
-        chromedriver.outDir = tmpDir;
-        chromedriver.osType = 'Windows_NT';
-        chromedriver.osArch = 'x64'
+        let chromedriver = new ChromeDriver(
+          { outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64'});
         await chromedriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
@@ -82,10 +80,8 @@ describe('chromedriver', () => {
         if (!await checkConnectivity('update binary for win x32 test')) {
           done();
         }
-        let chromedriver = new ChromeDriver();
-        chromedriver.outDir = tmpDir;
-        chromedriver.osType = 'Windows_NT';
-        chromedriver.osArch = 'x32'
+        let chromedriver = new ChromeDriver(
+          { outDir: tmpDir, osType: 'Windows_NT', osArch: 'x32'});
         await chromedriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
@@ -106,10 +102,8 @@ describe('chromedriver', () => {
         if (!await checkConnectivity('update binary for linux x64 test')) {
           done();
         }
-        let chromedriver = new ChromeDriver();
-        chromedriver.outDir = tmpDir;
-        chromedriver.osType = 'Linux';
-        chromedriver.osArch = 'x64'
+        let chromedriver = new ChromeDriver(
+          { outDir: tmpDir, osType: 'Linux', osArch: 'x64'});
         await chromedriver.updateBinary();
 
         let configFile = path.resolve(tmpDir, 'chromedriver.config.json');
@@ -130,10 +124,8 @@ describe('chromedriver', () => {
         if (!await checkConnectivity('update binary for linux x32 test')) {
           done();
         }
-        let chromedriver = new ChromeDriver();
-        chromedriver.outDir = tmpDir;
-        chromedriver.osType = 'Linux';
-        chromedriver.osArch = 'x32'
+        let chromedriver = new ChromeDriver(
+          { outDir: tmpDir, osType: 'Linux', osArch: 'x32' });
         chromedriver.updateBinary().then(() => {
           done.fail();
         }).catch(() => {
