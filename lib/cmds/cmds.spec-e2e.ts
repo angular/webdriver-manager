@@ -120,8 +120,9 @@ describe('using the cli', () => {
       expect(seleniumServer.runAsNode).toBeFalsy();
       await seleniumServer.stopServer();
 
-      // Check to see that the exit code is 143.
-      expect(await startProcess).toBe(143);
+      // Check to see that the exit code is greater than 1.
+      // Observed to be 1 and sometimes 143.
+      expect(await startProcess).toBeGreaterThanOrEqual(1);
     });
   });
 

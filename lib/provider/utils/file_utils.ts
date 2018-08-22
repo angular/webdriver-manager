@@ -256,5 +256,4 @@ export function removeFiles(outDir: string, fileRegexes: RegExp[]): string {
   } catch(_) {
     return null;
   }
-
 }

@@ -20,8 +20,10 @@ export async function handler(argv: yargs.Arguments) {
  */
 export function update(options: Options): Promise<any> {
   let promises = [];
-  for (let provider of options.providers) {
-    promises.push(provider.binary.updateBinary(provider.version));
+  if (options.providers) {
+    for (let provider of options.providers) {
+      promises.push(provider.binary.updateBinary(provider.version));
+    }
   }
   if (options.server && options.server.binary) {
     promises.push(options.server.binary.updateBinary(options.server.version));

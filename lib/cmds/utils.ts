@@ -22,25 +22,41 @@ export enum Provider {
  * @param providers A list of enums that represent the providers to construct.
  * @param runAsDetach To detach and return to the parent process.
  * @param runAsNode To run the selenium server with role = node.
+ * @param outDir The directory to download the binaries
+ * @param ignoreSSL When making get requests, ignore SSL.
+ * @param proxy The optional proxy server to use.
  * @returns An options object.
  */
 export function initOptions(
     providers: Provider[],
     runAsDetach?: boolean,
-    runAsNode?: boolean): Options {
+    runAsNode?: boolean,
+    outDir?: string,
+    ignoreSSL?: boolean,
+    proxy?: string): Options {
+  let providerConfig = {
+    ignoreSSL: ignoreSSL,
+    outDir: outDir,
+    proxy: proxy
+  };
+
   let options: Options = {
     providers: [],
-    server: {}
+    server: {},
+    ignoreSSL: ignoreSSL,
+    outDir: outDir,
+    proxy: proxy
   };
+
   for (let provider of providers) {
     if (provider === Provider.ChromeDriver) {
-      options.providers.push({binary: new ChromeDriver()});
+      options.providers.push({binary: new ChromeDriver(providerConfig)});
     } else if (provider === Provider.GeckoDriver) {
-      options.providers.push({binary: new GeckoDriver()});
+      options.providers.push({binary: new GeckoDriver(providerConfig)});
     } else if (provider === Provider.IEDriver) {
-      options.providers.push({binary: new IEDriver()});
+      options.providers.push({binary: new IEDriver(providerConfig)});
     } else if (provider === Provider.Selenium) {
-      options.server.binary = new SeleniumServer();
+      options.server.binary = new SeleniumServer(providerConfig);
       options.server.runAsDetach = runAsDetach;
       options.server.runAsNode = runAsNode;
     }
@@ -135,7 +151,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
       version: versionsGecko
     });
   }
-  if (argv.ie) {
+  if (argv.iedriver) {
     options.providers.push({
       name: 'iedriver',
       binary: new IEDriver(providerConfig),

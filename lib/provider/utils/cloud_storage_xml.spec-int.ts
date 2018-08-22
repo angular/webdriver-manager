@@ -42,8 +42,8 @@ describe('cloud_storage_xml', () => {
 
   afterAll((done) => {
     process.kill(proc.pid);
-    setTimeout(done, 5000);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+    setTimeout(done, 5000);
   });
 
   describe('updateXml', () => {
