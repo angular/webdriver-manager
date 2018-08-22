@@ -15,7 +15,7 @@ export function handler(argv: yargs.Arguments) {
 
 /**
  * Goes through all the providers and removes the downloaded files.
- * @param options The constructed options.
+ * @param options The constructed set of all options.
  * @returns A list of deleted files.
  */
 export function clean(options: Options): string {

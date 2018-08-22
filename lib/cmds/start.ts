@@ -30,8 +30,8 @@ export async function handler(argv: yargs.Arguments) {
 }
 
 /**
- * Goes through all the providers and creates a set of  java options to pass
- * to java when starting the selenium server standalone.
+ * Goes through all the option providers and creates a set of java options
+ * to pass to java when starting the selenium server standalone.
  * @param options The constructed options.
  * @returns Promise starting the server with the resolved exit code.
  */

@@ -7,10 +7,10 @@ import { constructProviders } from './utils';
  * Updates / downloads the providers binaries.
  * @param argv The argv from yargs.
  */
-export function handler(argv: yargs.Arguments) {
+export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
   let options = constructProviders(argv);
-  update(options).then(() => {});
+  await update(options);
 }
 
 /**

@@ -15,7 +15,7 @@ export function handler(argv: yargs.Arguments) {
 
 /**
  * Gets a list of versions for server and browser drivers.
- * @param options The constructed options.
+ * @param options The constructed set of all options.
  * @returns A string of the versions downloaded.
  */
 export function status(options: Options): string {
