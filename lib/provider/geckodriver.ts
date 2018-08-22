@@ -53,6 +53,9 @@ export class GeckoDriver implements ProviderInterface {
       if (providerConfig.requestUrl) {
         this.requestUrl = providerConfig.requestUrl;
       }
+      if (providerConfig.oauthToken) {
+        this.oauthToken = providerConfig.oauthToken as string;
+      }
     }
   }
 

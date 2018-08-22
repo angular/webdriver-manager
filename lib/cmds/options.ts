@@ -37,5 +37,5 @@ export interface Options {
   // To ignore SSL certs when making requests.
   ignoreSSL?: boolean,
   // The location where files should be saved.
-  outDir?: string
+  outDir?: string,
 }

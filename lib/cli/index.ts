@@ -36,6 +36,11 @@ const geckoOption: yargs.Options = {
   default: true,
   type: 'boolean'
 };
+const GITHUB_TOKEN = 'github_token';
+const githubTokenOption: yargs.Options = {
+  describe: 'Use a GitHub token to prevent rate limit issues.',
+  type: 'string'
+};
 const IEDRIVER = 'iedriver';
 const ieOption: yargs.Options = {
   describe: 'Install or update ie driver.',
@@ -144,6 +149,7 @@ yargs
       return yargs.option(OUT_DIR, outDirOption)
         .option(CHROME, chromeOption)
         .option(GECKO,  geckoOption)
+        .option(GITHUB_TOKEN, githubTokenOption)
         .option(IEDRIVER, ieOption)
         .option(IGNORE_SSL, ignoreSSLOption)
         .option(LOG_LEVEL, logLevelOption)

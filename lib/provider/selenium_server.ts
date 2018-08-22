@@ -29,6 +29,7 @@ export class SeleniumServer implements ProviderInterface {
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
   runAsNode = false;
+  runAsDetach = false;
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
@@ -53,6 +54,12 @@ export class SeleniumServer implements ProviderInterface {
       }
       if (providerConfig.requestUrl) {
         this.requestUrl = providerConfig.requestUrl;
+      }
+      if (providerConfig.runAsNode) {
+        this.runAsNode = providerConfig.runAsNode as boolean;
+      }
+      if (providerConfig.runAsDetach) {
+        this.runAsDetach = providerConfig.runAsDetach as boolean;
       }
     }
   }
@@ -108,12 +115,13 @@ export class SeleniumServer implements ProviderInterface {
       runAsNode?: boolean,
       runAsDetach?: boolean): Promise<number> {
     this.runAsNode = runAsNode;
+    this.runAsDetach = runAsDetach;
     let java = this.getJava();
     return new Promise<number>(async(resolve, _) => {
 
-      if (runAsDetach) {
-        runAsNode = true;
-        let cmd = this.getCmdStartServer(opts, version, runAsNode);
+      if (this.runAsDetach) {
+        this.runAsNode = true;
+        let cmd = this.getCmdStartServer(opts, version, this.runAsNode);
         log.info(`${java} ${cmd.join(' ')}`);
         this.seleniumProcess = childProcess.spawn(java, cmd,
           { detached: true, stdio: 'ignore' });
@@ -127,7 +135,7 @@ export class SeleniumServer implements ProviderInterface {
         });
         resolve();
       } else {
-        let cmd = this.getCmdStartServer(opts, version, runAsNode);
+        let cmd = this.getCmdStartServer(opts, version, this.runAsNode);
         log.info(`${java} ${cmd.join(' ')}`);
         this.seleniumProcess = childProcess.spawn(java, cmd,
           { stdio: 'inherit' });

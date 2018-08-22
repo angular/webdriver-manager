@@ -4,6 +4,7 @@ import { ChromeDriver } from '../provider/chromedriver';
 import { GeckoDriver } from '../provider/geckodriver';
 import { IEDriver } from '../provider/iedriver';
 import { SeleniumServer } from '../provider/selenium_server';
+import { ProviderConfig } from '../provider/provider';
 
 /**
  * A provider name that webdriver-manager can download.
@@ -65,7 +66,7 @@ export function initOptions(
 }
 
 /**
- * Create the options with all providers.
+ * Create the options with all providers. Used for clean and status commands.
  * @param argv
  */
 export function constructAllProviders(argv: yargs.Arguments): Options {
@@ -111,7 +112,8 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
 }
 
 /**
- * Create the options with providers depending on argv's.
+ * Create the options with providers depending on argv's. Used for update and
+ * start commands.
  * @param argv
  */
 export function constructProviders(argv: yargs.Arguments): Options {
@@ -123,7 +125,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
     proxy: argv.proxy,
   };
 
-  let providerConfig = {
+  let providerConfig: ProviderConfig = {
     outDir: options.outDir,
     proxy: options.proxy,
     ignoreSSL: options.ignoreSSL
@@ -145,9 +147,12 @@ export function constructProviders(argv: yargs.Arguments): Options {
     });
   }
   if (argv.gecko) {
+    let geckoOptions = providerConfig;
+    geckoOptions.oauthToken = argv.githubToken;
+    let gecko = new GeckoDriver(geckoOptions);
     options.providers.push({
       name: 'geckodriver',
-      binary: new GeckoDriver(providerConfig),
+      binary: gecko,
       version: versionsGecko
     });
   }
@@ -160,7 +165,12 @@ export function constructProviders(argv: yargs.Arguments): Options {
   }
   if (argv.standalone) {
     options.server.name = 'selenium';
-    options.server.binary = new SeleniumServer(providerConfig);
+
+    let seleniumOptions = providerConfig;
+    seleniumOptions.runAsNode = argv.standalone_node;
+    seleniumOptions.runAsDetach = argv.detach;
+    options.server.binary = new SeleniumServer(seleniumOptions);
+
     options.server.version = versionsStandalone;
     options.server.runAsNode = argv.standalone_node;
     options.server.chrome_logs = argv.chrome_logs;

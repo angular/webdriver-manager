@@ -43,12 +43,15 @@ export function start(options: Options): Promise<number> {
         provider.binary.getBinaryPath(provider.version);
     }
   }
+
   if (options.server) {
+    // TODO(cnishina): move this into start server command?
     if (options.server.chrome_logs) {
       let chromeLogs = options.server.chrome_logs
         .replace('"', '').replace('\'', '');
       javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
     }
+    // TODO(cnishina): move this into start server command?
     if (options.server.edge) {
       let edge = options.server.edge
         .replace('"', '').replace('\'', '');

@@ -99,6 +99,8 @@ Options:
   --chrome               Install or update chromedriver.
                                                        [boolean] [default: true]
   --gecko                Install or update geckodriver.[boolean] [default: true]
+  --github_token         Use a GitHub token to prevent rate limit issues.
+                                                                        [string]
   --iedriver             Install or update ie driver. [boolean] [default: false]
   --ignore_ssl           Ignore SSL certificates.                      [boolean]
   --log_level            The log level of this CLI.   [string] [default: "info"]

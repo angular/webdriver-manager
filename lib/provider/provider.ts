@@ -41,4 +41,6 @@ export interface ProviderConfig {
   proxy?: string;
   // Set the requests to ignore SSL (optional).
   ignoreSSL?: boolean;
+  // Catch all for other things.
+  [key:string]: string|boolean|number;
 }
