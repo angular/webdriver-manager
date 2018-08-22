@@ -20,6 +20,22 @@
     "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",
     "tsc": "tsc"
   },
+  "keywords": [
+    "automation",
+    "browser",
+    "browsers",
+    "browser test",
+    "browser testing",
+    "chromedriver",
+    "geckodriver",
+    "iedriver",
+    "selenium",
+    "selenium-webdriver",
+    "test",
+    "testing",
+    "webdriver",
+    "webdriverjs"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cnishina/webdriver-manager-replacement.git"
