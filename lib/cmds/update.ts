@@ -1,7 +1,7 @@
 import * as log from 'loglevel';
 import * as yargs from 'yargs';
-import { Options } from './options';
-import { constructProviders } from './utils';
+import {Options} from './options';
+import {constructProviders} from './utils';
 
 /**
  * Updates / downloads the providers binaries.
@@ -9,7 +9,7 @@ import { constructProviders } from './utils';
  */
 export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
-  let options = constructProviders(argv);
+  const options = constructProviders(argv);
   await update(options);
 }
 
@@ -18,10 +18,10 @@ export async function handler(argv: yargs.Arguments) {
  * @param options The constructed options.
  * @returns Promise when binaries are all downloaded.
  */
-export function update(options: Options): Promise<any> {
-  let promises = [];
+export function update(options: Options): Promise<void[]> {
+  const promises = [];
   if (options.providers) {
-    for (let provider of options.providers) {
+    for (const provider of options.providers) {
       promises.push(provider.binary.updateBinary(provider.version));
     }
   }

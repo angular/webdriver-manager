@@ -3,14 +3,7 @@ import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import {
-  generateConfigFile,
-  removeFiles,
-  tarFileList,
-  uncompressTarball,
-  unzipFile,
-  zipFileList
-} from './file_utils';
+import {generateConfigFile, removeFiles, tarFileList, uncompressTarball, unzipFile, zipFileList} from './file_utils';
 
 log.setLevel('debug');
 
@@ -19,14 +12,14 @@ const zipFile = path.resolve('spec/support/files/bar.zip');
 
 describe('file_utils', () => {
   describe('tarFileList', () => {
-    it('should have a file list', async() => {
-      let fileList = await tarFileList(tarballFile);
+    it('should have a file list', async () => {
+      const fileList = await tarFileList(tarballFile);
       expect(fileList).toBeTruthy();
       expect(fileList.length).toBe(1);
       expect(fileList[0]).toBe('bar');
     });
 
-    it('should return an error if the file does not exist', async(done) => {
+    it('should return an error if the file does not exist', async (done) => {
       try {
         await tarFileList('file_does_not_exist');
         done.fail();
@@ -43,17 +36,18 @@ describe('file_utils', () => {
     beforeAll(() => {
       tmpDir = path.resolve(os.tmpdir(), 'test');
       try {
-        fs.mkdirSync(tmpDir)
-      } catch(err) {}
+        fs.mkdirSync(tmpDir);
+      } catch (err) {
+      }
     });
 
     afterAll(() => {
       rimraf.sync(tmpDir);
     });
 
-    it('should uncompress the file', async() => {
-      let untarFiles = await uncompressTarball(tarballFile, tmpDir);
-      let untarBar = path.resolve(tmpDir, 'bar');
+    it('should uncompress the file', async () => {
+      const untarFiles = await uncompressTarball(tarballFile, tmpDir);
+      const untarBar = path.resolve(tmpDir, 'bar');
       expect(untarFiles).toBeTruthy();
       expect(untarFiles.length).toBe(1);
       expect(untarFiles[0]).toBe(untarBar);
@@ -63,7 +57,7 @@ describe('file_utils', () => {
 
   describe('zipFileList', () => {
     it('should have a file list', () => {
-      let fileList = zipFileList(zipFile);
+      const fileList = zipFileList(zipFile);
       expect(fileList).toBeTruthy();
       expect(fileList.length).toBe(1);
       expect(fileList[0]).toBe('bar');
@@ -86,8 +80,9 @@ describe('file_utils', () => {
     beforeAll(() => {
       tmpDir = path.resolve(os.tmpdir(), 'test');
       try {
-        fs.mkdirSync(tmpDir)
-      } catch(err) {}
+        fs.mkdirSync(tmpDir);
+      } catch (err) {
+      }
     });
 
     afterAll(() => {
@@ -95,8 +90,8 @@ describe('file_utils', () => {
     });
 
     it('should uncompress the file', () => {
-      let zipFiles = unzipFile(zipFile, tmpDir);
-      let unzipBar = path.resolve(tmpDir, 'bar');
+      const zipFiles = unzipFile(zipFile, tmpDir);
+      const unzipBar = path.resolve(tmpDir, 'bar');
       expect(zipFiles).toBeTruthy();
       expect(zipFiles.length).toBe(1);
       expect(zipFiles[0]).toBe(unzipBar);
@@ -110,8 +105,9 @@ describe('file_utils', () => {
     beforeAll(() => {
       tmpDir = path.resolve(os.tmpdir(), 'test');
       try {
-        fs.mkdirSync(tmpDir)
-      } catch(err) {}
+        fs.mkdirSync(tmpDir);
+      } catch (err) {
+      }
     });
 
     afterAll(() => {
@@ -120,28 +116,27 @@ describe('file_utils', () => {
 
     it('should write the file', () => {
       // Creates empty files in the temp directory.
-      [
-        'foo.zip',
-        'foo_.zip',
-        'foo_12.2',
-        'foo_12.4',
-        'foo.xml',
-        'foo_.xml',
-        'bar.tar.gz',
-        'bar_10.1.1',
-        'bar_10.1.2',
-        'bar.json',
+      ['foo.zip',
+       'foo_.zip',
+       'foo_12.2',
+       'foo_12.4',
+       'foo.xml',
+       'foo_.xml',
+       'bar.tar.gz',
+       'bar_10.1.1',
+       'bar_10.1.2',
+       'bar.json',
       ].forEach(fileName => {
         fs.closeSync(fs.openSync(path.resolve(tmpDir, fileName), 'w'));
       });
-      let tmpFile = path.resolve(tmpDir, 'foobar.config.json');
-      let lastBinary = path.resolve(tmpDir, 'foo_12.4');
+      const tmpFile = path.resolve(tmpDir, 'foobar.config.json');
+      const lastBinary = path.resolve(tmpDir, 'foo_12.4');
 
-      let fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
+      const fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
       generateConfigFile(tmpDir, tmpFile, fileBinaryPathRegex, lastBinary);
 
-      let contents = fs.readFileSync(tmpFile).toString();
-      let jsonContents = JSON.parse(contents);
+      const contents = fs.readFileSync(tmpFile).toString();
+      const jsonContents = JSON.parse(contents);
       expect(jsonContents['last']).toBe(lastBinary);
       expect(jsonContents['all'].length).toBe(2);
     });
@@ -153,8 +148,9 @@ describe('file_utils', () => {
     beforeEach(() => {
       tmpDir = path.resolve(os.tmpdir(), 'test');
       try {
-        fs.mkdirSync(tmpDir)
-      } catch(err) {}
+        fs.mkdirSync(tmpDir);
+      } catch (err) {
+      }
     });
 
     afterEach(() => {
@@ -175,11 +171,12 @@ describe('file_utils', () => {
       fs.closeSync(fs.openSync(path.resolve(tmpDir, 'foo-456'), 'w'));
       fs.closeSync(fs.openSync(path.resolve(tmpDir, 'foo-789'), 'w'));
 
-      expect(removeFiles(tmpDir, [/bar-.*/g])).toBe(
-        'bar-123\nbar-456\nbar-789');
+      expect(removeFiles(tmpDir, [/bar-.*/g]))
+          .toBe('bar-123\nbar-456\nbar-789');
       expect(fs.readdirSync(tmpDir).length).toBe(6);
-      expect(removeFiles(tmpDir, [/foo-.*/g, /baz-.*/g])).toBe(
-        'baz-123\nbaz-456\nbaz-789\nfoo-123\nfoo-456\nfoo-789');
+      expect(removeFiles(tmpDir, [
+        /foo-.*/g, /baz-.*/g
+      ])).toBe('baz-123\nbaz-456\nbaz-789\nfoo-123\nfoo-456\nfoo-789');
       expect(fs.readdirSync(tmpDir).length).toBe(0);
     });
 

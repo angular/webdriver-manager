@@ -1,10 +1,5 @@
 import * as fs from 'fs';
-import {
-  ChromeDriver,
-  osHelper,
-  semanticVersionParser,
-  versionParser,
-} from './chromedriver';
+import {ChromeDriver, osHelper, semanticVersionParser, versionParser,} from './chromedriver';
 
 describe('chromedriver', () => {
   describe('osHelper', () => {
@@ -53,9 +48,9 @@ describe('chromedriver', () => {
           ]
         }`;
         spyOn(fs, 'readFileSync').and.returnValue(configCache);
-        let chromedriver = new ChromeDriver({osType: 'Windows_NT'});
+        const chromedriver = new ChromeDriver({osType: 'Windows_NT'});
         expect(chromedriver.getStatus())
-          .toBe('90.0, 99.0-beta, 100.1 (latest)');
+            .toBe('90.0, 99.0-beta, 100.1 (latest)');
       });
 
       it('should get the status from the config file for not Windows', () => {
@@ -68,9 +63,9 @@ describe('chromedriver', () => {
           ]
         }`;
         spyOn(fs, 'readFileSync').and.returnValue(configCache);
-        let chromedriver = new ChromeDriver({osType: 'Darwin'});
+        const chromedriver = new ChromeDriver({osType: 'Darwin'});
         expect(chromedriver.getStatus())
-          .toBe('90.0, 99.0-beta, 100.1 (latest)');
+            .toBe('90.0, 99.0-beta, 100.1 (latest)');
       });
     });
   });

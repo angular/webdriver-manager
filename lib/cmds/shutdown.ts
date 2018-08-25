@@ -1,7 +1,8 @@
 import * as log from 'loglevel';
 import * as yargs from 'yargs';
-import { Options } from './options';
-import { SeleniumServer } from '../provider/selenium_server';
+
+import {SeleniumServer} from '../provider/selenium_server';
+import {Options} from './options';
 
 /**
  * Handles making the get request to stop the selenium server standalone if the
@@ -10,14 +11,9 @@ import { SeleniumServer } from '../provider/selenium_server';
  */
 export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
-  let seleniumServer = new SeleniumServer();
+  const seleniumServer = new SeleniumServer();
   seleniumServer.runAsNode = true;
-  let options = {
-    server: {
-      binary: seleniumServer,
-      runAsNode: true
-    }
-  };
+  const options = {server: {binary: seleniumServer, runAsNode: true}};
   await shutdown(options);
 }
 
@@ -28,6 +24,6 @@ export async function handler(argv: yargs.Arguments) {
  * @returns A promise for the get request.
  */
 export function shutdown(options: Options): Promise<void> {
-  let seleniumServer = options.server.binary as SeleniumServer;
+  const seleniumServer = options.server.binary as SeleniumServer;
   return seleniumServer.stopServer();
 }

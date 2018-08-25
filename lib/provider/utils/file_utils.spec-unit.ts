@@ -1,12 +1,6 @@
 import * as fs from 'fs';
-import {
-  convertXml2js,
-  getBinaryPathFromConfig,
-  isExpired,
-  getMatchingFiles,
-  readJson,
-  readXml} from './file_utils';
-import { JsonObject } from './http_utils';
+import {convertXml2js, getBinaryPathFromConfig, getMatchingFiles, isExpired, readJson, readXml} from './file_utils';
+import {JsonObject} from './http_utils';
 
 const xmlContents = `
 <?xml version='1.0' encoding='UTF-8'?>
@@ -43,61 +37,52 @@ const jsonArrayContents = `[{
 describe('file_utils', () => {
   describe('isExpired', () => {
     it('should return true if the file is zero', () => {
-      let mtime = Date.now() - 1000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 0,
-        mtime: mtime
-      });
+      const mtime = Date.now() - 1000;
+      spyOn(fs, 'statSync').and.returnValue({size: 0, mtime});
       expect(isExpired('foobar.xml')).toBeTruthy();
     });
-  
+
     it('should return true if the file is zero', () => {
-      let mtime = Date.now() - (60 * 60 * 1000) - 5000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 1000,
-        mtime: mtime
-      });
+      const mtime = Date.now() - (60 * 60 * 1000) - 5000;
+      spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime});
       expect(isExpired('foobar.xml')).toBeTruthy();
     });
-  
+
     it('should return true if the file is zero', () => {
-      let mtime = Date.now() - (60 * 60 * 1000) + 5000;
-      spyOn(fs, 'statSync').and.returnValue({
-        size: 1000,
-        mtime: mtime
-      });
+      const mtime = Date.now() - (60 * 60 * 1000) + 5000;
+      spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime});
       expect(isExpired('foobar.xml')).toBeFalsy();
-    });  
+    });
   });
-  
+
   describe('readXml', () => {
     it('should read the file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(xmlContents);
-      let xmlContent = readXml('foobar');
+      const xmlContent = readXml('foobar');
       expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
       expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
-        .toBe('2.0/foobar.zip');
+          .toBe('2.0/foobar.zip');
     });
 
     it('should get null if reading the file fails', () => {
-      let xmlContent = readXml('foobar');
+      const xmlContent = readXml('foobar');
       expect(xmlContent).toBeNull();
     });
   });
-  
+
   describe('convertXml2js', () => {
     it('should convert the content to json', () => {
-      let xmlContent = convertXml2js(xmlContents);
+      const xmlContent = convertXml2js(xmlContents);
       expect(xmlContent['ListBucketResult']['Name'][0]).toBe('foobar_driver');
       expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
-        .toBe('2.0/foobar.zip');
-    });    
+          .toBe('2.0/foobar.zip');
+    });
   });
 
   describe('readJson', () => {
     it('should read the json object from file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(jsonObjectContents);
-      let jsonObj = readJson('foobar') as JsonObject;
+      const jsonObj = readJson('foobar') as JsonObject;
       expect(jsonObj['foo']).toBe('abc');
       expect(jsonObj['bar']).toBe(123);
       expect(jsonObj['baz']['num']).toBe(101);
@@ -108,7 +93,7 @@ describe('file_utils', () => {
 
     it('should read the json array from file', () => {
       spyOn(fs, 'readFileSync').and.returnValue(jsonArrayContents);
-      let jsonArray = readJson('foobar') as JsonObject[];
+      const jsonArray = readJson('foobar') as JsonObject[];
       expect(jsonArray.length).toBe(3);
       expect(jsonArray[0]['foo']).toBe('abc');
       expect(jsonArray[1]['foo']).toBe('def');
@@ -116,14 +101,14 @@ describe('file_utils', () => {
     });
 
     it('should get null if reading the file fails', () => {
-      let jsoNContent = readJson('foobar');
+      const jsoNContent = readJson('foobar');
       expect(jsoNContent).toBeNull();
     });
   });
 
   describe('getMatchingFiles', () => {
     it('should find a set of matching files', () => {
-      let existingFiles = [
+      const existingFiles = [
         'foo.zip',
         'foo_.zip',
         'foo_12.2',
@@ -135,32 +120,31 @@ describe('file_utils', () => {
         'bar_10.1.2',
         'bar.json',
       ];
-      let fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
+      const fileBinaryPathRegex: RegExp = /foo_\d+.\d+/g;
       spyOn(fs, 'readdirSync').and.returnValue(existingFiles);
-      let matchedFiles = getMatchingFiles('/path/to', fileBinaryPathRegex);
+      const matchedFiles = getMatchingFiles('/path/to', fileBinaryPathRegex);
       expect(matchedFiles[0]).toContain('foo_12.2');
       expect(matchedFiles[1]).toContain('foo_12.4');
     });
   });
 
   describe('getBinaryPathFromConfig', () => {
-    let configBinaries = `{
+    const configBinaries = `{
       "last": "foo-1.0",
       "all": ["foo-1.0", "bar-1.1", "baz-1.2"]
-    }`;   
+    }`;
     it('should find the latest download', () => {
       spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
-      let last = getBinaryPathFromConfig('path-does-not-exist');
+      const last = getBinaryPathFromConfig('path-does-not-exist');
       expect(last).toBe('foo-1.0');
     });
 
     it('should find the download from a version', () => {
       spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
       expect(getBinaryPathFromConfig('path-does-not-exist', '1.0'))
-        .toBe('foo-1.0');
-        expect(getBinaryPathFromConfig('path-does-not-exist', '1.2'))
-        .toBe('baz-1.2');
+          .toBe('foo-1.0');
+      expect(getBinaryPathFromConfig('path-does-not-exist', '1.2'))
+          .toBe('baz-1.2');
     });
   });
 });
-

@@ -18,7 +18,8 @@ export interface RequestOptionsValue extends request.OptionsWithUrl {
  * A json object interface.
  */
 export interface JsonObject {
-  [key:string]: any;
+  // tslint:disable-next-line:no-any
+  [key: string]: any;
 }
 
 /**
@@ -30,7 +31,7 @@ export interface HttpOptions {
   // The file size or content length fo the file.
   fileSize?: number;
   // Headers to send with the request.
-  headers?: { [key:string]: string|number|string[] };
+  headers?: {[key: string]: string|number|string[]};
   // When making the request, to ignore SSL.
   ignoreSSL?: boolean;
   // When making the request, use the proxy url provided.
@@ -43,9 +44,7 @@ export interface HttpOptions {
  * @param httpOptions The http options for the request.
  */
 export function initOptions(
-    requestUrl: string,
-    httpOptions: HttpOptions): RequestOptionsValue {
-
+    requestUrl: string, httpOptions: HttpOptions): RequestOptionsValue {
   let options: RequestOptionsValue = {
     url: requestUrl,
     // default Linux can be anywhere from 20-120 seconds
@@ -55,9 +54,8 @@ export function initOptions(
   options = optionsSSL(options, httpOptions.ignoreSSL);
   options = optionsProxy(options, requestUrl, httpOptions.proxy);
   if (httpOptions.headers) {
-    for(let key of Object.keys(httpOptions.headers)) {
-      options = addHeader(options, key,
-        httpOptions.headers[key]);
+    for (const key of Object.keys(httpOptions.headers)) {
+      options = addHeader(options, key, httpOptions.headers[key]);
     }
   }
   return options;
@@ -66,26 +64,22 @@ export function initOptions(
 /**
  * Set ignore SSL option.
  * @param options The HTTP options
- * @param opt_ignoreSSL The ignore SSL option.
+ * @param optIgnoreSSL The ignore SSL option.
  */
 export function optionsSSL(
-    options: RequestOptionsValue,
-    opt_ignoreSSL: boolean): RequestOptionsValue {
-
-  if (opt_ignoreSSL) {
-    options.strictSSL = !opt_ignoreSSL;
-    (options as any).rejectUnauthorized = !opt_ignoreSSL;
+    options: RequestOptionsValue, optIgnoreSSL: boolean): RequestOptionsValue {
+  if (optIgnoreSSL) {
+    options.strictSSL = !optIgnoreSSL;
+    options.rejectUnauthorized = !optIgnoreSSL;
   }
   return options;
 }
 
 export function optionsProxy(
-    options: RequestOptionsValue,
-    requestUrl: string,
-    opt_proxy: string): RequestOptionsValue {
-
-  if (opt_proxy) {
-    options.proxy = resolveProxy(requestUrl, opt_proxy);
+    options: RequestOptionsValue, requestUrl: string,
+    optProxy: string): RequestOptionsValue {
+  if (optProxy) {
+    options.proxy = resolveProxy(requestUrl, optProxy);
     if (url.parse(requestUrl).protocol === 'https:') {
       options.url = requestUrl.replace('https:', 'http:');
     }
@@ -96,28 +90,27 @@ export function optionsProxy(
 /**
  * Resolves proxy based on values set.
  * @param requestUrl The url to download the file.
- * @param opt_proxy The proxy to connect to to download files.
+ * @param optProxy The proxy to connect to to download files.
  * @return Either undefined or the proxy.
  */
-export function resolveProxy(
-    requestUrl: string,
-    opt_proxy: string): string {
-
-  if (opt_proxy) {
-    return opt_proxy;
+export function resolveProxy(requestUrl: string, optProxy: string): string {
+  if (optProxy) {
+    return optProxy;
   } else {
-    let protocol = url.parse(requestUrl).protocol;
-    let hostname = url.parse(requestUrl).hostname;
+    const protocol = url.parse(requestUrl).protocol;
+    const hostname = url.parse(requestUrl).hostname;
     // If the NO_PROXY environment variable exists and matches the host name,
     // to ignore the resolve proxy.
-    // Check to see if it exists and equal to empty string is to help with testing
+    // Check to see if it exists and equal to empty string is to help with
+    // testing
     const noProxy: string = process.env.NO_PROXY || process.env.no_proxy;
     if (noProxy) {
-      // array of hostnames/domain names listed in the NO_PROXY environment variable
-      let noProxyTokens = noProxy.split(',');
+      // array of hostnames/domain names listed in the NO_PROXY environment
+      // variable
+      const noProxyTokens = noProxy.split(',');
       // check if the fileUrl hostname part does not end with one of the
       // NO_PROXY environment variable's hostnames/domain names
-      for (let noProxyToken of noProxyTokens) {
+      for (const noProxyToken of noProxyTokens) {
         if (hostname.indexOf(noProxyToken) !== -1) {
           return undefined;
         }
@@ -143,19 +136,19 @@ export function resolveProxy(
  * @param fileName The file name path.
  * @returns The curl command.
  */
-export function curlCommand(requestOptions: RequestOptionsValue,
-    fileName?: string) {
+export function curlCommand(
+    requestOptions: RequestOptionsValue, fileName?: string) {
   let curl = `${requestOptions.url}`;
   if (requestOptions.proxy) {
-    let pathUrl = url.parse(requestOptions.url.toString()).path;
-    let host = url.parse(requestOptions.url.toString()).host;
+    const pathUrl = url.parse(requestOptions.url.toString()).path;
+    const host = url.parse(requestOptions.url.toString()).host;
     if (requestOptions.proxy) {
-      let modifiedUrl = url.resolve(requestOptions.proxy, pathUrl);
+      const modifiedUrl = url.resolve(requestOptions.proxy, pathUrl);
       curl = `"${modifiedUrl}" -H "host: ${host}"`;
     }
   }
   if (requestOptions.headers) {
-    for (let headerName of Object.keys(requestOptions.headers)) {
+    for (const headerName of Object.keys(requestOptions.headers)) {
       curl += ` -H "${headerName}: ${requestOptions.headers[headerName]}"`;
     }
   }
@@ -175,7 +168,8 @@ export function curlCommand(requestOptions: RequestOptionsValue,
  * @param value The value of the header.
  * @returns The modified options object.
  */
-export function addHeader(options: RequestOptionsValue, name: string,
+export function addHeader(
+    options: RequestOptionsValue, name: string,
     value: string|number|string[]): RequestOptionsValue {
   if (!options.headers) {
     options.headers = {};
@@ -191,10 +185,9 @@ export function addHeader(options: RequestOptionsValue, name: string,
  * @param isLogInfo Log info or debug
  */
 export function requestBinary(
-    binaryUrl: string,
-    httpOptions: HttpOptions,
-    isLogInfo: boolean = true): Promise<boolean> {
-  let options = initOptions(binaryUrl, httpOptions);
+    binaryUrl: string, httpOptions: HttpOptions,
+    isLogInfo = true): Promise<boolean> {
+  const options = initOptions(binaryUrl, httpOptions);
   options.followRedirect = false;
   options.followAllRedirects = false;
   if (isLogInfo) {
@@ -203,9 +196,8 @@ export function requestBinary(
     log.debug(curlCommand(options, httpOptions.fileName));
   }
 
-
   return new Promise<boolean>((resolve, reject) => {
-    let req = request(options);
+    const req = request(options);
     req.on('response', response => {
       let contentLength: number;
       if (response.statusCode === 200) {
@@ -217,11 +209,12 @@ export function requestBinary(
           resolve(false);
         } else {
           // Only pipe if the headers are different length.
-          let dir = path.dirname(httpOptions.fileName);
+          const dir = path.dirname(httpOptions.fileName);
           try {
             fs.mkdirSync(dir);
-          } catch (err) {}
-          let file = fs.createWriteStream(httpOptions.fileName);
+          } catch (err) {
+          }
+          const file = fs.createWriteStream(httpOptions.fileName);
           req.pipe(file);
 
           file.on('close', () => {
@@ -229,7 +222,7 @@ export function requestBinary(
               if (error) {
                 reject(error);
               }
-              if (stats.size != contentLength) {
+              if (stats.size !== contentLength) {
                 fs.unlinkSync(httpOptions.fileName);
                 reject(error);
               }
@@ -241,11 +234,11 @@ export function requestBinary(
           });
         }
       } else if (response.statusCode === 302) {
-        let location = response.headers['location'] as string;
+        const location = response.headers['location'] as string;
         if (!httpOptions.headers) {
           httpOptions.headers = {};
         }
-        for (let header of Object.keys(response.headers)) {
+        for (const header of Object.keys(response.headers)) {
           httpOptions.headers[header] = response.headers[header];
         }
         resolve(requestBinary(location, httpOptions, false));
@@ -266,13 +259,12 @@ export function requestBinary(
  * @returns A promise string of the response body.
  */
 export function requestBody(
-    requestUrl: string,
-    httpOptions: HttpOptions): Promise<string> {
-  let options = initOptions(requestUrl, httpOptions);
+    requestUrl: string, httpOptions: HttpOptions): Promise<string> {
+  const options = initOptions(requestUrl, httpOptions);
   log.info(curlCommand(options, httpOptions.fileName));
   options.followRedirect = true;
   return new Promise((resolve, reject) => {
-    let req = request(options);
+    const req = request(options);
     req.on('response', response => {
       if (response.statusCode === 200) {
         let output = '';

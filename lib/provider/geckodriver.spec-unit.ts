@@ -1,8 +1,5 @@
 import * as fs from 'fs';
-import {
-  GeckoDriver,
-  osHelper
-} from './geckodriver';
+import {GeckoDriver, osHelper} from './geckodriver';
 
 describe('geckodriver', () => {
   describe('osHelper', () => {
@@ -36,9 +33,9 @@ describe('geckodriver', () => {
           ]
         }`;
         spyOn(fs, 'readFileSync').and.returnValue(configCache);
-        let geckodriver = new GeckoDriver({osType: 'Windows_NT'});
+        const geckodriver = new GeckoDriver({osType: 'Windows_NT'});
         expect(geckodriver.getStatus())
-          .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
+            .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
       });
 
       it('should get the status from the config file for not Windows', () => {
@@ -51,9 +48,9 @@ describe('geckodriver', () => {
           ]
         }`;
         spyOn(fs, 'readFileSync').and.returnValue(configCache);
-        let geckodriver = new GeckoDriver({osType: 'Darwin'});
+        const geckodriver = new GeckoDriver({osType: 'Darwin'});
         expect(geckodriver.getStatus())
-          .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
+            .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
       });
     });
   });

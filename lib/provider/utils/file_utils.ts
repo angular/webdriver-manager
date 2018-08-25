@@ -1,9 +1,9 @@
 import * as AdmZip from 'adm-zip';
-import * as tar from 'tar';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as tar from 'tar';
 import * as xml2js from 'xml2js';
-import { JsonObject } from './http_utils';
+import {JsonObject} from './http_utils';
 
 /**
  * Check to see if the modified timestamp is expired.
@@ -11,9 +11,9 @@ import { JsonObject } from './http_utils';
  */
 export function isExpired(fileName: string): boolean {
   try {
-    let timestamp = new Date(fs.statSync(fileName).mtime).getTime();
-    let size = fs.statSync(fileName).size;
-    let now = Date.now();
+    const timestamp = new Date(fs.statSync(fileName).mtime).getTime();
+    const size = fs.statSync(fileName).size;
+    const now = Date.now();
 
     if (size > 0 && (now - (60 * 60 * 1000) < timestamp)) {
       return false;
@@ -30,9 +30,9 @@ export function isExpired(fileName: string): boolean {
  * @param fileName The json filename to read.
  * @returns
  */
-export function readJson(fileName: string): JsonObject[] | JsonObject | null {
+export function readJson(fileName: string): JsonObject[]|JsonObject|null {
   try {
-    let contents = fs.readFileSync(fileName).toString();
+    const contents = fs.readFileSync(fileName).toString();
     return JSON.parse(contents);
   } catch (err) {
     return null;
@@ -43,9 +43,9 @@ export function readJson(fileName: string): JsonObject[] | JsonObject | null {
  * Reads the xml file.
  * @param fileName The xml filename to read.
  */
-export function readXml(fileName: string): JsonObject | null {
+export function readXml(fileName: string): JsonObject|null {
   try {
-    let contents = fs.readFileSync(fileName).toString();
+    const contents = fs.readFileSync(fileName).toString();
     return convertXml2js(contents);
   } catch (err) {
     return null;
@@ -56,8 +56,7 @@ export function readXml(fileName: string): JsonObject | null {
  * Convert the xml file to an object.
  * @param content The xml contents.
  */
-export function convertXml2js(
-  content: string): JsonObject | null {
+export function convertXml2js(content: string): JsonObject|null {
   let retResult: JsonObject = null;
   xml2js.parseString(content, (err, result) => {
     retResult = result;
@@ -72,12 +71,11 @@ export function convertXml2js(
  * @returns The renamed file name.
  */
 export function renameFileWithVersion(
-    srcFileName: string,
-    versionNumber: string): string {
-  let dirName = path.dirname(srcFileName);
-  let extName = path.extname(srcFileName);
-  let baseName = path.basename(srcFileName, extName);
-  let dstFileName = path.resolve(dirName, baseName + versionNumber + extName);
+    srcFileName: string, versionNumber: string): string {
+  const dirName = path.dirname(srcFileName);
+  const extName = path.extname(srcFileName);
+  const baseName = path.basename(srcFileName, extName);
+  const dstFileName = path.resolve(dirName, baseName + versionNumber + extName);
   fs.renameSync(srcFileName, dstFileName);
   return dstFileName;
 }
@@ -88,8 +86,8 @@ export function renameFileWithVersion(
  * @returns A list of files in the zip file.
  */
 export function zipFileList(zipFileName: string): string[] {
-  let fileList: string[] = [];
-  let zip = new AdmZip(zipFileName);
+  const fileList: string[] = [];
+  const zip = new AdmZip(zipFileName);
   zip.getEntries().forEach(entry => {
     fileList.push(entry.name);
   });
@@ -103,10 +101,10 @@ export function zipFileList(zipFileName: string): string[] {
  * @returns A list of uncompressed files.
  */
 export function unzipFile(zipFileName: string, dstDir: string): string[] {
-  let fileList: string[] = [];
-  let zip = new AdmZip(zipFileName);
+  const fileList: string[] = [];
+  const zip = new AdmZip(zipFileName);
   zip.extractAllTo(dstDir, true);
-  for (let fileItem of zipFileList(zipFileName)) {
+  for (const fileItem of zipFileList(zipFileName)) {
     fileList.push(path.resolve(dstDir, fileItem));
   }
   return fileList;
@@ -118,15 +116,17 @@ export function unzipFile(zipFileName: string, dstDir: string): string[] {
  * @returns A lsit of files in the tarball file.
  */
 export function tarFileList(tarball: string): Promise<string[]> {
-  let fileList: string[] = [];
-  return tar.list({
-    file: tarball,
-    onentry: entry => {
-      fileList.push(entry['path'].toString());
-    }
-   }).then(() => {
-    return fileList;
-   });
+  const fileList: string[] = [];
+  return tar
+      .list({
+        file: tarball,
+        onentry: entry => {
+          fileList.push(entry['path'].toString());
+        }
+      })
+      .then(() => {
+        return fileList;
+      });
 }
 
 /**
@@ -136,19 +136,17 @@ export function tarFileList(tarball: string): Promise<string[]> {
  * @returns A list of uncompressed files.
  */
 export async function uncompressTarball(
-    tarball: string,
-    dstDir: string): Promise<string[]> {
+    tarball: string, dstDir: string): Promise<string[]> {
   try {
     fs.mkdirSync(path.resolve(dstDir));
-  } catch (err) { }
+  } catch (err) {
+  }
 
-  let fileList = await tarFileList(tarball);
-  return tar.extract({
-    file: tarball
-  }).then(() => {
-    let dstFiles: string[] = [];
-    for (let fileItem of fileList) {
-      let dstFileName = path.resolve(dstDir, fileItem);
+  const fileList = await tarFileList(tarball);
+  return tar.extract({file: tarball}).then(() => {
+    const dstFiles: string[] = [];
+    for (const fileItem of fileList) {
+      const dstFileName = path.resolve(dstDir, fileItem);
       fs.renameSync(path.resolve(fileItem), dstFileName);
       dstFiles.push(dstFileName);
     }
@@ -160,12 +158,11 @@ export async function uncompressTarball(
  * Change the permissions for Linux and MacOS with chmod.
  * @param fileName The full path to the filename to change permissions.
  * @param mode The number to modify.
- * @param osType The OS type to decide if we need to change permissions on the file.
+ * @param osType The OS type to decide if we need to change permissions on the
+ *     file.
  */
 export function changeFilePermissions(
-    fileName: string,
-    mode: string,
-    osType: string) {
+    fileName: string, mode: string, osType: string) {
   if (osType === 'Darwin' || osType === 'Linux') {
     fs.chmodSync(path.resolve(fileName), mode);
   }
@@ -179,11 +176,9 @@ export function changeFilePermissions(
  * @param lastFileBinaryPath The full path to the last binary file downloaded.
  */
 export function generateConfigFile(
-    outDir: string,
-    fileName: string,
-    fileBinaryPathRegex: RegExp,
+    outDir: string, fileName: string, fileBinaryPathRegex: RegExp,
     lastFileBinaryPath?: string) {
-  let configData: JsonObject = {};
+  const configData: JsonObject = {};
   if (lastFileBinaryPath) {
     configData['last'] = lastFileBinaryPath;
   }
@@ -197,11 +192,10 @@ export function generateConfigFile(
  * @param fileBinaryPathRegex The regExp to match files in the outDir.
  */
 export function getMatchingFiles(
-    outDir: string,
-    fileBinaryPathRegex: RegExp): string[] {
-  let existFiles = fs.readdirSync(outDir);
-  let matchingFiles: string[] = [];
-  for (let existFile of existFiles) {
+    outDir: string, fileBinaryPathRegex: RegExp): string[] {
+  const existFiles = fs.readdirSync(outDir);
+  const matchingFiles: string[] = [];
+  for (const existFile of existFiles) {
     if (existFile.match(fileBinaryPathRegex)) {
       matchingFiles.push(path.resolve(outDir, existFile));
     }
@@ -218,14 +212,13 @@ export function getMatchingFiles(
  * @param version An optional version that is not necessarily semver.
  */
 export function getBinaryPathFromConfig(
-    cacheFilePath: string,
-    version?: string): string|null {
-  let cacheJson = JSON.parse(fs.readFileSync(cacheFilePath).toString());
+    cacheFilePath: string, version?: string): string|null {
+  const cacheJson = JSON.parse(fs.readFileSync(cacheFilePath).toString());
   let binaryPath = null;
   if (!version) {
     binaryPath = cacheJson['last'];
   } else {
-    for (let cachePath of cacheJson['all']) {
+    for (const cachePath of cacheJson['all']) {
       if (cachePath.match(version)) {
         binaryPath = cachePath;
       }
@@ -242,10 +235,10 @@ export function getBinaryPathFromConfig(
  */
 export function removeFiles(outDir: string, fileRegexes: RegExp[]): string {
   try {
-    let existFiles = fs.readdirSync(outDir);
-    let removedFiles: string[] = [];
-    for (let fileRegex of fileRegexes) {
-      for (let existFile of existFiles) {
+    const existFiles = fs.readdirSync(outDir);
+    const removedFiles: string[] = [];
+    for (const fileRegex of fileRegexes) {
+      for (const existFile of existFiles) {
         if (existFile.match(fileRegex)) {
           removedFiles.push(existFile);
           fs.unlinkSync(path.resolve(outDir, existFile));
@@ -253,7 +246,7 @@ export function removeFiles(outDir: string, fileRegexes: RegExp[]): string {
       }
     }
     return (removedFiles.sort()).join('\n');
-  } catch(_) {
+  } catch (_) {
     return null;
   }
 }

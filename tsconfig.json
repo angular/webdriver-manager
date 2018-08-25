@@ -1,16 +1,21 @@
-  {
+{
   "compilerOptions": {
-    "target": "es6",
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [ "es2017" ],
     "module": "commonjs",
     "moduleResolution": "node",
-    "sourceMap": true,
-    "declaration": true,
-    "removeComments": false,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitReturns": true,
     "outDir": "./dist",
-    "lib": [
-      "es2017"
-    ],
+    "pretty": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es2017",
     "typeRoots": [
       "./node_modules/@types"
     ],

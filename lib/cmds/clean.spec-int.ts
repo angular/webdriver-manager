@@ -2,10 +2,11 @@ import * as fs from 'fs';
 import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
-import * as yargs from 'yargs';
 import * as rimraf from 'rimraf';
-import { clean } from './clean';
-import { constructAllProviders } from './utils';
+import * as yargs from 'yargs';
+
+import {clean} from './clean';
+import {constructAllProviders} from './utils';
 
 log.setLevel('debug');
 const tmpDir = path.resolve(os.tmpdir(), 'test');
@@ -22,27 +23,27 @@ describe('clean cmd', () => {
       // create the directory
       try {
         fs.mkdirSync(tmpDir);
-      } catch (err) {}
+      } catch (err) {
+      }
       // create files that should be deleted.
-      fs.closeSync(fs.openSync(
-        path.resolve(tmpDir, 'chromedriver_2.41'), 'w'));
-      fs.closeSync(fs.openSync(
-        path.resolve(tmpDir, 'chromedriver_foo.zip'), 'w'));
-      fs.closeSync(fs.openSync(
-        path.resolve(tmpDir, 'chromedriver.config.json'), 'w'));
-      fs.closeSync(fs.openSync(
-        path.resolve(tmpDir, 'chromedriver.xml'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'chromedriver_2.41'), 'w'));
+      fs.closeSync(
+          fs.openSync(path.resolve(tmpDir, 'chromedriver_foo.zip'), 'w'));
+      fs.closeSync(
+          fs.openSync(path.resolve(tmpDir, 'chromedriver.config.json'), 'w'));
+      fs.closeSync(fs.openSync(path.resolve(tmpDir, 'chromedriver.xml'), 'w'));
     });
 
     afterAll(() => {
       try {
         rimraf.sync(tmpDir);
-      } catch (err) {}
+      } catch (err) {
+      }
     });
 
     it('should remove the files', () => {
       expect(fs.readdirSync(tmpDir).length).toBe(4);
-      let cleanList = clean(options).split('\n');
+      const cleanList = clean(options).split('\n');
       expect(cleanList.length).toBe(4);
       expect(fs.readdirSync(tmpDir).length).toBe(0);
     });

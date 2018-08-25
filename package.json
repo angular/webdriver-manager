@@ -1,7 +1,7 @@
 {
   "name": "webdriver-manager-replacement",
   "version": "0.5.1",
-  "description": "not the webdriver-manager cli",
+  "description": "webdriver-manager replacement",
   "bin": {
     "webdriver-manager": "bin/webdriver-manager",
     "webdriver-manager-replacement": "bin/webdriver-manager-replacement"
@@ -9,15 +9,23 @@
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "scripts": {
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "gts": "gts",
     "http-server": "tsc && node dist/spec/server/http_server.js",
     "jasmine": "jasmine",
-    "prepare": "tsc",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check",
     "proxy-server": "tsc && node dist/spec/server/proxy_server.js",
     "test": "tsc && npm run test-unit && npm run test-int && npm run test-proxy && npm run test-e2e",
     "test-e2e": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-e2e.json",
     "test-int": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-int.json",
     "test-proxy": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-proxy.json",
     "test-unit": "tsc && jasmine JASMINE_CONFIG_PATH=spec/jasmine-unit.json",
+    "tslint": "tslint -c tslint.json --fix lib/**/*.ts spec/**/*.ts",
     "tsc": "tsc"
   },
   "keywords": [
@@ -67,9 +75,12 @@
     "@types/tar": "^4.0.0",
     "@types/xml2js": "^0.4.3",
     "@types/yargs": "^11.1.1",
+    "clang-format": "^1.2.4",
+    "gts": "^0.8.0",
     "http-proxy": "^1.17.0",
     "jasmine": "^3.1.0",
     "rimraf": "^2.6.2",
+    "tslint": "^5.11.0",
     "typescript": "^2.9.2"
   }
 }

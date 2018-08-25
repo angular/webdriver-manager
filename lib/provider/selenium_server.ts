@@ -2,26 +2,19 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as log from 'loglevel';
 import * as os from 'os';
-import * as request from 'request';
 import * as path from 'path';
-import {
-  OUT_DIR,
-  ProviderInterface,
-  ProviderConfig,
-} from './provider';
-import {
-  generateConfigFile,
-  getBinaryPathFromConfig,
-  removeFiles,
-} from './utils/file_utils';
-import { curlCommand, initOptions, requestBinary } from './utils/http_utils';
-import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
-import { getVersion } from './utils/version_list';
+import * as request from 'request';
+
+import {OUT_DIR, ProviderConfig, ProviderInterface,} from './provider';
+import {convertXmlToVersionList, updateXml} from './utils/cloud_storage_xml';
+import {generateConfigFile, getBinaryPathFromConfig, removeFiles,} from './utils/file_utils';
+import {curlCommand, initOptions, requestBinary} from './utils/http_utils';
+import {getVersion} from './utils/version_list';
 
 export class SeleniumServer implements ProviderInterface {
   cacheFileName = 'selenium-server.xml';
   configFileName = 'selenium-server.config.json';
-  ignoreSSL: boolean = false;
+  ignoreSSL = false;
   osType = os.type();
   osArch = os.arch();
   outDir = OUT_DIR;
@@ -69,20 +62,19 @@ export class SeleniumServer implements ProviderInterface {
    * then download that binary.
    * @param version Optional to provide the version number or latest.
    */
-  async updateBinary(version?: string): Promise<any> {
+  async updateBinary(version?: string): Promise<void> {
     await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
-      proxy: this.proxy });
-    let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.cacheFileName), 'selenium-server-standalone',
-      versionParser,
-      semanticVersionParser);
-    let versionObj = getVersion(
-      versionList, '', version);
+      proxy: this.proxy
+    });
+    const versionList = convertXmlToVersionList(
+        path.resolve(this.outDir, this.cacheFileName),
+        'selenium-server-standalone', versionParser, semanticVersionParser);
+    const versionObj = getVersion(versionList, '', version);
 
-    let seleniumServerUrl = this.requestUrl + versionObj.url;
-    let seleniumServerJar = path.resolve(this.outDir, versionObj.name);
+    const seleniumServerUrl = this.requestUrl + versionObj.url;
+    const seleniumServerJar = path.resolve(this.outDir, versionObj.name);
 
     // We should check the jar file size if it exists. The size will
     // be used to either make the request, or quit the request if the file
@@ -90,14 +82,17 @@ export class SeleniumServer implements ProviderInterface {
     let fileSize = 0;
     try {
       fileSize = fs.statSync(seleniumServerJar).size;
-    } catch (err) {}
+    } catch (err) {
+    }
     await requestBinary(seleniumServerUrl, {
-      fileName: seleniumServerJar, fileSize,
+      fileName: seleniumServerJar,
+      fileSize,
       ignoreSSL: this.ignoreSSL,
-      proxy: this.proxy });
-    generateConfigFile(this.outDir,
-      path.resolve(this.outDir, this.configFileName),
-      matchBinaries(), seleniumServerJar);
+      proxy: this.proxy
+    });
+    generateConfigFile(
+        this.outDir, path.resolve(this.outDir, this.configFileName),
+        matchBinaries(), seleniumServerJar);
     return Promise.resolve();
   }
 
@@ -110,21 +105,18 @@ export class SeleniumServer implements ProviderInterface {
    * @returns A promise so the server can run while awaiting its completion.
    */
   startServer(
-      opts: {[key:string]: string},
-      version?: string,
-      runAsNode?: boolean,
+      opts: {[key: string]: string}, version?: string, runAsNode?: boolean,
       runAsDetach?: boolean): Promise<number> {
     this.runAsNode = runAsNode;
     this.runAsDetach = runAsDetach;
-    let java = this.getJava();
-    return new Promise<number>(async(resolve, _) => {
-
+    const java = this.getJava();
+    return new Promise<number>(async (resolve, _) => {
       if (this.runAsDetach) {
         this.runAsNode = true;
-        let cmd = this.getCmdStartServer(opts, version, this.runAsNode);
+        const cmd = this.getCmdStartServer(opts, version, this.runAsNode);
         log.info(`${java} ${cmd.join(' ')}`);
-        this.seleniumProcess = childProcess.spawn(java, cmd,
-          { detached: true, stdio: 'ignore' });
+        this.seleniumProcess =
+            childProcess.spawn(java, cmd, {detached: true, stdio: 'ignore'});
         log.info(`selenium process id: ${this.seleniumProcess.pid}`);
         await new Promise((resolve, _) => {
           setTimeout(resolve, 2000);
@@ -135,10 +127,10 @@ export class SeleniumServer implements ProviderInterface {
         });
         resolve();
       } else {
-        let cmd = this.getCmdStartServer(opts, version, this.runAsNode);
+        const cmd = this.getCmdStartServer(opts, version, this.runAsNode);
         log.info(`${java} ${cmd.join(' ')}`);
-        this.seleniumProcess = childProcess.spawn(java, cmd,
-          { stdio: 'inherit' });
+        this.seleniumProcess =
+            childProcess.spawn(java, cmd, {stdio: 'inherit'});
         log.info(`selenium process id: ${this.seleniumProcess.pid}`);
 
         this.seleniumProcess.on('exit', (code: number) => {
@@ -160,14 +152,13 @@ export class SeleniumServer implements ProviderInterface {
    * @returns The spawn arguments array.
    */
   getCmdStartServer(
-      opts: {[key:string]: string},
-      version?: string,
+      opts: {[key: string]: string}, version?: string,
       runAsNode?: boolean): string[] {
-    let configFilePath = path.resolve(this.outDir, this.configFileName);
-    let jarFile = getBinaryPathFromConfig(configFilePath, version);
-    let options: string[] = [];
+    const configFilePath = path.resolve(this.outDir, this.configFileName);
+    const jarFile = getBinaryPathFromConfig(configFilePath, version);
+    const options: string[] = [];
     if (opts) {
-      for (let opt of Object.keys(opts)) {
+      for (const opt of Object.keys(opts)) {
         options.push(`${opt}=${opts[opt]}`);
       }
     }
@@ -199,7 +190,7 @@ export class SeleniumServer implements ProviderInterface {
     if (process.env.JAVA_HOME) {
       java = path.resolve(process.env.JAVA_HOME, 'bin', 'java');
       if (this.osType === 'Windows_NT') {
-        java += '.exe'
+        java += '.exe';
       }
     }
     return java;
@@ -225,12 +216,12 @@ export class SeleniumServer implements ProviderInterface {
       if (!port) {
         port = 4444;
       }
-      let stopUrl = host + ':' + port +
-        '/extra/LifecycleServlet?action=shutdown';
-      let options = initOptions(stopUrl, {});
+      const stopUrl =
+          host + ':' + port + '/extra/LifecycleServlet?action=shutdown';
+      const options = initOptions(stopUrl, {});
       log.info(curlCommand(options));
       return new Promise<void>((resolve, _) => {
-        let req = request(options);
+        const req = request(options);
         req.on('response', response => {
           response.on('end', () => {
             resolve();
@@ -242,9 +233,8 @@ export class SeleniumServer implements ProviderInterface {
       return Promise.resolve();
     } else {
       return Promise.reject(
-        'Could not stop the server, server is not running.');
+          'Could not stop the server, server is not running.');
     }
-
   }
 
   /**
@@ -255,19 +245,20 @@ export class SeleniumServer implements ProviderInterface {
     try {
       const configFilePath = path.resolve(this.outDir, this.configFileName);
       const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
-      let versions: string[] = [];
-      for (let binaryPath of configJson['all']) {
+      const versions: string[] = [];
+      for (const binaryPath of configJson['all']) {
         let version = '';
-        let regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g
+        const regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g;
         try {
-          let exec = regex.exec(binaryPath);
+          const exec = regex.exec(binaryPath);
           if (exec && exec[1]) {
             version = exec[1];
           }
-        } catch (_) {}
+        } catch (_) {
+        }
 
         if (configJson['last'] === binaryPath) {
-          version += ' (latest)'
+          version += ' (latest)';
         }
         versions.push(version);
       }
@@ -294,10 +285,10 @@ export class SeleniumServer implements ProviderInterface {
  */
 export function versionParser(xmlKey: string) {
   // Capture the version name 12.34.56 or 12.34.56-beta
-  let regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g
+  const regex = /.*selenium-server-standalone-(\d+.\d+.\d+.*).jar/g;
   try {
     return regex.exec(xmlKey)[1];
-  } catch(_) {
+  } catch (_) {
     return null;
   }
 }
@@ -311,10 +302,10 @@ export function versionParser(xmlKey: string) {
  */
 export function semanticVersionParser(xmlKey: string) {
   // Only capture numbers 12.34.56
-  let regex = /.*selenium-server-standalone-(\d+.\d+.\d+).*.jar/g
+  const regex = /.*selenium-server-standalone-(\d+.\d+.\d+).*.jar/g;
   try {
     return regex.exec(xmlKey)[1];
-  } catch(_) {
+  } catch (_) {
     return null;
   }
 }
@@ -322,6 +313,6 @@ export function semanticVersionParser(xmlKey: string) {
 /**
  * Matches the installed binaries.
  */
-export function matchBinaries(): RegExp | null {
+export function matchBinaries(): RegExp|null {
   return /selenium-server-standalone-\d+.\d+.\d+.*.jar/g;
 }

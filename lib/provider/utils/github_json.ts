@@ -1,13 +1,14 @@
 import * as fs from 'fs';
 import * as log from 'loglevel';
 import * as path from 'path';
-import { isExpired, readJson } from './file_utils';
-import { HttpOptions, JsonObject, requestBody } from './http_utils';
-import { VersionList } from './version_list';
+
+import {isExpired, readJson} from './file_utils';
+import {HttpOptions, JsonObject, requestBody} from './http_utils';
+import {VersionList} from './version_list';
 
 export interface RequestMethod {
-  (jsonUrl: string, httpOptions: HttpOptions, oauthToken?: string):
-    Promise<string|null>;
+  (jsonUrl: string, httpOptions: HttpOptions,
+   oauthToken?: string): Promise<string|null>;
 }
 
 /**
@@ -18,18 +19,17 @@ export interface RequestMethod {
  * @param oauthToken An optional oauth token.
  */
 export async function updateJson(
-    jsonUrl: string,
-    httpOptions: HttpOptions,
-    oauthToken?: string): Promise<JsonObject|null> {
-
+    jsonUrl: string, httpOptions: HttpOptions,
+    oauthToken?: string): Promise<JsonObject|JsonObject[]|null> {
   if (isExpired(httpOptions.fileName)) {
     let contents: string;
 
     // Create the folder to store the cache.
-    let dir = path.dirname(httpOptions.fileName);
+    const dir = path.dirname(httpOptions.fileName);
     try {
       fs.mkdirSync(dir);
-    } catch (err) {}
+    } catch (err) {
+    }
 
     // Check the rate limit and if there is quota for this request.
     if (await hasQuota(oauthToken)) {
@@ -52,9 +52,8 @@ export async function updateJson(
  * @returns A promised string of the response body.
  */
 export function requestRateLimit(
-    oauthToken?: string,
-    requestMethod?: RequestMethod): Promise<string|null> {
-  let rateLimitUrl = 'https://api.github.com/rate_limit';
+    oauthToken?: string, requestMethod?: RequestMethod): Promise<string|null> {
+  const rateLimitUrl = 'https://api.github.com/rate_limit';
   if (requestMethod) {
     return requestMethod(rateLimitUrl, {}, oauthToken);
   } else {
@@ -70,8 +69,7 @@ export function requestRateLimit(
  * @returns A promised string of the response body.
  */
 export function requestGitHubJson(
-    jsonUrl: string,
-    httpOptions: HttpOptions,
+    jsonUrl: string, httpOptions: HttpOptions,
     oauthToken?: string): Promise<string|null> {
   if (!httpOptions.headers) {
     httpOptions.headers = {};
@@ -80,7 +78,7 @@ export function requestGitHubJson(
   if (oauthToken) {
     httpOptions.headers['Authorization'] = 'token ' + oauthToken;
   } else if (process.env['GITHUB_TOKEN'] || process.env['github_token']) {
-    let token = process.env['GITHUB_TOKEN'] || process.env['github_token'];
+    const token = process.env['GITHUB_TOKEN'] || process.env['github_token'];
     httpOptions.headers['Authorization'] = 'token ' + token;
   }
   return requestBody(jsonUrl, httpOptions);
@@ -92,20 +90,21 @@ export function requestGitHubJson(
  * @param requestMethod An overriding requesting method.
  */
 export async function hasQuota(
-    oauthToken?: string,
-    requestMethod?: RequestMethod): Promise<boolean> {
+    oauthToken?: string, requestMethod?: RequestMethod): Promise<boolean> {
   try {
-    let requesteRateLimit = await requestRateLimit(oauthToken, requestMethod);
+    const requesteRateLimit = await requestRateLimit(oauthToken, requestMethod);
     if (!requesteRateLimit) {
-      throw new Error('Request encountered an error. Received null, expecting json.')
+      throw new Error(
+          'Request encountered an error. Received null, expecting json.');
     }
-    let rateLimit = JSON.parse(requesteRateLimit);
+    const rateLimit = JSON.parse(requesteRateLimit);
     if (rateLimit['resources']['core']['remaining'] === 0) {
       if (oauthToken) {
         log.warn('[WARN] No remaining quota for requests to GitHub.');
       } else {
-        log.warn('[WARN] Provide an oauth token. ' +
-          'See https://github.com/settings/tokens');
+        log.warn(
+            '[WARN] Provide an oauth token. ' +
+            'See https://github.com/settings/tokens');
       }
       log.warn('[WARN] Stopping updates for gecko driver.');
       return false;
@@ -122,26 +121,28 @@ export async function hasQuota(
  * @param fileName the location of the xml file to read.
  * @returns the version list from the xml file.
  */
-export function convertJsonToVersionList(fileName: string): VersionList | null {
-  let githubJson = readJson(fileName) as JsonObject[];
+export function convertJsonToVersionList(fileName: string): VersionList|null {
+  const githubJson = readJson(fileName) as JsonObject[];
   if (!githubJson) {
     return null;
   }
-  let versionList: VersionList = {};
-  for(let githubObj of githubJson) {
-    let assets = githubObj['assets'];
-    let version = githubObj['tag_name'].replace('v', '');
+  const versionList: VersionList = {};
+  for (const githubObj of githubJson) {
+    interface Asset {
+      name: string;
+      browser_download_url: string;
+      size: number;
+    }
+    const assets = githubObj['assets'] as JsonObject[];
+    const version = (githubObj['tag_name'] as string).replace('v', '');
     versionList[version] = {};
-    for (let asset of assets) {
-      let name = asset['name'];
-      let downloadUrl = asset['browser_download_url'];
-      let size = asset['size'];
-      versionList[version][name] = {
-        name: name,
-        size: size,
-        url: downloadUrl,
-        version: version
-      };
+
+    for (const asset of assets) {
+      const name = asset['name'] as string;
+      const downloadUrl = asset['browser_download_url'];
+      const size = asset['size'];
+      versionList[version][name] = {name, size, url: downloadUrl, version} as
+          JsonObject;
     }
   }
   return versionList;

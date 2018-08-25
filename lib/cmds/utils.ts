@@ -1,10 +1,12 @@
 import * as yargs from 'yargs';
-import { Options } from './options';
-import { ChromeDriver } from '../provider/chromedriver';
-import { GeckoDriver } from '../provider/geckodriver';
-import { IEDriver } from '../provider/iedriver';
-import { SeleniumServer } from '../provider/selenium_server';
-import { ProviderConfig } from '../provider/provider';
+
+import {ChromeDriver} from '../provider/chromedriver';
+import {GeckoDriver} from '../provider/geckodriver';
+import {IEDriver} from '../provider/iedriver';
+import {ProviderConfig} from '../provider/provider';
+import {SeleniumServer} from '../provider/selenium_server';
+
+import {Options} from './options';
 
 /**
  * A provider name that webdriver-manager can download.
@@ -29,27 +31,14 @@ export enum Provider {
  * @returns An options object.
  */
 export function initOptions(
-    providers: Provider[],
-    runAsDetach?: boolean,
-    runAsNode?: boolean,
-    outDir?: string,
-    ignoreSSL?: boolean,
-    proxy?: string): Options {
-  let providerConfig = {
-    ignoreSSL: ignoreSSL,
-    outDir: outDir,
-    proxy: proxy
-  };
+    providers: Provider[], runAsDetach?: boolean, runAsNode?: boolean,
+    outDir?: string, ignoreSSL?: boolean, proxy?: string): Options {
+  const providerConfig = {ignoreSSL, outDir, proxy};
 
-  let options: Options = {
-    providers: [],
-    server: {},
-    ignoreSSL: ignoreSSL,
-    outDir: outDir,
-    proxy: proxy
-  };
+  const options:
+      Options = {providers: [], server: {}, ignoreSSL, outDir, proxy};
 
-  for (let provider of providers) {
+  for (const provider of providers) {
     if (provider === Provider.ChromeDriver) {
       options.providers.push({binary: new ChromeDriver(providerConfig)});
     } else if (provider === Provider.GeckoDriver) {
@@ -70,7 +59,7 @@ export function initOptions(
  * @param argv
  */
 export function constructAllProviders(argv: yargs.Arguments): Options {
-  let providerConfig = {
+  const providerConfig = {
     ignoreSSL: argv.ignore_ssl,
     outDir: argv.out_dir,
     proxy: argv.proxy
@@ -85,19 +74,23 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
   }
 
   return {
-    providers: [{
-      name: 'chromedriver',
-      binary: new ChromeDriver(providerConfig),
-      version: versionsChrome
-    }, {
-      name: 'geckodriver',
-      binary: new GeckoDriver(providerConfig),
-      version: versionsGecko
-    }, {
-      name: 'iedriver',
-      binary: new IEDriver(providerConfig),
-      version: versionsIe
-    }],
+    providers: [
+      {
+        name: 'chromedriver',
+        binary: new ChromeDriver(providerConfig),
+        version: versionsChrome
+      },
+      {
+        name: 'geckodriver',
+        binary: new GeckoDriver(providerConfig),
+        version: versionsGecko
+      },
+      {
+        name: 'iedriver',
+        binary: new IEDriver(providerConfig),
+        version: versionsIe
+      }
+    ],
     server: {
       name: 'selenium',
       binary: new SeleniumServer(providerConfig),
@@ -117,7 +110,7 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
  * @param argv
  */
 export function constructProviders(argv: yargs.Arguments): Options {
-  let options: Options = {
+  const options: Options = {
     providers: [],
     server: {},
     ignoreSSL: argv.ignore_ssl,
@@ -125,7 +118,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
     proxy: argv.proxy,
   };
 
-  let providerConfig: ProviderConfig = {
+  const providerConfig: ProviderConfig = {
     outDir: options.outDir,
     proxy: options.proxy,
     ignoreSSL: options.ignoreSSL
@@ -147,14 +140,11 @@ export function constructProviders(argv: yargs.Arguments): Options {
     });
   }
   if (argv.gecko) {
-    let geckoOptions = providerConfig;
+    const geckoOptions = providerConfig;
     geckoOptions.oauthToken = argv.githubToken;
-    let gecko = new GeckoDriver(geckoOptions);
-    options.providers.push({
-      name: 'geckodriver',
-      binary: gecko,
-      version: versionsGecko
-    });
+    const gecko = new GeckoDriver(geckoOptions);
+    options.providers.push(
+        {name: 'geckodriver', binary: gecko, version: versionsGecko});
   }
   if (argv.iedriver) {
     options.providers.push({
@@ -166,7 +156,7 @@ export function constructProviders(argv: yargs.Arguments): Options {
   if (argv.standalone) {
     options.server.name = 'selenium';
 
-    let seleniumOptions = providerConfig;
+    const seleniumOptions = providerConfig;
     seleniumOptions.runAsNode = argv.standalone_node;
     seleniumOptions.runAsDetach = argv.detach;
     options.server.binary = new SeleniumServer(seleniumOptions);

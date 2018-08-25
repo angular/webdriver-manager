@@ -19,15 +19,15 @@ const chromeLogsOption: yargs.Options = {
 const DETACH = 'detach';
 const detachOption: yargs.Options = {
   describe: 'Once the selenium server is up and running, return ' +
-    'control to the parent process and continue running the server ' +
-    'in the background.',
+      'control to the parent process and continue running the server ' +
+      'in the background.',
   default: false,
   type: 'boolean'
 };
 const EDGE = 'edge';
 const edgeOption: yargs.Options = {
   describe: 'Use an installed Microsoft edge driver. Usually installed: ' +
-    '"C:\Program Files (x86)\Microsoft Web Driver\MirosoftWebDriver.exe"',
+      '"C:\Program Files (x86)\Microsoft Web Driver\MirosoftWebDriver.exe"',
   type: 'string'
 };
 const GECKO = 'gecko';
@@ -57,9 +57,9 @@ const logLevelOption: yargs.Options = {
   describe: 'The log level of this CLI.',
   default: 'info',
   type: 'string'
-}
+};
 const OUT_DIR = 'out_dir';
-let outDirOption: yargs.Options = {
+const outDirOption: yargs.Options = {
   describe: 'Location of output.',
   type: 'string'
 };
@@ -100,68 +100,75 @@ const versionsStandaloneOption: yargs.Options = {
   type: 'string'
 };
 
+// tslint:disable-next-line:no-unused-expression
 yargs
-  .command('clean', 'Removes downloaded files from the out_dir.',
-    (yargs: yargs.Argv) => {
-      return yargs
-        .option(LOG_LEVEL, logLevelOption)
-        .option(OUT_DIR, outDirOption)
-    }, (argv: yargs.Arguments) => {
-      clean.handler(argv);
-    })
-  .command('shutdown', 'Shutdown a local selenium server with GET request',
-    (yargs: yargs.Argv) => {
-      return yargs
-      .option(LOG_LEVEL, logLevelOption)
-    }, (argv: yargs.Arguments) => {
-      shutdown.handler(argv);
-    })
-  .command('start', 'Start up the selenium server.',
-    (yargs: yargs.Argv) => {
-      return yargs
-        .option(CHROME, chromeOption)
-        .option(CHROME_LOGS, chromeLogsOption)
-        .option(DETACH, detachOption)
-        .option(EDGE, edgeOption)
-        .option(GECKO,  geckoOption)
-        .option(IEDRIVER, ieOption)
-        .option(LOG_LEVEL, logLevelOption)
-        .option(OUT_DIR, outDirOption)
-        .option(STANDALONE, standaloneOption)
-        .option(STANDALONE_NODE, standaloneNodeOption)
-        .option(VERSIONS_CHROME, versionsChromeOption)
-        .option(VERSIONS_GECKO, versionsGeckoOption)
-        .option(VERSIONS_IE, versionsIeOption)
-        .option(VERSIONS_STANDALONE, versionsStandaloneOption);
-    }, (argv: yargs.Arguments) => {
-      start.handler(argv);
-    })
-  .command('status', 'List the current available binaries.',
-    (yargs: yargs.Argv) => {
-      return yargs
-        .option(LOG_LEVEL, logLevelOption)
-        .option(OUT_DIR, outDirOption)
-    }, (argv: yargs.Arguments) => {
-      status.handler(argv);
-    })
-  .command('update', 'Install or update selected binaries.',
-    (yargs: yargs.Argv) => {
-      return yargs.option(OUT_DIR, outDirOption)
-        .option(CHROME, chromeOption)
-        .option(GECKO,  geckoOption)
-        .option(GITHUB_TOKEN, githubTokenOption)
-        .option(IEDRIVER, ieOption)
-        .option(IGNORE_SSL, ignoreSSLOption)
-        .option(LOG_LEVEL, logLevelOption)
-        .option(OUT_DIR, outDirOption)
-        .option(PROXY, proxyOption)
-        .option(STANDALONE, standaloneOption)
-        .option(VERSIONS_CHROME, versionsChromeOption)
-        .option(VERSIONS_GECKO, versionsGeckoOption)
-        .option(VERSIONS_IE, versionsIeOption)
-        .option(VERSIONS_STANDALONE, versionsStandaloneOption);
-    }, (argv: yargs.Arguments) => {
-      update.handler(argv);
-    })
-  .help()
-  .argv;
+    .command(
+        'clean', 'Removes downloaded files from the out_dir.',
+        (yargs: yargs.Argv) => {
+          return yargs.option(LOG_LEVEL, logLevelOption)
+              .option(OUT_DIR, outDirOption);
+        },
+        (argv: yargs.Arguments) => {
+          clean.handler(argv);
+        })
+    .command(
+        'shutdown', 'Shutdown a local selenium server with GET request',
+        (yargs: yargs.Argv) => {
+          return yargs.option(LOG_LEVEL, logLevelOption);
+        },
+        (argv: yargs.Arguments) => {
+          shutdown.handler(argv);
+        })
+    .command(
+        'start', 'Start up the selenium server.',
+        (yargs: yargs.Argv) => {
+          return yargs.option(CHROME, chromeOption)
+              .option(CHROME_LOGS, chromeLogsOption)
+              .option(DETACH, detachOption)
+              .option(EDGE, edgeOption)
+              .option(GECKO, geckoOption)
+              .option(IEDRIVER, ieOption)
+              .option(LOG_LEVEL, logLevelOption)
+              .option(OUT_DIR, outDirOption)
+              .option(STANDALONE, standaloneOption)
+              .option(STANDALONE_NODE, standaloneNodeOption)
+              .option(VERSIONS_CHROME, versionsChromeOption)
+              .option(VERSIONS_GECKO, versionsGeckoOption)
+              .option(VERSIONS_IE, versionsIeOption)
+              .option(VERSIONS_STANDALONE, versionsStandaloneOption);
+        },
+        (argv: yargs.Arguments) => {
+          start.handler(argv);
+        })
+    .command(
+        'status', 'List the current available binaries.',
+        (yargs: yargs.Argv) => {
+          return yargs.option(LOG_LEVEL, logLevelOption)
+              .option(OUT_DIR, outDirOption);
+        },
+        (argv: yargs.Arguments) => {
+          status.handler(argv);
+        })
+    .command(
+        'update', 'Install or update selected binaries.',
+        (yargs: yargs.Argv) => {
+          return yargs.option(OUT_DIR, outDirOption)
+              .option(CHROME, chromeOption)
+              .option(GECKO, geckoOption)
+              .option(GITHUB_TOKEN, githubTokenOption)
+              .option(IEDRIVER, ieOption)
+              .option(IGNORE_SSL, ignoreSSLOption)
+              .option(LOG_LEVEL, logLevelOption)
+              .option(OUT_DIR, outDirOption)
+              .option(PROXY, proxyOption)
+              .option(STANDALONE, standaloneOption)
+              .option(VERSIONS_CHROME, versionsChromeOption)
+              .option(VERSIONS_GECKO, versionsGeckoOption)
+              .option(VERSIONS_IE, versionsIeOption)
+              .option(VERSIONS_STANDALONE, versionsStandaloneOption);
+        },
+        (argv: yargs.Arguments) => {
+          update.handler(argv);
+        })
+    .help()
+    .argv;

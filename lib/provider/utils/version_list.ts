@@ -10,7 +10,7 @@ import * as semver from 'semver';
 export interface VersionList {
   // The forced version is the semver equivalent version of the
   // actual version number. An example is 2.9 would translate into 2.9.0
-  [forced_version: string]: {
+  [forcedVersion: string]: {
 
     // The name of the binary file.
     [name: string]: VersionObj;
@@ -42,10 +42,9 @@ export interface VersionObj {
  * * @returns Either a VersionObj or null.
  */
 export function getVersion(
-    versionList: VersionList,
-    osMatch: string,
-    version?: string): VersionObj|null {
-  let versionObjs = getVersionObjs(versionList, version);
+    versionList: VersionList, osMatch: string, version?: string): VersionObj|
+    null {
+  const versionObjs = getVersionObjs(versionList, version);
   return getVersionObj(versionObjs, osMatch);
 }
 
@@ -55,13 +54,13 @@ export function getVersion(
  * @param version Optional field for the semver version number or latest.
  * @returns The object with paritial urls associated with the binary size.
  */
-export function getVersionObjs(versionList: VersionList,
-      version?: string): { [key: string]: VersionObj } {
+export function getVersionObjs(
+    versionList: VersionList, version?: string): {[key: string]: VersionObj} {
   if (version && version !== 'latest') {
     return versionList[version];
   } else {
     let latestVersion = null;
-    for (let versionKey of Object.keys(versionList)) {
+    for (const versionKey of Object.keys(versionList)) {
       if (!latestVersion) {
         latestVersion = versionKey;
       } else {
@@ -81,9 +80,9 @@ export function getVersionObjs(versionList: VersionList,
  * @returns Either a VersionObj or null.
  */
 export function getVersionObj(
-    versionObjMap: {[key:string]: VersionObj},
-    osMatch: string): VersionObj|null {
-  for (let name of Object.keys(versionObjMap)) {
+    versionObjMap: {[key: string]: VersionObj}, osMatch: string): VersionObj|
+    null {
+  for (const name of Object.keys(versionObjMap)) {
     if (name.includes(osMatch)) {
       return versionObjMap[name];
     }

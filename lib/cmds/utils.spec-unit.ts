@@ -1,23 +1,20 @@
-import {
-  constructAllProviders,
-  constructProviders,
-} from './utils';
+import {constructAllProviders, constructProviders,} from './utils';
 
 describe('utils', () => {
   describe('constructAllProviders', () => {
     it('should create all providers', () => {
-      let argv = {
+      const argv = {
         _: ['foobar'],
         proxy: 'http://some.proxy.com',
-        versions: { gecko: '0.16.0', chrome: '2.20' },
+        versions: {gecko: '0.16.0', chrome: '2.20'},
         out_dir: 'foobar_download',
         ignore_ssl: false,
         '$0': 'bin\\webdriver-manager'
       };
-      let options = constructAllProviders(argv);
+      const options = constructAllProviders(argv);
       expect(options.providers).toBeTruthy();
       expect(options.providers.length).toBe(3);
-      for (let provider of options.providers) {
+      for (const provider of options.providers) {
         if (provider.name === 'geckodriver') {
           expect(provider.version).toBe('0.16.0');
         }
@@ -40,19 +37,19 @@ describe('utils', () => {
   });
   describe('constructProviders', () => {
     it('should create the default providers', () => {
-      let argv = {
+      const argv = {
         _: ['foobar'],
         chrome: true,
         gecko: true,
         standalone: true,
-        versions: { gecko: '0.16.0', chrome: '2.20' },
+        versions: {gecko: '0.16.0', chrome: '2.20'},
         out_dir: 'foobar_download',
         '$0': 'bin\\webdriver-manager'
       };
-      let options = constructProviders(argv);
+      const options = constructProviders(argv);
       expect(options.providers).toBeTruthy();
       expect(options.providers.length).toBe(2);
-      for (let provider of options.providers) {
+      for (const provider of options.providers) {
         if (provider.name === 'geckodriver') {
           expect(provider.version).toBe('0.16.0');
         }
@@ -68,5 +65,5 @@ describe('utils', () => {
       expect(options.proxy).toBeUndefined();
       expect(options.ignoreSSL).toBeUndefined();
     });
-  })
+  });
 });

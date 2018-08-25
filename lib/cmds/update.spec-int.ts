@@ -3,18 +3,19 @@ import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-import { update } from './update';
-import { Options } from './options';
-import { ChromeDriver } from '../provider/chromedriver';
-import { GeckoDriver } from '../provider/geckodriver';
-import { IEDriver } from '../provider/iedriver';
-import { SeleniumServer } from '../provider/selenium_server';
+
+import {ChromeDriver} from '../provider/chromedriver';
+import {GeckoDriver} from '../provider/geckodriver';
+import {IEDriver} from '../provider/iedriver';
+import {SeleniumServer} from '../provider/selenium_server';
+import {Options} from './options';
+import {update} from './update';
 
 log.setLevel('debug');
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 
 describe('update cmd', () => {
-  let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   beforeAll(() => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000;
@@ -28,63 +29,60 @@ describe('update cmd', () => {
     // create the directory
     try {
       fs.mkdirSync(tmpDir);
-    } catch (err) {}
+    } catch (err) {
+    }
   });
 
   afterEach(() => {
     try {
       rimraf.sync(tmpDir);
-    } catch (err) {}
+    } catch (err) {
+    }
   });
 
-  it('should download the chromdriver files', async() => {
+  it('should download the chromdriver files', async () => {
     const options: Options = {
       outDir: tmpDir,
-      providers: [{ binary: new ChromeDriver({outDir: tmpDir}) }]
+      providers: [{binary: new ChromeDriver({outDir: tmpDir})}]
     };
     await update(options);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
-  it('should download the geckodriver files', async() => {
+  it('should download the geckodriver files', async () => {
     const options: Options = {
       outDir: tmpDir,
-      providers: [{ binary: new GeckoDriver({outDir: tmpDir}) }]
+      providers: [{binary: new GeckoDriver({outDir: tmpDir})}]
     };
     await update(options);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
-  it('should download selenium server files', async() => {
+  it('should download selenium server files', async () => {
     const options: Options = {
       outDir: tmpDir,
-      server: { binary: new SeleniumServer({outDir: tmpDir}) }
+      server: {binary: new SeleniumServer({outDir: tmpDir})}
     };
     await update(options);
     expect(fs.readdirSync(tmpDir).length).toBe(3);
   });
 
-  it('should download iedriver files', async() => {
+  it('should download iedriver files', async () => {
     const iedriver = new IEDriver({outDir: tmpDir});
     iedriver.osType = 'Windows_NT';
-    const options: Options = {
-      outDir: tmpDir,
-      providers: [{ binary: iedriver }]
-    };
+    const options: Options = {outDir: tmpDir, providers: [{binary: iedriver}]};
     await update(options);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
-  it('should download default files', async() => {
+  it('should download default files', async () => {
     const options: Options = {
       outDir: tmpDir,
       providers: [
-        { binary: new ChromeDriver({outDir: tmpDir}) },
-        { binary: new GeckoDriver({outDir: tmpDir}) },
+        {binary: new ChromeDriver({outDir: tmpDir})},
+        {binary: new GeckoDriver({outDir: tmpDir})},
       ],
-      server: {
-        binary: new SeleniumServer({outDir: tmpDir})
-      }
+      server: {binary: new SeleniumServer({outDir: tmpDir})}
     };
     await update(options);
     expect(fs.readdirSync(tmpDir).length).toBe(11);

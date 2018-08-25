@@ -5,43 +5,46 @@ import * as url from 'url';
 
 import * as env from './env';
 
-let port = process.argv[2] || env.httpPort;
+const port = process.argv[2] || env.httpPort;
 
-export let httpServer = http.createServer((request: http.ServerRequest,
-    response: http.ServerResponse) => {
-  let uri = url.parse(request.url).pathname;
-  let fileName = path.join(process.cwd(), uri);
-  
-  try {
-    if (fs.statSync(fileName).isFile() || fs.statSync(fileName).isDirectory) {
-    } else {
-      response.writeHead(404, {'Content-Type': 'text/plain'});
-      response.write('404 Not Found\n');
-      response.end();
-      return;
-    }
-  } catch(err) {
-    response.writeHead(404, {'Content-Type': 'text/plain'});
-    response.write('404 Not Found\n');
-    response.end();
-    return;
-  }
+http.createServer(
+        (request: http.ServerRequest, response: http.ServerResponse) => {
+          const uri = url.parse(request.url).pathname;
+          let fileName = path.join(process.cwd(), uri);
 
-  if (fs.statSync(fileName).isDirectory()) {
-    fileName += '/index.html';
-  }
+          try {
+            if (fs.statSync(fileName).isFile() ||
+                fs.statSync(fileName).isDirectory) {
+            } else {
+              response.writeHead(404, {'Content-Type': 'text/plain'});
+              response.write('404 Not Found\n');
+              response.end();
+              return;
+            }
+          } catch (err) {
+            response.writeHead(404, {'Content-Type': 'text/plain'});
+            response.write('404 Not Found\n');
+            response.end();
+            return;
+          }
 
-  fs.readFile(fileName, 'binary', ((err, file) => {
-    if (err) {        
-      response.writeHead(500, {'Content-Type': 'text/plain'});
-      response.write(err + '\n');
-      response.end();
-      return;
-    }
+          if (fs.statSync(fileName).isDirectory()) {
+            fileName += '/index.html';
+          }
 
-    response.writeHead(200, {'Content-Length': fs.statSync(fileName).size});
-    response.write(file, 'binary');
-    response.end();
-  }));
-}).listen(port);
+          fs.readFile(
+              fileName, 'binary', ((err, file) => {
+                if (err) {
+                  response.writeHead(500, {'Content-Type': 'text/plain'});
+                  response.write(err + '\n');
+                  response.end();
+                  return;
+                }
 
+                response.writeHead(
+                    200, {'Content-Length': fs.statSync(fileName).size});
+                response.write(file, 'binary');
+                response.end();
+              }));
+        })
+    .listen(port);

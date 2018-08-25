@@ -3,9 +3,10 @@ import * as fs from 'fs';
 import * as log from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
-import { requestBinary, requestBody } from './http_utils';
-import { httpBaseUrl } from '../../../spec/server/env';
-import { spawnProcess } from '../../../spec/support/helpers/test_utils';
+
+import {httpBaseUrl} from '../../../spec/server/env';
+import {spawnProcess} from '../../../spec/support/helpers/test_utils';
+import {requestBinary, requestBody} from './http_utils';
 
 log.setLevel('debug');
 
@@ -18,7 +19,7 @@ const fooXmlUrl = httpBaseUrl + '/spec/support/files/foo.xml';
 const barZipSize = 171;
 
 describe('binary_utils', () => {
-  let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   let proc: childProcess.ChildProcess;
 
   beforeAll((done) => {
@@ -29,17 +30,20 @@ describe('binary_utils', () => {
 
     try {
       fs.mkdirSync(tmpDir);
-    } catch (err) {}
+    } catch (err) {
+    }
     try {
       fs.unlinkSync(fileName);
-    } catch (err) {}
+    } catch (err) {
+    }
   });
 
   afterAll((done) => {
     try {
       fs.unlinkSync(fileName);
       fs.rmdirSync(tmpDir);
-    } catch (err) {}
+    } catch (err) {
+    }
 
     process.kill(proc.pid);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
@@ -48,47 +52,51 @@ describe('binary_utils', () => {
 
   describe('requestBinary', () => {
     it('should download the file if no file exists or ' +
-        'the content lenght is different', (done) => {
-      requestBinary(binaryUrl, { fileName, fileSize: 0 }).then((result) => {
-        expect(result).toBeTruthy();
-        expect(fs.statSync(fileName).size).toBe(barZipSize);
-        done();
-      }).catch(err => {
-        done.fail(err);
-      });
-    });
+           'the content lenght is different',
+       (done) => {
+         requestBinary(binaryUrl, {fileName, fileSize: 0})
+             .then((result) => {
+               expect(result).toBeTruthy();
+               expect(fs.statSync(fileName).size).toBe(barZipSize);
+               done();
+             })
+             .catch(err => {
+               done.fail(err);
+             });
+       });
 
     it('should not download the file if the file exists', (done) => {
-      requestBinary(binaryUrl, { fileName, fileSize: barZipSize })
+      requestBinary(binaryUrl, {fileName, fileSize: barZipSize})
           .then((result) => {
-        expect(result).toBeFalsy();
-        expect(fs.statSync(fileName).size).toBe(barZipSize);
-        done();
-      }).catch(err => {
-        done.fail(err);
-      });
+            expect(result).toBeFalsy();
+            expect(fs.statSync(fileName).size).toBe(barZipSize);
+            done();
+          })
+          .catch(err => {
+            done.fail(err);
+          });
     });
   });
 
   describe('requestBody', () => {
-    it('should download a json object file', async() => {
-      let foo = await requestBody(fooJsonUrl, {});
-      let fooJson = JSON.parse(foo);
-      expect(fooJson["foo"]).toBe("abc");
-      expect(fooJson["bar"]).toBe(123);
+    it('should download a json object file', async () => {
+      const foo = await requestBody(fooJsonUrl, {});
+      const fooJson = JSON.parse(foo);
+      expect(fooJson['foo']).toBe('abc');
+      expect(fooJson['bar']).toBe(123);
     });
 
-    it('should download a json array file', async() => {
-      let foo = await requestBody(fooArrayUrl, {});
-      let fooJson = JSON.parse(foo);
+    it('should download a json array file', async () => {
+      const foo = await requestBody(fooArrayUrl, {});
+      const fooJson = JSON.parse(foo);
       expect(fooJson.length).toBe(3);
       expect(fooJson[0]['foo']).toBe('abc');
       expect(fooJson[1]['foo']).toBe('def');
       expect(fooJson[2]['foo']).toBe('ghi');
     });
 
-    it('should get the xml file', async() => {
-      let text = await requestBody(fooXmlUrl, {});
+    it('should get the xml file', async () => {
+      const text = await requestBody(fooXmlUrl, {});
       expect(text.length).toBeGreaterThan(0);
     });
   });

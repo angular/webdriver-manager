@@ -1,28 +1,17 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import {
-  OUT_DIR,
-  ProviderInterface,
-  ProviderConfig
-} from './provider';
-import {
-  changeFilePermissions,
-  generateConfigFile,
-  getBinaryPathFromConfig,
-  removeFiles,
-  renameFileWithVersion,
-  unzipFile,
-  zipFileList,
-} from './utils/file_utils';
-import { requestBinary } from './utils/http_utils';
-import { convertXmlToVersionList, updateXml } from './utils/cloud_storage_xml';
-import { getVersion } from './utils/version_list';
+
+import {OUT_DIR, ProviderConfig, ProviderInterface} from './provider';
+import {convertXmlToVersionList, updateXml} from './utils/cloud_storage_xml';
+import {changeFilePermissions, generateConfigFile, getBinaryPathFromConfig, removeFiles, renameFileWithVersion, unzipFile, zipFileList,} from './utils/file_utils';
+import {requestBinary} from './utils/http_utils';
+import {getVersion} from './utils/version_list';
 
 export class ChromeDriver implements ProviderInterface {
   cacheFileName = 'chromedriver.xml';
   configFileName = 'chromedriver.config.json';
-  ignoreSSL: boolean = false;
+  ignoreSSL = false;
   osType = os.type();
   osArch = os.arch();
   outDir = OUT_DIR;
@@ -62,24 +51,24 @@ export class ChromeDriver implements ProviderInterface {
    * then download that binary.
    * @param version Optional to provide the version number or latest.
    */
-  async updateBinary(version?: string): Promise<any> {
+  async updateBinary(version?: string): Promise<void> {
     await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
-      proxy: this.proxy });
+      proxy: this.proxy
+    });
 
-    let versionList = convertXmlToVersionList(
-      path.resolve(this.outDir, this.cacheFileName), '.zip',
-      versionParser,
-      semanticVersionParser);
+    const versionList = convertXmlToVersionList(
+        path.resolve(this.outDir, this.cacheFileName), '.zip', versionParser,
+        semanticVersionParser);
     if (version) {
       version = version + '.0';
     }
-    let versionObj = getVersion(
-      versionList, osHelper(this.osType, this.osArch), version);
+    const versionObj =
+        getVersion(versionList, osHelper(this.osType, this.osArch), version);
 
-    let chromeDriverUrl = this.requestUrl + versionObj.url;
-    let chromeDriverZip = path.resolve(this.outDir, versionObj.name);
+    const chromeDriverUrl = this.requestUrl + versionObj.url;
+    const chromeDriverZip = path.resolve(this.outDir, versionObj.name);
 
     // We should check the zip file size if it exists. The size will
     // be used to either make the request, or quit the request if the file
@@ -87,23 +76,27 @@ export class ChromeDriver implements ProviderInterface {
     let fileSize = 0;
     try {
       fileSize = fs.statSync(chromeDriverZip).size;
-    } catch (err) {}
-    await requestBinary(chromeDriverUrl,
-      { fileName: chromeDriverZip, fileSize, ignoreSSL: this.ignoreSSL,
-        proxy: this.proxy });
+    } catch (err) {
+    }
+    await requestBinary(chromeDriverUrl, {
+      fileName: chromeDriverZip,
+      fileSize,
+      ignoreSSL: this.ignoreSSL,
+      proxy: this.proxy
+    });
 
     // Unzip and rename all the files (a grand total of 1) and set the
     // permissions.
-    let fileList = zipFileList(chromeDriverZip);
-    let fileItem = path.resolve(this.outDir, fileList[0]);
+    const fileList = zipFileList(chromeDriverZip);
+    const fileItem = path.resolve(this.outDir, fileList[0]);
     unzipFile(chromeDriverZip, this.outDir);
-    let renamedFileName = renameFileWithVersion(
-      fileItem, '_' + versionObj.version);
+    const renamedFileName =
+        renameFileWithVersion(fileItem, '_' + versionObj.version);
     changeFilePermissions(renamedFileName, '0755', this.osType);
 
-    generateConfigFile(this.outDir,
-      path.resolve(this.outDir, this.configFileName),
-      matchBinaries(this.osType), renamedFileName);
+    generateConfigFile(
+        this.outDir, path.resolve(this.outDir, this.configFileName),
+        matchBinaries(this.osType), renamedFileName);
     return Promise.resolve();
   }
 
@@ -128,22 +121,23 @@ export class ChromeDriver implements ProviderInterface {
     try {
       const configFilePath = path.resolve(this.outDir, this.configFileName);
       const configJson = JSON.parse(fs.readFileSync(configFilePath).toString());
-      let versions: string[] = [];
-      for (let binaryPath of configJson['all']) {
+      const versions: string[] = [];
+      for (const binaryPath of configJson['all']) {
         let version = '';
-        let regex = /.*chromedriver_(\d+.\d+.*)/g
+        let regex = /.*chromedriver_(\d+.\d+.*)/g;
         if (this.osType === 'Windows_NT') {
-          regex = /.*chromedriver_(\d+.\d+.*).exe/g
+          regex = /.*chromedriver_(\d+.\d+.*).exe/g;
         }
         try {
-          let exec = regex.exec(binaryPath);
+          const exec = regex.exec(binaryPath);
           if (exec && exec[1]) {
             version = exec[1];
           }
-        } catch (_) {}
+        } catch (_) {
+        }
 
         if (configJson['last'] === binaryPath) {
-          version += ' (latest)'
+          version += ' (latest)';
         }
         versions.push(version);
       }
@@ -172,13 +166,12 @@ export function osHelper(ostype: string, osarch: string): string {
   if (ostype === 'Darwin') {
     return 'mac';
   } else if (ostype === 'Windows_NT') {
-    if (osarch === 'x64')  {
+    if (osarch === 'x64') {
+      return 'win32';
+    } else if (osarch === 'x32') {
       return 'win32';
     }
-    else if (osarch === 'x32') {
-      return 'win32';
-    }
-  } else if (ostype == 'Linux') {
+  } else if (ostype === 'Linux') {
     if (osarch === 'x64') {
       return 'linux64';
     } else if (osarch === 'x32') {
@@ -195,9 +188,9 @@ export function osHelper(ostype: string, osarch: string): string {
  * @param xmlKey The xml key including the partial url.
  */
 export function versionParser(xmlKey: string) {
-  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+  const regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g;
   try {
-    let exec = regex.exec(xmlKey);
+    const exec = regex.exec(xmlKey);
     if (exec) {
       return exec[1];
     }
@@ -213,10 +206,10 @@ export function versionParser(xmlKey: string) {
  * the version is 12.34.00.
  * @param xmlKey The xml key including the partial url.
  */
-export function semanticVersionParser(xmlKey: string): string | null {
-  let regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g
+export function semanticVersionParser(xmlKey: string): string|null {
+  const regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g;
   try {
-    let exec = regex.exec(xmlKey);
+    const exec = regex.exec(xmlKey);
     if (exec) {
       return exec[1] + '.0';
     }
@@ -230,11 +223,11 @@ export function semanticVersionParser(xmlKey: string): string | null {
  * Matches the installed binaries depending on the operating system.
  * @param ostype The operating stystem type.
  */
-export function matchBinaries(ostype: string): RegExp | null {
-  if (ostype === 'Darwin' || ostype == 'Linux') {
-    return /chromedriver_\d+.\d+/g
+export function matchBinaries(ostype: string): RegExp|null {
+  if (ostype === 'Darwin' || ostype === 'Linux') {
+    return /chromedriver_\d+.\d+/g;
   } else if (ostype === 'Windows_NT') {
-    return /chromedriver_\d+.\d+.exe/g
+    return /chromedriver_\d+.\d+.exe/g;
   }
   return null;
 }

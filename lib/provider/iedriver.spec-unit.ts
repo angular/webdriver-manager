@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { IEDriver } from './iedriver';
+import {IEDriver} from './iedriver';
 
 describe('iedriver', () => {
   describe('class IEDriver', () => {
@@ -14,9 +14,9 @@ describe('iedriver', () => {
           ]
         }`;
         spyOn(fs, 'readFileSync').and.returnValue(configCache);
-        let iedriver = new IEDriver({osType: 'Windows_NT'});
+        const iedriver = new IEDriver({osType: 'Windows_NT'});
         expect(iedriver.getStatus())
-          .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
+            .toBe('90.0.0, 99.0.0-beta, 100.1.0 (latest)');
       });
     });
   });

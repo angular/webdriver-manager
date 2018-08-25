@@ -2,18 +2,18 @@ import * as path from 'path';
 
 // Change the output directory for all providers.
 // This will download to the webdriver-manager/downloads directory.
-export const OUT_DIR = path.resolve(
-  __dirname, '..', '..', '..', 'downloads');
+export const OUT_DIR = path.resolve(__dirname, '..', '..', '..', 'downloads');
 
 /**
  * The provider updateBinary interface implemented by all providers.
  */
 export interface ProviderInterface {
   cleanFiles?: () => string;
-  getBinaryPath?: (version?: string) => string|null;
-  getStatus?: () => string|null;
-  updateBinary: (version?: string) => Promise<any>;
+  getBinaryPath?: (version?: string) => string | null;
+  getStatus?: () => string | null;
+  updateBinary: (version?: string) => Promise<void>;
   seleniumFlag?: string;
+  osType?: string;
 }
 
 /**
@@ -42,5 +42,5 @@ export interface ProviderConfig {
   // Set the requests to ignore SSL (optional).
   ignoreSSL?: boolean;
   // Catch all for other things.
-  [key:string]: string|boolean|number;
+  [key: string]: string|boolean|number;
 }

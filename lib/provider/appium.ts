@@ -1,18 +1,19 @@
-import * as fs from 'fs';
 import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import * as log from 'loglevel';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as semver from 'semver';
-import * as log from 'loglevel';
-import { ProviderConfig, ProviderInterface } from './provider';
-import { requestBody } from './utils/http_utils';
+
+import {ProviderConfig, ProviderInterface} from './provider';
+import {requestBody} from './utils/http_utils';
 
 export class Appium implements ProviderInterface {
   ignoreSSL: boolean;
   outDir: string;
   outDirAppium: string;
   proxy: string;
-  requestUrl: string = 'http://registry.npmjs.org/appium';
+  requestUrl = 'http://registry.npmjs.org/appium';
 
   constructor(providerConfig?: ProviderConfig) {
     if (providerConfig) {
@@ -33,8 +34,8 @@ export class Appium implements ProviderInterface {
    * If no valid version is provided get version from appium
    */
   async getVersion(): Promise<string> {
-    let body = await requestBody(this.requestUrl, {
-      proxy: this.proxy, ignoreSSL: this.ignoreSSL });
+    const body = await requestBody(
+        this.requestUrl, {proxy: this.proxy, ignoreSSL: this.ignoreSSL});
     return JSON.parse(body)['dist-tags']['latest'];
   }
   /**
@@ -48,16 +49,16 @@ export class Appium implements ProviderInterface {
     this.outDirAppium = path.resolve(this.outDir, 'appium');
     try {
       rimraf.sync(this.outDirAppium);
-    } catch (err) { }
-      fs.mkdirSync(this.outDirAppium);
-    let packageJson = {
+    } catch (err) {
+    }
+    fs.mkdirSync(this.outDirAppium);
+    const packageJson = {
       scripts: {appium: 'appium'},
-      dependencies: {
-        appium: '^' + version
-      }
+      dependencies: {appium: '^' + version}
     };
     fs.writeFileSync(
-      path.resolve(this.outDirAppium, 'package.json'), JSON.stringify(packageJson));
+        path.resolve(this.outDirAppium, 'package.json'),
+        JSON.stringify(packageJson));
   }
 
   /**
