@@ -1,12 +1,14 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as semver from 'semver';
 
 import {ProviderConfig, ProviderInterface} from './provider';
 import {requestBody} from './utils/http_utils';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 export class Appium implements ProviderInterface {
   ignoreSSL: boolean;

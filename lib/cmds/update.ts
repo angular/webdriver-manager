@@ -1,7 +1,9 @@
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as yargs from 'yargs';
 import {Options} from './options';
 import {constructProviders} from './utils';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * Updates / downloads the providers binaries.

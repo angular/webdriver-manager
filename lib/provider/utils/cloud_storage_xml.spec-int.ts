@@ -1,14 +1,14 @@
 
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
-
 import {httpBaseUrl} from '../../../spec/server/env';
 import {spawnProcess} from '../../../spec/support/helpers/test_utils';
 import {convertXmlToVersionList, updateXml} from './cloud_storage_xml';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
 
 function chromedriverVersionParser(key: string): string {

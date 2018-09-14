@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as http from 'http';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -12,6 +12,7 @@ import {shutdown} from './shutdown';
 import {start} from './start';
 import {update} from './update';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const selenium = new SeleniumServer({outDir: tmpDir});

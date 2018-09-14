@@ -1,7 +1,9 @@
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as yargs from 'yargs';
 import {Options} from './options';
 import {constructAllProviders} from './utils';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * Handles removing files that were downloaded and logs the files.

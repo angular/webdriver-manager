@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import {SeleniumServer, semanticVersionParser, versionParser,} from './selenium_server';
 
-
 describe('selenium_server', () => {
   describe('verisonParser', () => {
     it('should generate a semantic version', () => {

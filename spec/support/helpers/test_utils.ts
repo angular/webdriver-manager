@@ -1,6 +1,8 @@
 import * as childProcess from 'child_process';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import {requestBody} from '../../../lib/provider/utils/http_utils';
+
+const log = loglevel.getLogger('webdriver-manager-test');
 
 /**
  * A command line to run. Example 'npm start', the task='npm' and the

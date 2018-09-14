@@ -1,10 +1,11 @@
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import {generateConfigFile, removeFiles, tarFileList, uncompressTarball, unzipFile, zipFileList} from './file_utils';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
 
 const tarballFile = path.resolve('spec/support/files/bar.tar.gz');

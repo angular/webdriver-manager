@@ -1,7 +1,9 @@
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as yargs from 'yargs';
 import {Options} from './options';
 import {constructAllProviders} from './utils';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * Displays which versions of providers that have been downloaded.

@@ -1,6 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -9,6 +9,7 @@ import {spawnProcess} from '../../../spec/support/helpers/test_utils';
 
 import {requestBinary, requestBody} from './http_utils';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');

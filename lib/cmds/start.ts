@@ -1,11 +1,12 @@
-import * as childProcess from 'child_process';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as path from 'path';
 import * as yargs from 'yargs';
 
 import {SeleniumServer} from '../provider/selenium_server';
 import {Options} from './options';
 import {constructProviders} from './utils';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * Starts the selenium server standalone with browser drivers. Also handles

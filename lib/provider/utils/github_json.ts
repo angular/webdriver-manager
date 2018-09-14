@@ -1,10 +1,12 @@
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as path from 'path';
 
 import {isExpired, readJson} from './file_utils';
 import {HttpOptions, JsonObject, requestBody} from './http_utils';
 import {VersionList} from './version_list';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 export interface RequestMethod {
   (jsonUrl: string, httpOptions: HttpOptions,

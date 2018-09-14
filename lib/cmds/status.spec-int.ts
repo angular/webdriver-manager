@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -8,7 +8,9 @@ import * as yargs from 'yargs';
 import {status} from './status';
 import {constructAllProviders} from './utils';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
+
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const argv: yargs.Arguments = {
   _: ['foobar'],

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
@@ -11,7 +11,9 @@ import {SeleniumServer} from '../provider/selenium_server';
 import {Options} from './options';
 import {update} from './update';
 
+const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
+
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 
 describe('update cmd', () => {

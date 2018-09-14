@@ -1,6 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as os from 'os';
 import * as path from 'path';
 import * as request from 'request';
@@ -10,6 +10,8 @@ import {convertXmlToVersionList, updateXml} from './utils/cloud_storage_xml';
 import {generateConfigFile, getBinaryPathFromConfig, removeFiles,} from './utils/file_utils';
 import {curlCommand, initOptions, requestBinary} from './utils/http_utils';
 import {getVersion} from './utils/version_list';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 export class SeleniumServer implements ProviderInterface {
   cacheFileName = 'selenium-server.xml';

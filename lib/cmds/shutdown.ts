@@ -1,8 +1,10 @@
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as yargs from 'yargs';
 
 import {SeleniumServer} from '../provider/selenium_server';
 import {Options} from './options';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * Handles making the get request to stop the selenium server standalone if the

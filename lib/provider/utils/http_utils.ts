@@ -1,8 +1,10 @@
 import * as fs from 'fs';
-import * as log from 'loglevel';
+import * as loglevel from 'loglevel';
 import * as path from 'path';
 import * as request from 'request';
 import * as url from 'url';
+
+const log = loglevel.getLogger('webdriver-manager');
 
 /**
  * The request options that extend the request. This is not exported
