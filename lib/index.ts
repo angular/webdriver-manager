@@ -1,7 +1,9 @@
 // Exports when using this module as a dependency.
 
 // Expose the loglevel api.
-export {setLevel as setLogLevel} from 'loglevel';
+import * as loglevel from 'loglevel';
+export let setLogLevel = loglevel.getLogger('webdriver-manager').setLevel;
+
 // Export commands used in the cli.
 export {clean} from './cmds/clean';
 // Options that are used by the exported commands.
