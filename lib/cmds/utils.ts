@@ -1,106 +1,79 @@
 import * as yargs from 'yargs';
-
 import {ChromeDriver} from '../provider/chromedriver';
 import {GeckoDriver} from '../provider/geckodriver';
 import {IEDriver} from '../provider/iedriver';
 import {ProviderConfig} from '../provider/provider';
-import {SeleniumServer} from '../provider/selenium_server';
+import {SeleniumServer, SeleniumServerProviderConfig} from '../provider/selenium_server';
 
 import {Options} from './options';
+import {OptionsBinary} from './options_binary';
 
 /**
- * A provider name that webdriver-manager can download.
+ * Converts an options object into an options binary object.
+ * @param options
  */
-export enum Provider {
-  ChromeDriver,
-  GeckoDriver,
-  IEDriver,
-  Selenium,
-}
+export function addOptionsBinary(options: Options): OptionsBinary {
+  if (!options) {
+    return null;
+  }
+  const providerConfig: ProviderConfig = {
+    ignoreSSL: options.ignoreSSL,
+    outDir: options.outDir,
+    proxy: options.proxy
+  };
 
-/**
- * A helper method to initialize the options object. This is a simplified
- * way of creating an option. If a full set of options need be generated,
- * refer to the Options interface.
- * @param providers A list of enums that represent the providers to construct.
- * @param runAsDetach To detach and return to the parent process.
- * @param runAsNode To run the selenium server with role = node.
- * @param outDir The directory to download the binaries
- * @param ignoreSSL When making get requests, ignore SSL.
- * @param proxy The optional proxy server to use.
- * @returns An options object.
- */
-export function initOptions(
-    providers: Provider[], runAsDetach?: boolean, runAsNode?: boolean,
-    outDir?: string, ignoreSSL?: boolean, proxy?: string): Options {
-  const providerConfig = {ignoreSSL, outDir, proxy};
-
-  const options:
-      Options = {providers: [], server: {}, ignoreSSL, outDir, proxy};
-
-  for (const provider of providers) {
-    if (provider === Provider.ChromeDriver) {
-      options.providers.push({binary: new ChromeDriver(providerConfig)});
-    } else if (provider === Provider.GeckoDriver) {
-      options.providers.push({binary: new GeckoDriver(providerConfig)});
-    } else if (provider === Provider.IEDriver) {
-      options.providers.push({binary: new IEDriver(providerConfig)});
-    } else if (provider === Provider.Selenium) {
-      options.server.binary = new SeleniumServer(providerConfig);
-      options.server.runAsDetach = runAsDetach;
-      options.server.runAsNode = runAsNode;
+  const optionsBinary: OptionsBinary = options;
+  if (optionsBinary.browserDrivers) {
+    for (const browserDriver of optionsBinary.browserDrivers) {
+      if (browserDriver.name === 'chromedriver') {
+        browserDriver.binary = new ChromeDriver(providerConfig);
+      } else if (browserDriver.name === 'geckodriver') {
+        const geckoProviderConfig = providerConfig;
+        geckoProviderConfig.oauthToken = optionsBinary.githubToken;
+        browserDriver.binary = new GeckoDriver(geckoProviderConfig);
+      } else if (browserDriver.name === 'iedriver') {
+        browserDriver.binary = new IEDriver(providerConfig);
+      }
     }
   }
-  return options;
+  if (optionsBinary.server) {
+    const seleniumProviderConfig: SeleniumServerProviderConfig = providerConfig;
+    seleniumProviderConfig.port = optionsBinary.server.port;
+    seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsDetach;
+    seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsNode;
+    optionsBinary.server.binary = new SeleniumServer(seleniumProviderConfig);
+  }
+  return optionsBinary;
 }
 
 /**
  * Create the options with all providers. Used for clean and status commands.
  * @param argv
  */
-export function constructAllProviders(argv: yargs.Arguments): Options {
-  const providerConfig = {
-    ignoreSSL: argv.ignore_ssl,
-    outDir: argv.out_dir,
-    proxy: argv.proxy
-  };
-
+export function convertArgs2AllOptions(argv: yargs.Arguments): Options {
   let versionsChrome, versionsGecko, versionsIe, versionsStandalone = undefined;
   if (argv.versions) {
-    versionsChrome = argv.versions.chrome;
-    versionsGecko = argv.versions.gecko;
-    versionsIe = argv.versions.ie;
-    versionsStandalone = argv.versions.standalone;
+    versionsChrome = argv.versions.chrome as string;
+    versionsGecko = argv.versions.gecko as string;
+    versionsIe = argv.versions.ie as string;
+    versionsStandalone = argv.versions.standalone as string;
   }
-
   return {
-    providers: [
-      {
-        name: 'chromedriver',
-        binary: new ChromeDriver(providerConfig),
-        version: versionsChrome
-      },
-      {
-        name: 'geckodriver',
-        binary: new GeckoDriver(providerConfig),
-        version: versionsGecko
-      },
-      {
-        name: 'iedriver',
-        binary: new IEDriver(providerConfig),
-        version: versionsIe
-      }
+    browserDrivers: [
+      {name: 'chromedriver', version: versionsChrome},
+      {name: 'geckodriver', version: versionsGecko},
+      {name: 'iedriver', version: versionsIe}
     ],
     server: {
       name: 'selenium',
-      binary: new SeleniumServer(providerConfig),
       version: versionsStandalone,
-      runAsNode: argv.standalone_node,
-      runAsDetach: argv.detach
+      runAsNode: argv.standalone_node as boolean,
+      runAsDetach: argv.detach as boolean,
     },
-    ignoreSSL: argv.ignore_ssl,
-    outDir: argv.out_dir,
-    proxy: argv.proxy,
+    ignoreSSL: argv.ignore_ssl as boolean,
+    outDir: argv.out_dir as string,
+    proxy: argv.proxy as string,
+    githubToken: argv.github_token as string,
   };
 }
 
@@ -109,63 +82,41 @@ export function constructAllProviders(argv: yargs.Arguments): Options {
  * start commands.
  * @param argv
  */
-export function constructProviders(argv: yargs.Arguments): Options {
+export function convertArgs2Options(argv: yargs.Arguments): Options {
   const options: Options = {
-    providers: [],
+    browserDrivers: [],
     server: {},
-    ignoreSSL: argv.ignore_ssl,
-    outDir: argv.out_dir,
-    proxy: argv.proxy,
-  };
-
-  const providerConfig: ProviderConfig = {
-    outDir: options.outDir,
-    proxy: options.proxy,
-    ignoreSSL: options.ignoreSSL
+    ignoreSSL: argv.ignore_ssl as boolean,
+    outDir: argv.out_dir as string,
+    proxy: argv.proxy as string,
+    githubToken: argv.github_token as string,
   };
 
   let versionsChrome, versionsGecko, versionsIe, versionsStandalone = undefined;
   if (argv.versions) {
-    versionsChrome = argv.versions.chrome;
-    versionsGecko = argv.versions.gecko;
-    versionsIe = argv.versions.ie;
-    versionsStandalone = argv.versions.standalone;
+    versionsChrome = argv.versions.chrome as string;
+    versionsGecko = argv.versions.gecko as string;
+    versionsIe = argv.versions.ie as string;
+    versionsStandalone = argv.versions.standalone as string;
   }
-
   if (argv.chrome) {
-    options.providers.push({
-      name: 'chromedriver',
-      binary: new ChromeDriver(providerConfig),
-      version: versionsChrome
-    });
+    options.browserDrivers.push(
+        {name: 'chromedriver', version: versionsChrome});
   }
   if (argv.gecko) {
-    const geckoOptions = providerConfig;
-    geckoOptions.oauthToken = argv.githubToken;
-    const gecko = new GeckoDriver(geckoOptions);
-    options.providers.push(
-        {name: 'geckodriver', binary: gecko, version: versionsGecko});
+    options.browserDrivers.push({name: 'geckodriver', version: versionsGecko});
   }
   if (argv.iedriver) {
-    options.providers.push({
-      name: 'iedriver',
-      binary: new IEDriver(providerConfig),
-      version: versionsIe
-    });
+    options.browserDrivers.push({name: 'iedriver', version: versionsIe});
   }
   if (argv.standalone) {
     options.server.name = 'selenium';
-
-    const seleniumOptions = providerConfig;
-    seleniumOptions.runAsNode = argv.standalone_node;
-    seleniumOptions.runAsDetach = argv.detach;
-    options.server.binary = new SeleniumServer(seleniumOptions);
-
+    options.server.runAsNode = argv.standalone_node as boolean;
+    options.server.runAsDetach = argv.detach as boolean;
     options.server.version = versionsStandalone;
-    options.server.runAsNode = argv.standalone_node;
-    options.server.chrome_logs = argv.chrome_logs;
-    options.server.edge = argv.edge;
-    options.server.runAsDetach = argv.detach;
+    options.server.chrome_logs = argv.chrome_logs as string;
+    options.server.edge = argv.edge as string;
+    options.server.runAsDetach = argv.detach as boolean;
   }
   return options;
 }

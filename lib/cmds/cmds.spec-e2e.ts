@@ -5,11 +5,12 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 
 import {SeleniumServer} from '../provider/selenium_server';
+
 import {clean} from './clean';
-import {start} from './start';
+import {startBinary} from './start';
 import {status} from './status';
 import {update} from './update';
-import {constructAllProviders, constructProviders,} from './utils';
+import {addOptionsBinary, convertArgs2AllOptions, convertArgs2Options} from './utils';
 
 const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
@@ -43,7 +44,7 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructProviders(argv);
+      const options = convertArgs2Options(argv);
       await update(options);
       const existFiles = fs.readdirSync(tmpDir);
       expect(existFiles.length).toBe(7);
@@ -57,7 +58,7 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructAllProviders(argv);
+      const options = convertArgs2AllOptions(argv);
       const statusLog = status(options);
       log.debug(statusLog);
       const lines = statusLog.split('\n');
@@ -75,16 +76,17 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructProviders(argv);
+      const options = convertArgs2Options(argv);
+      const optionsBinary = addOptionsBinary(options);
       // Do not await this promise to start the server since the promise is
       // never resolved by waiting, it is either killed by pid or get request.
-      const startProcess = start(options);
+      const startProcess = startBinary(optionsBinary);
 
       // Arbitrarily wait for the server to start.
       await new Promise((resolve, _) => {
         setTimeout(resolve, 3000);
       });
-      const seleniumServer = (options.server.binary as SeleniumServer);
+      const seleniumServer = (optionsBinary.server.binary as SeleniumServer);
       expect(seleniumServer.seleniumProcess).toBeTruthy();
       expect(seleniumServer.seleniumProcess.pid).toBeTruthy();
 
@@ -94,6 +96,9 @@ describe('using the cli', () => {
 
       // Check to see that the exit code is 0.
       expect(await startProcess).toBe(0);
+      await new Promise((resolve, _) => {
+        setTimeout(resolve, 5000);
+      });
     });
 
     it('should start the selenium server standalone', async () => {
@@ -104,16 +109,17 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructProviders(argv);
+      const options = convertArgs2Options(argv);
+      const optionsBinary = addOptionsBinary(options);
       // Do not await this promise to start the server since the promise is
       // never resolved by waiting, it is either killed by pid or get request.
-      const startProcess = start(options);
+      const startProcess = startBinary(optionsBinary);
 
       // Arbitrarily wait for the server to start.
       await new Promise((resolve, _) => {
         setTimeout(resolve, 3000);
       });
-      const seleniumServer = (options.server.binary as SeleniumServer);
+      const seleniumServer = (optionsBinary.server.binary as SeleniumServer);
       expect(seleniumServer.seleniumProcess).toBeTruthy();
       expect(seleniumServer.seleniumProcess.pid).toBeTruthy();
 
@@ -124,6 +130,9 @@ describe('using the cli', () => {
       // Check to see that the exit code is greater than 1.
       // Observed to be 1 and sometimes 143.
       expect(await startProcess).toBeGreaterThanOrEqual(1);
+      await new Promise((resolve, _) => {
+        setTimeout(resolve, 5000);
+      });
     });
   });
 
@@ -134,7 +143,7 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructAllProviders(argv);
+      const options = convertArgs2AllOptions(argv);
       const cleanLogs = clean(options);
       log.debug(cleanLogs);
       const lines = cleanLogs.split('\n');

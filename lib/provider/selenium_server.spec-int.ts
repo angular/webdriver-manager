@@ -13,8 +13,15 @@ describe('selenium_server', () => {
     const tmpDir = path.resolve(os.tmpdir(), 'test');
     const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-    beforeEach(() => {
+    beforeAll(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+    });
+
+    afterAll(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+    });
+
+    beforeEach(() => {
       try {
         fs.mkdirSync(tmpDir);
       } catch (err) {
@@ -22,33 +29,30 @@ describe('selenium_server', () => {
     });
 
     afterEach(() => {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
       try {
         rimraf.sync(tmpDir);
       } catch (err) {
       }
     });
 
-    it('should download the file', async (done) => {
-      if (!await checkConnectivity('update binary for mac test')) {
-        done();
+    it('should download the file', async () => {
+      if (await checkConnectivity('update binary for mac test')) {
+        const seleniumServer = new SeleniumServer({outDir: tmpDir});
+        await seleniumServer.updateBinary();
+  
+        const configFile = path.resolve(tmpDir, 'selenium-server.config.json');
+        const xmlFile = path.resolve(tmpDir, 'selenium-server.xml');
+        expect(fs.statSync(configFile).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
+  
+        const versionList = convertXmlToVersionList(
+            xmlFile, 'selenium-server-standalone', versionParser,
+            semanticVersionParser);
+        const versionObj = getVersion(versionList, '');
+        const executableFile = path.resolve(
+            tmpDir, 'selenium-server-standalone-' + versionObj.version + '.jar');
+        expect(fs.statSync(executableFile).size).toBeTruthy();  
       }
-      const seleniumServer = new SeleniumServer({outDir: tmpDir});
-      await seleniumServer.updateBinary();
-
-      const configFile = path.resolve(tmpDir, 'selenium-server.config.json');
-      const xmlFile = path.resolve(tmpDir, 'selenium-server.xml');
-      expect(fs.statSync(configFile).size).toBeTruthy();
-      expect(fs.statSync(xmlFile).size).toBeTruthy();
-
-      const versionList = convertXmlToVersionList(
-          xmlFile, 'selenium-server-standalone', versionParser,
-          semanticVersionParser);
-      const versionObj = getVersion(versionList, '');
-      const executableFile = path.resolve(
-          tmpDir, 'selenium-server-standalone-' + versionObj.version + '.jar');
-      expect(fs.statSync(executableFile).size).toBeTruthy();
-      done();
     });
   });
 });

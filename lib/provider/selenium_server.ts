@@ -13,6 +13,12 @@ import {getVersion} from './utils/version_list';
 
 const log = loglevel.getLogger('webdriver-manager');
 
+export interface SeleniumServerProviderConfig extends ProviderConfig {
+  port?: number;
+  runAsNode?: boolean;
+  runAsDetach?: boolean;
+}
+
 export class SeleniumServer implements ProviderInterface {
   cacheFileName = 'selenium-server.xml';
   configFileName = 'selenium-server.config.json';
@@ -20,13 +26,14 @@ export class SeleniumServer implements ProviderInterface {
   osType = os.type();
   osArch = os.arch();
   outDir = OUT_DIR;
+  port = 4444;
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
   runAsNode = false;
   runAsDetach = false;
 
-  constructor(providerConfig?: ProviderConfig) {
+  constructor(providerConfig?: SeleniumServerProviderConfig) {
     if (providerConfig) {
       if (providerConfig.cacheFileName) {
         this.cacheFileName = providerConfig.cacheFileName;
@@ -44,6 +51,9 @@ export class SeleniumServer implements ProviderInterface {
       if (providerConfig.outDir) {
         this.outDir = providerConfig.outDir;
       }
+      if (providerConfig.port) {
+        this.port = providerConfig.port;
+      }
       if (providerConfig.proxy) {
         this.proxy = providerConfig.proxy;
       }
@@ -51,10 +61,11 @@ export class SeleniumServer implements ProviderInterface {
         this.requestUrl = providerConfig.requestUrl;
       }
       if (providerConfig.runAsNode) {
-        this.runAsNode = providerConfig.runAsNode as boolean;
+        this.runAsNode = providerConfig.runAsNode;
       }
       if (providerConfig.runAsDetach) {
-        this.runAsDetach = providerConfig.runAsDetach as boolean;
+        this.runAsDetach = providerConfig.runAsDetach;
+        this.runAsNode = true;
       }
     }
   }
@@ -102,20 +113,15 @@ export class SeleniumServer implements ProviderInterface {
    * Starts selenium standalone server and handles emitted exit events.
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
-   * @param runAsNode The option to run the selenium jar with role set to node.
-   * @param runAsDetach The option to detach the server and return to parent.
    * @returns A promise so the server can run while awaiting its completion.
    */
-  startServer(
-      opts: {[key: string]: string}, version?: string, runAsNode?: boolean,
-      runAsDetach?: boolean): Promise<number> {
-    this.runAsNode = runAsNode;
-    this.runAsDetach = runAsDetach;
+  startServer(opts: {[key: string]: string}, version?: string):
+      Promise<number> {
     const java = this.getJava();
     return new Promise<number>(async (resolve, _) => {
       if (this.runAsDetach) {
         this.runAsNode = true;
-        const cmd = this.getCmdStartServer(opts, version, this.runAsNode);
+        const cmd = this.getCmdStartServer(opts, version);
         log.info(`${java} ${cmd.join(' ')}`);
         this.seleniumProcess =
             childProcess.spawn(java, cmd, {detached: true, stdio: 'ignore'});
@@ -127,9 +133,9 @@ export class SeleniumServer implements ProviderInterface {
         await new Promise((resolve, _) => {
           setTimeout(resolve, 500);
         });
-        resolve();
+        resolve(0);
       } else {
-        const cmd = this.getCmdStartServer(opts, version, this.runAsNode);
+        const cmd = this.getCmdStartServer(opts, version);
         log.info(`${java} ${cmd.join(' ')}`);
         this.seleniumProcess =
             childProcess.spawn(java, cmd, {stdio: 'inherit'});
@@ -150,12 +156,9 @@ export class SeleniumServer implements ProviderInterface {
    * Get the selenium server start command (not including the java command)
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
-   * @param runAsNode The option to run the selenium jar with role set to node.
    * @returns The spawn arguments array.
    */
-  getCmdStartServer(
-      opts: {[key: string]: string}, version?: string,
-      runAsNode?: boolean): string[] {
+  getCmdStartServer(opts: {[key: string]: string}, version?: string): string[] {
     const configFilePath = path.resolve(this.outDir, this.configFileName);
     const jarFile = getBinaryPathFromConfig(configFilePath, version);
     const options: string[] = [];
@@ -167,7 +170,7 @@ export class SeleniumServer implements ProviderInterface {
     options.push('-jar');
     options.push(jarFile);
 
-    if (runAsNode) {
+    if (this.runAsNode) {
       options.push('-role');
       options.push('node');
 
@@ -178,7 +181,7 @@ export class SeleniumServer implements ProviderInterface {
       options.push('0');
     }
     options.push('-port');
-    options.push('4444');
+    options.push(this.port.toString());
 
     return options;
   }
@@ -216,7 +219,7 @@ export class SeleniumServer implements ProviderInterface {
         host = 'http://127.0.0.1';
       }
       if (!port) {
-        port = 4444;
+        port = this.port;
       }
       const stopUrl =
           host + ':' + port + '/extra/LifecycleServlet?action=shutdown';

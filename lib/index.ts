@@ -12,7 +12,6 @@ export {shutdown} from './cmds/shutdown';
 export {start} from './cmds/start';
 export {status} from './cmds/status';
 export {update} from './cmds/update';
-export {initOptions, Provider} from './cmds/utils';
 export {ChromeDriver} from './provider/chromedriver';
 export {GeckoDriver} from './provider/geckodriver';
 export {IEDriver} from './provider/iedriver';

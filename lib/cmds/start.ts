@@ -4,7 +4,8 @@ import * as yargs from 'yargs';
 
 import {SeleniumServer} from '../provider/selenium_server';
 import {Options} from './options';
-import {constructProviders} from './utils';
+import {OptionsBinary} from './options_binary';
+import {addOptionsBinary, convertArgs2Options} from './utils';
 
 const log = loglevel.getLogger('webdriver-manager');
 
@@ -15,14 +16,15 @@ const log = loglevel.getLogger('webdriver-manager');
  */
 export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
-  const options = constructProviders(argv);
+  const options = convertArgs2Options(argv);
   if (options.server.runAsDetach) {
     await start(options);
     process.exit();
   } else {
     process.stdin.resume();
     process.on('SIGINT', () => {
-      const seleniumServer = (options.server.binary as SeleniumServer);
+      const optionsBinary = addOptionsBinary(options);
+      const seleniumServer = (optionsBinary.server.binary as SeleniumServer);
       process.kill(seleniumServer.seleniumProcess.pid);
       process.exit(process.exitCode);
     });
@@ -37,31 +39,38 @@ export async function handler(argv: yargs.Arguments) {
  * @returns Promise starting the server with the resolved exit code.
  */
 export function start(options: Options): Promise<number> {
+  const optionsBinary = addOptionsBinary(options);
+  return startBinary(optionsBinary);
+}
+
+/**
+ * Goes through all the option providers and creates a set of java options
+ * to pass to java when starting the selenium server standalone.
+ * @param optionsBinary The constructed options with binaries.
+ * @returns Promise starting the server with the resolved exit code.
+ */
+export function startBinary(optionsBinary: OptionsBinary): Promise<number> {
   const javaOpts: {[key: string]: string} = {};
-  for (const provider of options.providers) {
-    if (provider.binary) {
-      javaOpts[provider.binary.seleniumFlag] =
-          provider.binary.getBinaryPath(provider.version);
+  for (const browserDriver of optionsBinary.browserDrivers) {
+    if (browserDriver.binary) {
+      javaOpts[browserDriver.binary.seleniumFlag] =
+          browserDriver.binary.getBinaryPath(browserDriver.version);
     }
   }
 
-  if (options.server) {
-    // TODO(cnishina): move this into start server command?
-    if (options.server.chrome_logs) {
+  if (optionsBinary.server) {
+    if (optionsBinary.server.chrome_logs) {
       const chromeLogs =
-          options.server.chrome_logs.replace('"', '').replace('\'', '');
+          optionsBinary.server.chrome_logs.replace('"', '').replace('\'', '');
       javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
     }
-    // TODO(cnishina): move this into start server command?
-    if (options.server.edge) {
-      const edge = options.server.edge.replace('"', '').replace('\'', '');
+    if (optionsBinary.server.edge) {
+      const edge = optionsBinary.server.edge.replace('"', '').replace('\'', '');
       javaOpts['-Dwebdriver.edge.driver'] = path.resolve(edge);
     }
-    if (options.server.binary) {
-      return (options.server.binary as SeleniumServer)
-          .startServer(
-              javaOpts, options.server.version, options.server.runAsNode,
-              options.server.runAsDetach);
+    if (optionsBinary.server.binary) {
+      return (optionsBinary.server.binary as SeleniumServer)
+          .startServer(javaOpts, optionsBinary.server.version);
     }
   }
   return Promise.reject('Could not start the server');

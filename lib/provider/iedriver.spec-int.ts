@@ -14,8 +14,15 @@ describe('iedriver', () => {
     const tmpDir = path.resolve(os.tmpdir(), 'test');
     const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-    beforeEach(() => {
+    beforeAll(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+    });
+
+    afterAll(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+    });
+
+    beforeEach(() => {
       try {
         fs.mkdirSync(tmpDir);
       } catch (err) {
@@ -23,18 +30,15 @@ describe('iedriver', () => {
     });
 
     afterEach(() => {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
       try {
         rimraf.sync(tmpDir);
       } catch (err) {
       }
     });
 
-    it('should download the file', async (done) => {
-      if (!await checkConnectivity('update binary for windows test')) {
-        done();
-      }
-      const ieDriver =
+    it('should download the file', async () => {
+      if (await checkConnectivity('update binary for windows test')) {
+        const ieDriver =
           new IEDriver({outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64'});
       await ieDriver.updateBinary();
 
@@ -49,7 +53,7 @@ describe('iedriver', () => {
       const executableFile =
           path.resolve(tmpDir, 'IEDriverServer_' + versionObj.version + '.exe');
       expect(fs.statSync(executableFile).size).toBeTruthy();
-      done();
+      }
     });
   });
 });

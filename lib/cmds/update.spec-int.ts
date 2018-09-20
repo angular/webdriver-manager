@@ -8,8 +8,8 @@ import {ChromeDriver} from '../provider/chromedriver';
 import {GeckoDriver} from '../provider/geckodriver';
 import {IEDriver} from '../provider/iedriver';
 import {SeleniumServer} from '../provider/selenium_server';
-import {Options} from './options';
-import {update} from './update';
+import {OptionsBinary} from './options_binary';
+import {updateBinary} from './update';
 
 const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
@@ -43,50 +43,51 @@ describe('update cmd', () => {
   });
 
   it('should download the chromdriver files', async () => {
-    const options: Options = {
+    const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
-      providers: [{binary: new ChromeDriver({outDir: tmpDir})}]
+      browserDrivers: [{binary: new ChromeDriver({outDir: tmpDir})}]
     };
-    await update(options);
+    await updateBinary(optionsBinary);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
   it('should download the geckodriver files', async () => {
-    const options: Options = {
+    const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
-      providers: [{binary: new GeckoDriver({outDir: tmpDir})}]
+      browserDrivers: [{binary: new GeckoDriver({outDir: tmpDir})}]
     };
-    await update(options);
+    await updateBinary(optionsBinary);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
   it('should download selenium server files', async () => {
-    const options: Options = {
+    const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
       server: {binary: new SeleniumServer({outDir: tmpDir})}
     };
-    await update(options);
+    await updateBinary(optionsBinary);
     expect(fs.readdirSync(tmpDir).length).toBe(3);
   });
 
   it('should download iedriver files', async () => {
     const iedriver = new IEDriver({outDir: tmpDir});
     iedriver.osType = 'Windows_NT';
-    const options: Options = {outDir: tmpDir, providers: [{binary: iedriver}]};
-    await update(options);
+    const optionsBinary:
+        OptionsBinary = {outDir: tmpDir, browserDrivers: [{binary: iedriver}]};
+    await updateBinary(optionsBinary);
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
   it('should download default files', async () => {
-    const options: Options = {
+    const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
-      providers: [
+      browserDrivers: [
         {binary: new ChromeDriver({outDir: tmpDir})},
         {binary: new GeckoDriver({outDir: tmpDir})},
       ],
       server: {binary: new SeleniumServer({outDir: tmpDir})}
     };
-    await update(options);
+    await updateBinary(optionsBinary);
     expect(fs.readdirSync(tmpDir).length).toBe(11);
   });
 });

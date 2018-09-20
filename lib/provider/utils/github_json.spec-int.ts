@@ -6,16 +6,14 @@ const fileName = path.resolve('spec/support/files/gecko.json');
 
 describe('github_json', () => {
   describe('requestRateLimit', () => {
-    it('should get rate limit assuming quota exists', async (done) => {
-      if (!await checkConnectivity('rate limit test')) {
-        done();
+    it('should get rate limit assuming quota exists', async () => {
+      if (await checkConnectivity('rate limit test')) {
+        const rateLimit = await requestRateLimit();
+        expect(rateLimit).toBeTruthy();
+        const rateLimitObj = JSON.parse(rateLimit);
+        expect(rateLimitObj['resources']).toBeTruthy();
+        expect(rateLimitObj['resources']['core']).toBeTruthy();
       }
-      const rateLimit = await requestRateLimit();
-      expect(rateLimit).toBeTruthy();
-      const rateLimitObj = JSON.parse(rateLimit);
-      expect(rateLimitObj['resources']).toBeTruthy();
-      expect(rateLimitObj['resources']['core']).toBeTruthy();
-      done();
     });
   });
 

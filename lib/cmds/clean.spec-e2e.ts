@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 
 import {clean} from './clean';
-import {constructAllProviders} from './utils';
+import {convertArgs2AllOptions} from './utils';
 
 const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
@@ -26,7 +26,7 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructAllProviders(argv);
+      const options = convertArgs2AllOptions(argv);
       const statusLog = clean(options);
       expect(statusLog).toBe('');
     });
@@ -38,7 +38,7 @@ describe('using the cli', () => {
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
-      const options = constructAllProviders(argv);
+      const options = convertArgs2AllOptions(argv);
       const statusLog = clean(options);
       expect(statusLog).toBe('');
     });

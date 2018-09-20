@@ -62,8 +62,10 @@ describe('selenium_server', () => {
       it('should use a selenium server with node options', () => {
         spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
         const seleniumServer = new SeleniumServer();
+        seleniumServer.runAsDetach = true;
+        seleniumServer.runAsNode = true;
         const cmd = seleniumServer.getCmdStartServer(
-            {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'}, null, true);
+            {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'});
         expect(cmd.join(' '))
             .toContain(
                 '-Dwebdriver.chrome.driver=path/to/chromedriver ' +

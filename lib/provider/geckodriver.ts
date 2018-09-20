@@ -8,6 +8,10 @@ import {convertJsonToVersionList, updateJson} from './utils/github_json';
 import {requestBinary} from './utils/http_utils';
 import {getVersion} from './utils/version_list';
 
+export interface GeckoDriverProviderConfig extends ProviderConfig {
+  oauthToken?: string;
+}
+
 export class GeckoDriver implements ProviderInterface {
   cacheFileName = 'geckodriver.json';
   configFileName = 'geckodriver.config.json';
@@ -20,7 +24,7 @@ export class GeckoDriver implements ProviderInterface {
   requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
   seleniumFlag = '-Dwebdriver.gecko.driver';
 
-  constructor(providerConfig?: ProviderConfig) {
+  constructor(providerConfig?: GeckoDriverProviderConfig) {
     if (providerConfig) {
       if (providerConfig.cacheFileName) {
         this.cacheFileName = providerConfig.cacheFileName;
@@ -45,7 +49,7 @@ export class GeckoDriver implements ProviderInterface {
         this.requestUrl = providerConfig.requestUrl;
       }
       if (providerConfig.oauthToken) {
-        this.oauthToken = providerConfig.oauthToken as string;
+        this.oauthToken = providerConfig.oauthToken;
       }
     }
   }

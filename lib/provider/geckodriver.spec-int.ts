@@ -14,8 +14,15 @@ describe('geckodriver', () => {
 
   describe('class GeckoDriver', () => {
     describe('updateBinary', () => {
-      beforeEach(() => {
+      beforeAll(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+      });
+
+      afterAll(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
+      });
+
+      beforeEach(() => {
         try {
           fs.mkdirSync(tmpDir);
         } catch (err) {
@@ -23,115 +30,104 @@ describe('geckodriver', () => {
       });
 
       afterEach(() => {
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
         try {
           rimraf.sync(tmpDir);
         } catch (err) {
         }
       });
 
-      it('should download the latest for MacOS', async (done) => {
-        if (!await checkConnectivity('update binary for mac test')) {
-          done();
+      it('should download the latest for MacOS', async () => {
+        if (await checkConnectivity('update binary for mac test')) {
+          const geckodriver = new GeckoDriver({outDir: tmpDir, osType: 'Darwin'});
+          await geckodriver.updateBinary();
+  
+          const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
+          const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
+          expect(fs.statSync(configFile).size).toBeTruthy();
+          expect(fs.statSync(jsonFile).size).toBeTruthy();
+  
+          const versionList = convertJsonToVersionList(jsonFile);
+          const versionObj = getVersion(versionList, 'macos');
+          const executableFile =
+              path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
+          expect(fs.statSync(executableFile).size).toBeTruthy(); 
         }
-        const geckodriver = new GeckoDriver({outDir: tmpDir, osType: 'Darwin'});
-        await geckodriver.updateBinary();
-
-        const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
-        const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(configFile).size).toBeTruthy();
-        expect(fs.statSync(jsonFile).size).toBeTruthy();
-
-        const versionList = convertJsonToVersionList(jsonFile);
-        const versionObj = getVersion(versionList, 'macos');
-        const executableFile =
-            path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
-        expect(fs.statSync(executableFile).size).toBeTruthy();
-        done();
       });
 
-      it('should download the latest for Windows x64', async (done) => {
-        if (!await checkConnectivity('update binary for win64 test')) {
-          done();
-        }
-        const geckodriver = new GeckoDriver(
+      it('should download the latest for Windows x64', async () => {
+        if (await checkConnectivity('update binary for win64 test')) {
+          const geckodriver = new GeckoDriver(
             {outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64'});
-        await geckodriver.updateBinary();
+          await geckodriver.updateBinary();
 
-        const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
-        const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(configFile).size).toBeTruthy();
-        expect(fs.statSync(jsonFile).size).toBeTruthy();
+          const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
+          const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
+          expect(fs.statSync(configFile).size).toBeTruthy();
+          expect(fs.statSync(jsonFile).size).toBeTruthy();
 
-        const versionList = convertJsonToVersionList(jsonFile);
-        const versionObj = getVersion(versionList, 'win64');
-        const executableFile =
-            path.resolve(tmpDir, 'geckodriver_' + versionObj.version + '.exe');
-        expect(fs.statSync(executableFile).size).toBeTruthy();
-        done();
+          const versionList = convertJsonToVersionList(jsonFile);
+          const versionObj = getVersion(versionList, 'win64');
+          const executableFile =
+              path.resolve(tmpDir, 'geckodriver_' + versionObj.version + '.exe');
+          expect(fs.statSync(executableFile).size).toBeTruthy();
+        }
       });
 
-      it('should download the latest for Windows x32', async (done) => {
-        if (!await checkConnectivity('update binary for win32 test')) {
-          done();
-        }
-        const geckodriver = new GeckoDriver(
+      it('should download the latest for Windows x32', async () => {
+        if (await checkConnectivity('update binary for win32 test')) {
+          const geckodriver = new GeckoDriver(
             {outDir: tmpDir, osType: 'Windows_NT', osArch: 'x32'});
-        await geckodriver.updateBinary();
+          await geckodriver.updateBinary();
 
-        const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
-        const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(configFile).size).toBeTruthy();
-        expect(fs.statSync(jsonFile).size).toBeTruthy();
+          const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
+          const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
+          expect(fs.statSync(configFile).size).toBeTruthy();
+          expect(fs.statSync(jsonFile).size).toBeTruthy();
 
-        const versionList = convertJsonToVersionList(jsonFile);
-        const versionObj = getVersion(versionList, 'win64');
-        const executableFile =
-            path.resolve(tmpDir, 'geckodriver_' + versionObj.version + '.exe');
-        expect(fs.statSync(executableFile).size).toBeTruthy();
-        done();
+          const versionList = convertJsonToVersionList(jsonFile);
+          const versionObj = getVersion(versionList, 'win64');
+          const executableFile =
+              path.resolve(tmpDir, 'geckodriver_' + versionObj.version + '.exe');
+          expect(fs.statSync(executableFile).size).toBeTruthy();
+        }
       });
 
-      it('should download the latest for Linux x64', async (done) => {
-        if (!await checkConnectivity('update binary for linux64 test')) {
-          done();
+      it('should download the latest for Linux x64', async () => {
+        if (await checkConnectivity('update binary for linux64 test')) {
+          const geckodriver =
+              new GeckoDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x64'});
+          await geckodriver.updateBinary();
+
+          const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
+          const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
+          expect(fs.statSync(configFile).size).toBeTruthy();
+          expect(fs.statSync(jsonFile).size).toBeTruthy();
+
+          const versionList = convertJsonToVersionList(jsonFile);
+          const versionObj = getVersion(versionList, 'linux64');
+          const executableFile =
+              path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
+          expect(fs.statSync(executableFile).size).toBeTruthy(); 
         }
-        const geckodriver =
-            new GeckoDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x64'});
-        await geckodriver.updateBinary();
-
-        const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
-        const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(configFile).size).toBeTruthy();
-        expect(fs.statSync(jsonFile).size).toBeTruthy();
-
-        const versionList = convertJsonToVersionList(jsonFile);
-        const versionObj = getVersion(versionList, 'linux64');
-        const executableFile =
-            path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
-        expect(fs.statSync(executableFile).size).toBeTruthy();
-        done();
       });
 
-      it('should download the latest for Linux x32', async (done) => {
-        if (!await checkConnectivity('update binary for linux32 test')) {
-          done();
+      it('should download the latest for Linux x32', async () => {
+        if (await checkConnectivity('update binary for linux32 test')) {
+          const geckodriver =
+              new GeckoDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x32'});
+          await geckodriver.updateBinary();
+
+          const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
+          const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
+          expect(fs.statSync(configFile).size).toBeTruthy();
+          expect(fs.statSync(jsonFile).size).toBeTruthy();
+
+          const versionList = convertJsonToVersionList(jsonFile);
+          const versionObj = getVersion(versionList, 'linux32');
+          const executableFile =
+              path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
+          expect(fs.statSync(executableFile).size).toBeTruthy();  
         }
-        const geckodriver =
-            new GeckoDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x32'});
-        await geckodriver.updateBinary();
-
-        const configFile = path.resolve(tmpDir, 'geckodriver.config.json');
-        const jsonFile = path.resolve(tmpDir, 'geckodriver.json');
-        expect(fs.statSync(configFile).size).toBeTruthy();
-        expect(fs.statSync(jsonFile).size).toBeTruthy();
-
-        const versionList = convertJsonToVersionList(jsonFile);
-        const versionObj = getVersion(versionList, 'linux32');
-        const executableFile =
-            path.resolve(tmpDir, 'geckodriver_' + versionObj.version);
-        expect(fs.statSync(executableFile).size).toBeTruthy();
-        done();
       });
     });
   });

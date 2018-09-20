@@ -20,13 +20,12 @@ describe('file_utils', () => {
       expect(fileList[0]).toBe('bar');
     });
 
-    it('should return an error if the file does not exist', async (done) => {
+    it('should return an error if the file does not exist', async () => {
       try {
         await tarFileList('file_does_not_exist');
-        done.fail();
+        expect(false).toBeTruthy();
       } catch (err) {
         expect(err).toBeTruthy();
-        done();
       }
     });
   });
@@ -64,13 +63,12 @@ describe('file_utils', () => {
       expect(fileList[0]).toBe('bar');
     });
 
-    it('should return an error if the file does not exist', (done) => {
+    it('should return an error if the file does not exist', () => {
       try {
         zipFileList('file_does_not_exist');
-        done.fail();
+        expect(false).toBeTruthy();
       } catch (err) {
         expect(err).toBeTruthy();
-        done();
       }
     });
   });

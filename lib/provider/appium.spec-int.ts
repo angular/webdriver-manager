@@ -12,33 +12,44 @@ describe('appium', () => {
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   describe('getVersion', () => {
     let proc: childProcess.ChildProcess;
-    beforeAll((done) => {
+
+    beforeAll(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-      proc = spawnProcess('node', ['dist/spec/server/http_server.js']);
-      console.log('http-server: ' + proc.pid);
-      try {
-        fs.mkdirSync(tmpDir);
-      } catch (err) {
-      }
-      setTimeout(done, 3000);
     });
 
     afterAll(() => {
-      try {
-        rimraf.sync(tmpDir);
-      } catch (err) {
-      }
-      process.kill(proc.pid);
       jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
     });
 
-    it('should get the version from the local server', async () => {
-      const appium = new Appium({
-        outDir: tmpDir,
-        requestUrl: 'http://127.0.0.1:8812/spec/support/files/appium.json'
+    describe('with a http server', () => {
+      beforeAll(async () => {
+        proc = spawnProcess('node', ['dist/spec/server/http_server.js']);
+        console.log('http-server: ' + proc.pid);
+        try {
+          fs.mkdirSync(tmpDir);
+        } catch (err) {
+        }
+        await new Promise((resolve, _) => {
+          setTimeout(resolve, 3000);
+        });
       });
-      expect(await appium.getVersion()).toBe('10.11.12');
-    });
+  
+      afterAll(() => {
+        try {
+          rimraf.sync(tmpDir);
+        } catch (err) {
+        }
+        process.kill(proc.pid);
+      });
+
+      it('should get the version from the local server', async () => {
+        const appium = new Appium({
+          outDir: tmpDir,
+          requestUrl: 'http://127.0.0.1:8812/spec/support/files/appium.json'
+        });
+        expect(await appium.getVersion()).toBe('10.11.12');
+      });
+    });    
   });
 
   describe('setup', () => {
