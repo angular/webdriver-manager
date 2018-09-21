@@ -33,7 +33,7 @@ describe('appium', () => {
           setTimeout(resolve, 3000);
         });
       });
-  
+
       afterAll(() => {
         try {
           rimraf.sync(tmpDir);
@@ -49,7 +49,7 @@ describe('appium', () => {
         });
         expect(await appium.getVersion()).toBe('10.11.12');
       });
-    });    
+    });
   });
 
   describe('setup', () => {

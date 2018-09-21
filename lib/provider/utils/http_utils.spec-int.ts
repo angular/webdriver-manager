@@ -38,7 +38,7 @@ describe('http_utils', () => {
       await new Promise((resolve, _) => {
         setTimeout(resolve, 3000);
       });
-  
+
       try {
         fs.mkdirSync(tmpDir);
       } catch (err) {
@@ -48,14 +48,14 @@ describe('http_utils', () => {
       } catch (err) {
       }
     });
-  
+
     afterAll(async () => {
       try {
         fs.unlinkSync(fileName);
         fs.rmdirSync(tmpDir);
       } catch (err) {
       }
-  
+
       process.kill(proc.pid);
       await new Promise((resolve, _) => {
         setTimeout(resolve, 3000);
@@ -76,7 +76,7 @@ describe('http_utils', () => {
                  done.fail(err);
                });
          });
-  
+
       it('should not download the file if the file exists', (done) => {
         requestBinary(binaryUrl, {fileName, fileSize: barZipSize})
             .then((result) => {
@@ -89,7 +89,7 @@ describe('http_utils', () => {
             });
       });
     });
-  
+
     describe('requestBody', () => {
       it('should download a json object file', async () => {
         const foo = await requestBody(fooJsonUrl, {});
@@ -97,7 +97,7 @@ describe('http_utils', () => {
         expect(fooJson['foo']).toBe('abc');
         expect(fooJson['bar']).toBe(123);
       });
-  
+
       it('should download a json array file', async () => {
         const foo = await requestBody(fooArrayUrl, {});
         const fooJson = JSON.parse(foo);
@@ -106,7 +106,7 @@ describe('http_utils', () => {
         expect(fooJson[1]['foo']).toBe('def');
         expect(fooJson[2]['foo']).toBe('ghi');
       });
-  
+
       it('should get the xml file', async () => {
         const text = await requestBody(fooXmlUrl, {});
         expect(text.length).toBeGreaterThan(0);

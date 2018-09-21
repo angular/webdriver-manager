@@ -50,18 +50,18 @@ describe('cloud_storage_xml', () => {
         setTimeout(resolve, 3000);
       });
     });
-  
+
     afterAll(async () => {
       process.kill(proc.pid);
       await new Promise((resolve, _) => {
         setTimeout(resolve, 5000);
       });
     });
-  
+
     describe('updateXml', () => {
       const fileName = path.resolve(tmpDir, 'foo.xml');
       const xmlUrl = httpBaseUrl + '/spec/support/files/foo.xml';
-  
+
       beforeAll(() => {
         try {
           fs.mkdirSync(tmpDir);
@@ -72,7 +72,7 @@ describe('cloud_storage_xml', () => {
         } catch (_) {
         }
       });
-  
+
       afterAll(() => {
         try {
           fs.unlinkSync(fileName);
@@ -80,7 +80,7 @@ describe('cloud_storage_xml', () => {
         } catch (_) {
         }
       });
-      
+
       it('should request and write the file if it does not exist', async () => {
         try {
           fs.statSync(fileName);
@@ -91,21 +91,21 @@ describe('cloud_storage_xml', () => {
             expect(fs.statSync(fileName).size).toBeGreaterThan(0);
             expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
                 .toBe('2.0/foobar.zip');
-          } catch(_) {
+          } catch (_) {
             expect('thrown error from update xml.').toBeFalsy();
           }
         }
       });
-  
+
       it('should request and write the file if it is expired', async () => {
         const mtime = Date.now() - (60 * 60 * 1000) - 5000;
         const initialStats = fs.statSync(fileName);
-  
+
         // Maintain the fs.statSync method before being spyed on.
         // Spy on the fs.statSync method and return fake values.
         const fsStatSync = fs.statSync;
         spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime});
-  
+
         try {
           const xmlContent = await updateXml(xmlUrl, {fileName});
           expect(fsStatSync(fileName).size).toBeGreaterThan(0);
@@ -118,18 +118,18 @@ describe('cloud_storage_xml', () => {
           expect('debugging required').toBeFalsy();
         }
       });
-  
+
       it('should read the file when it is not expired', async () => {
         const initialStats = fs.statSync(fileName);
         const mtime = Date.now();
-  
+
         // Maintain the fs.statSync method before being spyed on.
         // Spy on the fs.statSync method and return fake values.
         const fsStatSync = fs.statSync;
         spyOn(fs, 'statSync').and.returnValue({size: 1000, mtime});
-  
+
         try {
-          const xmlContent = await updateXml(xmlUrl, {fileName});    
+          const xmlContent = await updateXml(xmlUrl, {fileName});
           expect(fsStatSync(fileName).size).toBe(initialStats.size);
           expect(fsStatSync(fileName).mtime.getMilliseconds())
               .toBe(initialStats.mtime.getMilliseconds());
@@ -140,10 +140,10 @@ describe('cloud_storage_xml', () => {
         }
       });
     });
-  
+
     describe('convertXmlToVersionList', () => {
       const fileName = 'spec/support/files/chromedriver.xml';
-  
+
       it('should convert an xml file an object from the xml file', () => {
         const versionList = convertXmlToVersionList(
             fileName, '.zip', chromedriverVersionParser,
@@ -162,7 +162,7 @@ describe('cloud_storage_xml', () => {
         expect(versionList['2.20.0']['chromedriver_linux32.zip']['size'])
             .toBe(2612186);
       });
-  
+
       it('should return a null value if the file does not exist', () => {
         const versionList = convertXmlToVersionList(
             'spec/support/files/does_not_exist.xml', '.zip',
@@ -171,6 +171,4 @@ describe('cloud_storage_xml', () => {
       });
     });
   });
-
-
 });

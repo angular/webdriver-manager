@@ -15,8 +15,8 @@ import {updateBinary} from './update';
 const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
 const tmpDir = path.resolve(os.tmpdir(), 'test');
-const selenium = new SeleniumServer({outDir: tmpDir, runAsDetach: true,
-  runAsNode: true});
+const selenium =
+    new SeleniumServer({outDir: tmpDir, runAsDetach: true, runAsNode: true});
 
 const optionsBinary: OptionsBinary = {
   outDir: tmpDir,

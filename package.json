@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager-replacement",
-  "version": "0.5.3",
+  "version": "1.0.0",
   "description": "webdriver-manager replacement",
   "bin": {
     "webdriver-manager": "bin/webdriver-manager",

@@ -22,7 +22,7 @@ describe('chromedriver', () => {
     });
 
     describe('updateBinary', () => {
-      beforeEach(() => {        
+      beforeEach(() => {
         try {
           fs.mkdirSync(tmpDir);
         } catch (err) {
@@ -70,9 +70,9 @@ describe('chromedriver', () => {
           const versionList = convertXmlToVersionList(
               xmlFile, '.zip', versionParser, semanticVersionParser);
           const versionObj = getVersion(versionList, 'win32');
-          const executableFile =
-              path.resolve(tmpDir, 'chromedriver_' + versionObj.version + '.exe');
-          expect(fs.statSync(executableFile).size).toBeTruthy(); 
+          const executableFile = path.resolve(
+              tmpDir, 'chromedriver_' + versionObj.version + '.exe');
+          expect(fs.statSync(executableFile).size).toBeTruthy();
         }
       });
 
@@ -90,16 +90,16 @@ describe('chromedriver', () => {
           const versionList = convertXmlToVersionList(
               xmlFile, '.zip', versionParser, semanticVersionParser);
           const versionObj = getVersion(versionList, 'win32');
-          const executableFile =
-              path.resolve(tmpDir, 'chromedriver_' + versionObj.version + '.exe');
-          expect(fs.statSync(executableFile).size).toBeTruthy();  
+          const executableFile = path.resolve(
+              tmpDir, 'chromedriver_' + versionObj.version + '.exe');
+          expect(fs.statSync(executableFile).size).toBeTruthy();
         }
       });
 
       it('should download the latest for Linux x64', async () => {
         if (await checkConnectivity('update binary for linux x64 test')) {
-          const chromedriver =
-              new ChromeDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x64'});
+          const chromedriver = new ChromeDriver(
+              {outDir: tmpDir, osType: 'Linux', osArch: 'x64'});
           await chromedriver.updateBinary();
 
           const configFile = path.resolve(tmpDir, 'chromedriver.config.json');
@@ -112,18 +112,19 @@ describe('chromedriver', () => {
           const versionObj = getVersion(versionList, 'linux64');
           const executableFile =
               path.resolve(tmpDir, 'chromedriver_' + versionObj.version);
-          expect(fs.statSync(executableFile).size).toBeTruthy();  
+          expect(fs.statSync(executableFile).size).toBeTruthy();
         }
       });
 
       it('should not download for Linux x32', async () => {
         if (await checkConnectivity('update binary for linux x32 test')) {
-          const chromedriver =
-              new ChromeDriver({outDir: tmpDir, osType: 'Linux', osArch: 'x32'});
-          chromedriver.updateBinary().then(() => {
+          const chromedriver = new ChromeDriver(
+              {outDir: tmpDir, osType: 'Linux', osArch: 'x32'});
+          chromedriver.updateBinary()
+              .then(() => {
                 expect(false).toBeTruthy();
-              }).catch(() => {
-              });
+              })
+              .catch(() => {});
         }
       });
     });

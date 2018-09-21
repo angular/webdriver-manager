@@ -39,20 +39,20 @@ describe('iedriver', () => {
     it('should download the file', async () => {
       if (await checkConnectivity('update binary for windows test')) {
         const ieDriver =
-          new IEDriver({outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64'});
-      await ieDriver.updateBinary();
+            new IEDriver({outDir: tmpDir, osType: 'Windows_NT', osArch: 'x64'});
+        await ieDriver.updateBinary();
 
-      const configFile = path.resolve(tmpDir, 'iedriver.config.json');
-      const xmlFile = path.resolve(tmpDir, 'iedriver.xml');
-      expect(fs.statSync(configFile).size).toBeTruthy();
-      expect(fs.statSync(xmlFile).size).toBeTruthy();
+        const configFile = path.resolve(tmpDir, 'iedriver.config.json');
+        const xmlFile = path.resolve(tmpDir, 'iedriver.xml');
+        expect(fs.statSync(configFile).size).toBeTruthy();
+        expect(fs.statSync(xmlFile).size).toBeTruthy();
 
-      const versionList = convertXmlToVersionList(
-          xmlFile, 'IEDriverServer_', versionParser, semanticVersionParser);
-      const versionObj = getVersion(versionList, '');
-      const executableFile =
-          path.resolve(tmpDir, 'IEDriverServer_' + versionObj.version + '.exe');
-      expect(fs.statSync(executableFile).size).toBeTruthy();
+        const versionList = convertXmlToVersionList(
+            xmlFile, 'IEDriverServer_', versionParser, semanticVersionParser);
+        const versionObj = getVersion(versionList, '');
+        const executableFile = path.resolve(
+            tmpDir, 'IEDriverServer_' + versionObj.version + '.exe');
+        expect(fs.statSync(executableFile).size).toBeTruthy();
       }
     });
   });
