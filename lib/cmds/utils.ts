@@ -40,7 +40,7 @@ export function addOptionsBinary(options: Options): OptionsBinary {
     const seleniumProviderConfig: SeleniumServerProviderConfig = providerConfig;
     seleniumProviderConfig.port = optionsBinary.server.port;
     seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsDetach;
-    seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsNode;
+    seleniumProviderConfig.runAsNode = optionsBinary.server.runAsNode;
     optionsBinary.server.binary = new SeleniumServer(seleniumProviderConfig);
   }
   return optionsBinary;
@@ -69,6 +69,8 @@ export function convertArgs2AllOptions(argv: yargs.Arguments): Options {
       version: versionsStandalone,
       runAsNode: argv.standalone_node as boolean,
       runAsDetach: argv.detach as boolean,
+      chromeLogs: argv.chrome_logs as string,
+      edge: argv.edge as string,
     },
     ignoreSSL: argv.ignore_ssl as boolean,
     outDir: argv.out_dir as string,
@@ -114,9 +116,8 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     options.server.runAsNode = argv.standalone_node as boolean;
     options.server.runAsDetach = argv.detach as boolean;
     options.server.version = versionsStandalone;
-    options.server.chrome_logs = argv.chrome_logs as string;
+    options.server.chromeLogs = argv.chrome_logs as string;
     options.server.edge = argv.edge as string;
-    options.server.runAsDetach = argv.detach as boolean;
   }
   return options;
 }

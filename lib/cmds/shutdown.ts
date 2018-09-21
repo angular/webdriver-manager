@@ -17,7 +17,7 @@ export async function handler(argv: yargs.Arguments) {
   log.setLevel(argv.log_level);
   const seleniumServer = new SeleniumServer();
   seleniumServer.runAsNode = true;
-  const options = {server: {binary: seleniumServer, runAsNode: true}};
+  const options: Options = {server: {name: 'selenium', runAsNode: true}};
   await shutdown(options);
 }
 

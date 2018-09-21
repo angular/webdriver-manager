@@ -38,7 +38,7 @@ export interface Server {
   // Run as role = node option.
   runAsNode?: boolean;
   // The relative or full path to the chrome logs file.
-  chrome_logs?: string;
+  chromeLogs?: string;
   // The full path to the edge driver server.
   edge?: string;
   // Detach the server and return the process to the parent.

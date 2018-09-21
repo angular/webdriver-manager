@@ -59,9 +59,9 @@ export function startBinary(optionsBinary: OptionsBinary): Promise<number> {
   }
 
   if (optionsBinary.server) {
-    if (optionsBinary.server.chrome_logs) {
+    if (optionsBinary.server.chromeLogs) {
       const chromeLogs =
-          optionsBinary.server.chrome_logs.replace('"', '').replace('\'', '');
+          optionsBinary.server.chromeLogs.replace('"', '').replace('\'', '');
       javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
     }
     if (optionsBinary.server.edge) {
