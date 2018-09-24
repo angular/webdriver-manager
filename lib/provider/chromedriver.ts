@@ -185,38 +185,58 @@ export function osHelper(ostype: string, osarch: string): string {
  * Captures the version name which includes the semantic version and extra
  * metadata. So an example for 12.34/chromedriver_linux64.zip,
  * the version is 12.34.
+ *
+ * The new version is 70.0.3538.16/chromedriver_linux64.zip. This will return
+ * 70.0.3538.16.
  * @param xmlKey The xml key including the partial url.
  */
 export function versionParser(xmlKey: string) {
-  const regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g;
+  const newRegex = /([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*)\/chromedriver_.*\.zip/g;
   try {
-    const exec = regex.exec(xmlKey);
+    const exec = newRegex.exec(xmlKey);
     if (exec) {
       return exec[1];
     }
-    return null;
-  } catch (err) {
-    return null;
+  } catch (_) {
   }
+  const oldRegex = /([0-9]*\.[0-9]*)\/chromedriver_.*\.zip/g;
+  try {
+    const exec = oldRegex.exec(xmlKey);
+    if (exec) {
+      return exec[1];
+    }
+  } catch (_) {
+  }
+  return null;
 }
 
 /**
  * Captures the version name which includes the semantic version and extra
  * metadata. So an example for 12.34/chromedriver_linux64.zip,
- * the version is 12.34.00.
+ * the version is 12.34.0.
+ *
+ * The new version is 70.0.3538.16/chromedriver_linux64.zip. This will return
+ * 70.0.3538.
  * @param xmlKey The xml key including the partial url.
  */
 export function semanticVersionParser(xmlKey: string): string|null {
-  const regex = /([0-9]*.[0-9]*)\/chromedriver_.*.zip/g;
+  const newRegex = /([0-9]*\.[0-9]*\.[0-9]*).[0-9]*\/chromedriver_.*\.zip/g;
   try {
-    const exec = regex.exec(xmlKey);
+    const exec = newRegex.exec(xmlKey);
+    if (exec) {
+      return exec[1];
+    }
+  } catch (_) {
+  }
+  const oldRegex = /([0-9]*\.[0-9]*)\/chromedriver_.*\.zip/g;
+  try {
+    const exec = oldRegex.exec(xmlKey);
     if (exec) {
       return exec[1] + '.0';
     }
-    return null;
-  } catch (err) {
-    return null;
+  } catch (_) {
   }
+  return null;
 }
 
 /**
@@ -225,9 +245,9 @@ export function semanticVersionParser(xmlKey: string): string|null {
  */
 export function matchBinaries(ostype: string): RegExp|null {
   if (ostype === 'Darwin' || ostype === 'Linux') {
-    return /chromedriver_\d+.\d+/g;
+    return /chromedriver_\d+.\d+.*/g;
   } else if (ostype === 'Windows_NT') {
-    return /chromedriver_\d+.\d+.exe/g;
+    return /chromedriver_\d+.\d+.*.exe/g;
   }
   return null;
 }

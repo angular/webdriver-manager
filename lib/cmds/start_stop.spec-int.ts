@@ -14,6 +14,7 @@ import {updateBinary} from './update';
 
 const log = loglevel.getLogger('webdriver-manager-test');
 log.setLevel('debug');
+loglevel.getLogger('webdriver-manager').setLevel('info');
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const selenium =
     new SeleniumServer({outDir: tmpDir, runAsDetach: true, runAsNode: true});
@@ -24,7 +25,7 @@ const optionsBinary: OptionsBinary = {
   server: {binary: selenium, runAsDetach: true, runAsNode: true}
 };
 
-describe('start cmd', () => {
+describe('start and stop cmd', () => {
   const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   beforeAll(() => {
@@ -35,44 +36,49 @@ describe('start cmd', () => {
     }
   });
 
-  beforeAll(async () => {
-    await updateBinary(optionsBinary);
-  });
-
   afterAll(() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
-  });
-
-  afterEach(() => {
     try {
       rimraf.sync(tmpDir);
     } catch (err) {
     }
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
   });
 
-  it('should run the detached server', async () => {
-    await startBinary(optionsBinary);
-    const hubUrl = 'http://127.0.0.1:4444/wd/hub/static/resource/hub.html';
-    const responseCode = new Promise((resolve, reject) => {
-      http.get(hubUrl, res => {
-        if (res.statusCode === 200) {
-          resolve(res.statusCode);
-        } else {
-          reject('Should be 200');
-        }
+  describe('start', () => {
+    beforeAll(async () => {
+      await updateBinary(optionsBinary);
+    });
+
+    it('should run the detached server', async () => {
+      await startBinary(optionsBinary);
+      const hubUrl = 'http://127.0.0.1:4444/wd/hub/static/resource/hub.html';
+      const responseCode = new Promise((resolve, reject) => {
+        http.get(hubUrl, res => {
+          if (res.statusCode === 200) {
+            resolve(res.statusCode);
+          } else {
+            reject('Should be 200');
+          }
+        });
       });
+      expect(await responseCode).toBe(200);
     });
-    expect(await responseCode).toBe(200);
-    await shutdownBinary(optionsBinary);
-    await new Promise((resolve, _) => {
-      setTimeout(resolve, 3000);
-    });
-    // tslint:disable-next-line:no-any
-    const noResponse = new Promise<any>((resolve, _) => {
-      http.get(hubUrl, _ => {}).on('error', (err) => {
-        resolve(err);
+  });
+
+  describe('stop', () => {
+    it('should shutdown the detached server', async () => {
+      const hubUrl = 'http://127.0.0.1:4444/wd/hub/static/resource/hub.html';
+      await shutdownBinary(optionsBinary);
+      await new Promise((resolve, _) => {
+        setTimeout(resolve, 3000);
       });
+      // tslint:disable-next-line:no-any
+      const noResponse = new Promise<any>((resolve, _) => {
+        http.get(hubUrl, _ => {}).on('error', (err) => {
+          resolve(err);
+        });
+      });
+      expect((await noResponse)['code']).toBe('ECONNREFUSED');
     });
-    expect((await noResponse)['code']).toBe('ECONNREFUSED');
   });
 });
