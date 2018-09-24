@@ -153,14 +153,26 @@ export class SeleniumServer implements ProviderInterface {
   }
 
   /**
+   * Get the binary file path.
+   * @param version Optional to provide the version number or the latest.
+   */
+  getBinaryPath(version?: string): string|null {
+    try {
+      const configFilePath = path.resolve(this.outDir, this.configFileName);
+      return getBinaryPathFromConfig(configFilePath, version);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /**
    * Get the selenium server start command (not including the java command)
    * @param opts The options to pass to the jar file.
    * @param version The optional version of the selenium jar file.
    * @returns The spawn arguments array.
    */
   getCmdStartServer(opts: {[key: string]: string}, version?: string): string[] {
-    const configFilePath = path.resolve(this.outDir, this.configFileName);
-    const jarFile = getBinaryPathFromConfig(configFilePath, version);
+    const jarFile = this.getBinaryPath(version);
     const options: string[] = [];
     if (opts) {
       for (const opt of Object.keys(opts)) {
