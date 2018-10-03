@@ -8,7 +8,7 @@ import * as env from './env';
 const port = process.argv[2] || env.httpPort;
 
 http.createServer(
-        (request: http.ServerRequest, response: http.ServerResponse) => {
+        (request: http.IncomingMessage, response: http.ServerResponse) => {
           const uri = url.parse(request.url).pathname;
           let fileName = path.join(process.cwd(), uri);
 
