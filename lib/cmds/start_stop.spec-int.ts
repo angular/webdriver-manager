@@ -8,6 +8,7 @@ import * as rimraf from 'rimraf';
 import {ChromeDriver} from '../provider/chromedriver';
 import {SeleniumServer} from '../provider/selenium_server';
 import {OptionsBinary} from './options_binary';
+import {findPort} from '../../spec/support/helpers/port_finder';
 import {shutdownBinary} from './shutdown';
 import {startBinary} from './start';
 import {updateBinary} from './update';
@@ -24,6 +25,7 @@ const optionsBinary: OptionsBinary = {
   browserDrivers: [{binary: new ChromeDriver({outDir: tmpDir})}],
   server: {binary: selenium, runAsDetach: true, runAsNode: true}
 };
+let port: number;
 
 describe('start and stop cmd', () => {
   const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -50,8 +52,11 @@ describe('start and stop cmd', () => {
     });
 
     it('should run the detached server', async () => {
+      port = await findPort(4000, 5000);
+      optionsBinary.server.port = port;
+      (optionsBinary.server.binary as SeleniumServer).port = port;
       await startBinary(optionsBinary);
-      const hubUrl = 'http://127.0.0.1:4444/wd/hub/static/resource/hub.html';
+      const hubUrl = `http://localhost:${port}/wd/hub/static/resource/hub.html`;
       const responseCode = new Promise((resolve, reject) => {
         http.get(hubUrl, res => {
           if (res.statusCode === 200) {
@@ -67,7 +72,7 @@ describe('start and stop cmd', () => {
 
   describe('stop', () => {
     it('should shutdown the detached server', async () => {
-      const hubUrl = 'http://127.0.0.1:4444/wd/hub/static/resource/hub.html';
+      const hubUrl = `http://localhost:${port}/wd/hub/static/resource/hub.html`;
       await shutdownBinary(optionsBinary);
       await new Promise((resolve, _) => {
         setTimeout(resolve, 3000);
