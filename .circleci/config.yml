@@ -1,17 +1,36 @@
+var_1: &docker_image circleci/node:8-browsers
+
+anchor_1: &job_defaults
+  working_directory: ~/workspace
+  docker:
+    - image: *docker_image
+
 version: 2
 jobs:
-  build:
-    working_directory: ~/workspace
-    docker:
-      - image: circleci/node:8-browsers
+  build_and_test:
+    <<: *job_defaults
     steps:
       - checkout
-
       - run: node --version
       - run: npm --version
-
       - run: npm install
+
       - run: npm run test-unit
       - run: npm run test-int
       - run: npm run test-proxy
       - run: npm run test-e2e
+workflows:
+  version: 2
+  default_workflow:
+    jobs:
+      - build_and_test
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build_and_test
