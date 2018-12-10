@@ -66,10 +66,12 @@ describe('cloud_storage_xml', () => {
         try {
           fs.mkdirSync(tmpDir);
         } catch (_) {
+          // If the directory already exists, we are in the desired state.
         }
         try {
           fs.unlinkSync(fileName);
         } catch (_) {
+          // If the file does not exist, we are in the desired state.
         }
       });
 
@@ -98,6 +100,13 @@ describe('cloud_storage_xml', () => {
       });
 
       it('should request and write the file if it is expired', async () => {
+        try {
+          // try to create the file before trying to calling fs.statSync.
+          fs.closeSync(fs.openSync(path.resolve(fileName), 'w'));
+        } catch (_) {
+          // If the file already exists, do nothing.
+        }
+
         const mtime = Date.now() - (60 * 60 * 1000) - 5000;
         const initialStats = fs.statSync(fileName);
 
