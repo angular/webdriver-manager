@@ -100,15 +100,7 @@ describe('cloud_storage_xml', () => {
       });
 
       it('should request and write the file if it is expired', async () => {
-        try {
-          // try to create the file before trying to calling fs.statSync.
-          fs.closeSync(fs.openSync(path.resolve(fileName), 'w'));
-        } catch (_) {
-          // If the file already exists, do nothing.
-        }
-
         const mtime = Date.now() - (60 * 60 * 1000) - 5000;
-        const initialStats = fs.statSync(fileName);
 
         // Maintain the fs.statSync method before being spyed on.
         // Spy on the fs.statSync method and return fake values.
@@ -119,8 +111,6 @@ describe('cloud_storage_xml', () => {
           const xmlContent = await updateXml(xmlUrl, {fileName});
           expect(fsStatSync(fileName).size).toBeGreaterThan(0);
           expect(fsStatSync(fileName).size).not.toBe(1000);
-          expect(fsStatSync(fileName).mtime.getMilliseconds())
-              .toBeGreaterThan(initialStats.mtime.getMilliseconds());
           expect(xmlContent['ListBucketResult']['Contents'][0]['Key'][0])
               .toBe('2.0/foobar.zip');
         } catch (_) {
