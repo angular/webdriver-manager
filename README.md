@@ -1,5 +1,4 @@
-# webdriver-manager [![CircleCI](https://circleci.com/gh/cnishina/webdriver-manager-replacement.svg?style=svg)](https://circleci.com/gh/cnishina/webdriver-manager-replacement)
-not the webdriver-manager cli
+# webdriver-manager [![CircleCI](https://circleci.com/gh/angular/webdriver-manager/tree/replacement.svg?style=svg)](https://circleci.com/gh/angular/webdriver-manager/tree/replacement)
 
 * [Use as a dependency](#use-as-a-dependency)
 * [Use as a command line interface](#use-as-a-command-line-interface)
@@ -9,43 +8,49 @@ not the webdriver-manager cli
 
 ## Use as a dependency
 
-To install this as a dependency: `npm i -D webdriver-manager-replacement`. The
-following is an example running webdriver-manager-replacement as a dependency.
+To install this as a dependency: `npm install -D webdriver-manager`. The
+following is an example running webdriver-manager as a dependency.
 The test downloads the providers and starts the selenium server standalone as
 detached. After the test, it will shutdown the selenium server standalone.
 
 
 ```
 import {
-  initOptions,
   Options,
-  Provider,
   setLogLevel,
   shutdown,
   start,
   update,
-} from 'webdriver-manager-replacement';
+} from 'webdriver-manager';
 
-let options: Options;
-const providers = [Provider.ChromeDriver, Provider.Selenium];
-const runAsDetach = true;     // To run this in detached. This returns the
-                              // process back to the parent process.
-const runAsNode = true;       // If we want to run as a node. By default
+const options: Options = {
+  browserDrivers: [{
+    name: 'chromedriver'     // For browser drivers, we just need to use a valid
+                             // browser driver name. Other possible values
+                             // include 'geckodriver' and 'iedriver'.
+  }],
+  server: {
+    name: 'selenium',
+    runAsNode: true,          // If we want to run as a node. By default
                               // running as detached will set this to true.
-setLogLevel('info');          // Required if we want to log to console.
+    runAsDetach: true         // To run this in detached. This returns the
+                              // process back to the parent process.
+  }
+};
+setLogLevel('info');          // Required if we webdriver-manager to log to
+                              // console. Not setting this will hide the logs.
 
 describe('some web test', () => {
-  beforeAll(async() => {
-    options = initOptions(providers, runAsDetach, runAsNode);
+  beforeAll(async () => {
     await update(options);
     await start(options);
   });
 
-  it('should run some web test', () => {
-    // Your web test with some framework.
+  it('should run some web test', async () => {
+    // Your async / await web test with some framework.
   });
 
-  afterAll(async(() => {
+  afterAll(async () => {
     await shutdown(options);  // Makes the web request to shutdown the server.
                               // If we do not call shutdown, the java command
                               // will still be running the server on port 4444.
@@ -57,11 +62,16 @@ describe('some web test', () => {
 ## Use as a command line interface
 
 ```
-npm i -g webdriver-manager-replacement
+npm i -g webdriver-manager
 
-webdriver-manager update    // Downloads the latest binaries.
-webdriver-manager start     // Starts the selenium server standalone.
+webdriver-manager update      // Downloads the latest binaries.
+webdriver-manager start       // Starts the selenium server standalone.
 ```
+
+Note: Installing globally will not work with Protractor if you are trying to
+start a Selenium Standalone server with a "local" or "directConnect". It will
+not work for these since Protractor is looking files downloaded locally to
+the project.
 
 ## The command line interface help commands
 
