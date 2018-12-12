@@ -14,7 +14,7 @@ const log = loglevel.getLogger('webdriver-manager-test');
  */
 export function spawnProcess(task: string, optArg?: string[], optIo?: string) {
   optArg = typeof optArg !== 'undefined' ? optArg : [];
-  let stdio = 'inherit';
+  let stdio: childProcess.StdioOptions = 'inherit';
   if (optIo === 'ignore') {
     stdio = 'ignore';
   }

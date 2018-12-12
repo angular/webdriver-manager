@@ -1,10 +1,9 @@
 {
-  "name": "webdriver-manager-replacement",
-  "version": "1.1.0",
-  "description": "webdriver-manager replacement",
+  "name": "webdriver-manager",
+  "version": "13.0.0-beta",
+  "description": "webdriver-manager",
   "bin": {
-    "webdriver-manager": "bin/webdriver-manager",
-    "webdriver-manager-replacement": "bin/webdriver-manager-replacement"
+    "webdriver-manager": "bin/webdriver-manager"
   },
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -47,41 +46,41 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cnishina/webdriver-manager-replacement.git"
+    "url": "git+https://github.com/angular/webdriver-manager.git"
   },
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cnishina/webdriver-manager-replacement/issues"
+    "url": "https://github.com/angular/webdriver-manager/issues"
   },
-  "homepage": "https://github.com/cnishina/webdriver-manager-replacement#readme",
+  "homepage": "https://github.com/angular/webdriver-manager#readme",
   "dependencies": {
-    "adm-zip": "^0.4.11",
+    "adm-zip": "^0.4.13",
     "loglevel": "^1.6.1",
-    "request": "^2.87.0",
-    "semver": "^5.5.0",
-    "tar": "^4.4.4",
+    "request": "^2.88.0",
+    "semver": "^5.6.0",
+    "tar": "^4.4.8",
     "xml2js": "^0.4.19",
-    "yargs": "^12.0.1"
+    "yargs": "^12.0.5"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.31",
     "@types/http-proxy": "^1.16.2",
-    "@types/jasmine": "^2.8.8",
+    "@types/jasmine": "^3.3.1",
     "@types/loglevel": "^1.5.3",
-    "@types/node": "^10.3.3",
-    "@types/request": "^2.47.0",
+    "@types/node": "^10.12.12",
+    "@types/request": "^2.48.1",
     "@types/rimraf": "^2.0.2",
     "@types/semver": "^5.5.0",
     "@types/tar": "^4.0.0",
     "@types/xml2js": "^0.4.3",
-    "@types/yargs": "^11.1.1",
+    "@types/yargs": "^12.0.1",
     "clang-format": "^1.2.4",
-    "gts": "^0.8.0",
+    "gts": "^0.9.0",
     "http-proxy": "^1.17.0",
-    "jasmine": "^3.1.0",
+    "jasmine": "^3.3.1",
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.2.2"
   }
 }
