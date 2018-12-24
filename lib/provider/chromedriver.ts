@@ -61,8 +61,8 @@ export class ChromeDriver implements ProviderInterface {
     const versionList = convertXmlToVersionList(
         path.resolve(this.outDir, this.cacheFileName), '.zip', versionParser,
         semanticVersionParser);
-    const versionObj =
-        getVersion(versionList, osHelper(this.osType, this.osArch),
+    const versionObj = getVersion(
+        versionList, osHelper(this.osType, this.osArch),
         formatVersion(version));
 
     const chromeDriverUrl = this.requestUrl + versionObj.url;

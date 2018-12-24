@@ -5,10 +5,11 @@ import * as os from 'os';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 
+import {findPort} from '../../spec/support/helpers/port_finder';
 import {ChromeDriver} from '../provider/chromedriver';
 import {SeleniumServer} from '../provider/selenium_server';
+
 import {OptionsBinary} from './options_binary';
-import {findPort} from '../../spec/support/helpers/port_finder';
 import {shutdownBinary} from './shutdown';
 import {startBinary} from './start';
 import {updateBinary} from './update';

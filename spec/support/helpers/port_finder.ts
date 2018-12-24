@@ -9,8 +9,7 @@ import * as net from 'net';
  * @param portRangeEnd
  */
 export async function findPort(
-  portRangeStart: number, portRangeEnd: number): Promise<number> {
-
+    portRangeStart: number, portRangeEnd: number): Promise<number> {
   // When no start is provided but an end range is provided, create
   // an arbitrary start point.
   if (!portRangeStart && portRangeEnd) {
@@ -30,25 +29,23 @@ export async function findPort(
   let portFound = null;
   for (let port = portRangeStart; port <= portRangeEnd; port++) {
     let server: net.Server;
-    const shouldBreak = await new Promise<boolean>(resolve => {
+    const result = await new Promise<boolean>(resolve => {
       // Start a server to check if we can listen to a port.
-      server = net.createServer().listen(port)
-        .on('error', () => {
-          // EADDRINUSE or EACCES, move on.
-          resolve(false);
-        })
-        .on('listening', () => {
-          resolve(true);
-        });
-    }).then(result => {
-      if (result) {
-        // If the server is listening, close the server.
-        server.close();
-        portFound = port;
-      }
-      return result;
+      server = net.createServer()
+                   .listen(port)
+                   .on('error',
+                       () => {
+                         // EADDRINUSE or EACCES, move on.
+                         resolve(false);
+                       })
+                   .on('listening', () => {
+                     resolve(true);
+                   });
     });
-    if (shouldBreak) {
+    if (result) {
+      // If the server is listening, close the server.
+      server.close();
+      portFound = port;
       break;
     }
   }
