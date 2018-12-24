@@ -88,7 +88,7 @@ export function convertArgs2AllOptions(argv: yargs.Arguments): Options {
 export function convertArgs2Options(argv: yargs.Arguments): Options {
   const options: Options = {
     browserDrivers: [],
-    server: {},
+    server: null,
     ignoreSSL: argv.ignore_ssl as boolean,
     outDir: argv.out_dir as string,
     proxy: argv.proxy as string,
@@ -102,17 +102,18 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     versionsIe = argv.versions.ie as string;
     versionsStandalone = argv.versions.standalone as string;
   }
-  if (argv.chrome) {
+  if (argv.chrome as boolean) {
     options.browserDrivers.push(
         {name: 'chromedriver', version: versionsChrome});
   }
-  if (argv.gecko) {
+  if (argv.gecko as boolean) {
     options.browserDrivers.push({name: 'geckodriver', version: versionsGecko});
   }
-  if (argv.iedriver) {
+  if (argv.iedriver as boolean) {
     options.browserDrivers.push({name: 'iedriver', version: versionsIe});
   }
-  if (argv.standalone) {
+  if (argv.standalone as boolean) {
+    options.server = {};
     options.server.name = 'selenium';
     options.server.runAsNode = argv.standalone_node as boolean;
     options.server.runAsDetach = argv.detach as boolean;
