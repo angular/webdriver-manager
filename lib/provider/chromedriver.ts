@@ -61,11 +61,9 @@ export class ChromeDriver implements ProviderInterface {
     const versionList = convertXmlToVersionList(
         path.resolve(this.outDir, this.cacheFileName), '.zip', versionParser,
         semanticVersionParser);
-    if (version) {
-      version = version + '.0';
-    }
     const versionObj =
-        getVersion(versionList, osHelper(this.osType, this.osArch), version);
+        getVersion(versionList, osHelper(this.osType, this.osArch),
+        formatVersion(version));
 
     const chromeDriverUrl = this.requestUrl + versionObj.url;
     const chromeDriverZip = path.resolve(this.outDir, versionObj.name);
@@ -248,6 +246,41 @@ export function matchBinaries(ostype: string): RegExp|null {
     return /chromedriver_\d+.\d+.*/g;
   } else if (ostype === 'Windows_NT') {
     return /chromedriver_\d+.\d+.*.exe/g;
+  }
+  return null;
+}
+
+/**
+ * Specifically to chromedriver, when downloading a version, the version
+ * you give webdriver-manager is not in the same as the output from the
+ * semanticVersionParser. So getting the version to the versionList will not
+ * be just a dictionary look up versionList[version]. The version will have
+ * to be formatted.
+ *
+ * Example:
+ *   2.44 will return with the formatted semantic version 2.44.0
+ *   70.0.1.1 will return with the formatted semantic version 70.0.1
+ *
+ * @param version The actual version.
+ */
+export function formatVersion(version: string): string|null {
+  const newRegex = /([0-9]*\.[0-9]*\.[0-9]*).[0-9]*/g;
+  try {
+    const exec = newRegex.exec(version);
+    if (exec) {
+      return exec[1];
+    }
+  } catch (_) {
+    // no-op: if exec[1] is not reachable, move to the next regex.
+  }
+  const oldRegex = /([0-9]*\.[0-9]*)/g;
+  try {
+    const exec = oldRegex.exec(version);
+    if (exec) {
+      return exec[1] + '.0';
+    }
+  } catch (_) {
+    // no-op: if exec[1] is not reachable, move on to return null.
   }
   return null;
 }

@@ -28,7 +28,6 @@ export async function updateXml(
   }
 }
 
-
 /**
  * Returns a list of versions and the partial url paths.
  * @param fileName the location of the xml file to read.
