@@ -24,7 +24,7 @@ describe('http_utils', () => {
   let proc: childProcess.ChildProcess;
 
   beforeAll(() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
   });
 
   afterAll(() => {

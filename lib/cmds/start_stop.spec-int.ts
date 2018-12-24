@@ -31,7 +31,7 @@ describe('start and stop cmd', () => {
   const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   beforeAll(() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     try {
       fs.mkdirSync(tmpDir);
     } catch (err) {

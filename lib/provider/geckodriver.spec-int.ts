@@ -15,7 +15,7 @@ describe('geckodriver', () => {
   describe('class GeckoDriver', () => {
     describe('updateBinary', () => {
       beforeAll(() => {
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
       });
 
       afterAll(() => {

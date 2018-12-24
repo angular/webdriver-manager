@@ -7,14 +7,14 @@ import * as rimraf from 'rimraf';
 import {spawnProcess} from '../../spec/support/helpers/test_utils';
 import {Appium} from './appium';
 
-describe('appium', () => {
+xdescribe('appium', () => {
   const tmpDir = path.resolve(os.tmpdir(), 'test');
   let origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   describe('getVersion', () => {
     let proc: childProcess.ChildProcess;
 
     beforeAll(() => {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     });
 
     afterAll(() => {

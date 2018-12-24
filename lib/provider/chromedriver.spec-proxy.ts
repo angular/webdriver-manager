@@ -24,7 +24,7 @@ describe('chromedriver', () => {
 
     describe('updateBinary', () => {
       beforeEach((done) => {
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
         proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
         log.debug('proxy-server: ' + proxyProc.pid);
         try {

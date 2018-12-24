@@ -14,7 +14,7 @@ describe('chromedriver', () => {
   describe('class ChromeDriver', () => {
     const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     beforeAll(() => {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     });
 
     afterAll(() => {

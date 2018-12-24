@@ -29,7 +29,7 @@ describe('binary_utils', () => {
   let proxyProc: childProcess.ChildProcess;
 
   beforeAll((done) => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     httpProc = spawnProcess('node', ['dist/spec/server/http_server.js']);
     log.debug('http-server: ' + httpProc.pid);
     proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);

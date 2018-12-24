@@ -20,7 +20,7 @@ describe('using the cli', () => {
   const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   beforeAll(() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     try {
       fs.mkdirSync(tmpDir);
     } catch (err) {
