@@ -38,6 +38,7 @@ export function addOptionsBinary(options: Options): OptionsBinary {
   }
   if (optionsBinary.server) {
     const seleniumProviderConfig: SeleniumServerProviderConfig = providerConfig;
+    seleniumProviderConfig.outDir = optionsBinary.outDir;
     seleniumProviderConfig.port = optionsBinary.server.port;
     seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsDetach;
     seleniumProviderConfig.runAsNode = optionsBinary.server.runAsNode;
