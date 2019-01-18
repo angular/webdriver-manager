@@ -43,9 +43,6 @@ export class HttpUtils {
       OptionsWithUrl {
     if (opt_proxy) {
       options.proxy = HttpUtils.resolveProxy(requestUrl, opt_proxy);
-      if (url.parse(requestUrl).protocol === 'https:') {
-        options.url = requestUrl.replace('https:', 'http:');
-      }
     }
     return options;
   }
