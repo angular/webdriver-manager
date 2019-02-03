@@ -1,8 +1,14 @@
-export interface MinimistArgs { [opt: string]: string[] }
+export interface MinimistArgs {
+  [opt: string]: string[]
+}
 
-export interface Args { [opt: string]: number|string|boolean }
+export interface Args {
+  [opt: string]: number|string|boolean
+}
 
-export interface Options { [opt: string]: Option; }
+export interface Options {
+  [opt: string]: Option;
+}
 
 export class Option {
   opt: string;

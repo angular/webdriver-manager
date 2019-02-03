@@ -19,7 +19,9 @@ export interface BinaryUrl {
 /**
  * Dictionary to map the binary's id to the binary object
  */
-export interface BinaryMap<T extends Binary> { [id: string]: T; }
+export interface BinaryMap<T extends Binary> {
+  [id: string]: T;
+}
 
 export abstract class Binary {
   static os: OS[];

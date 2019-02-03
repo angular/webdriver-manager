@@ -6,7 +6,9 @@ import {Args, MinimistArgs, Option, Options} from './options';
 /**
  * Dictionary that maps the command and the program.
  */
-export interface Programs { [cmd: string]: Program; }
+export interface Programs {
+  [cmd: string]: Program;
+}
 
 /**
  * A program has a command, a description, options, and a run method
