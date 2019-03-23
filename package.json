@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "13.0.0-beta",
+  "version": "13.0.0",
   "description": "webdriver-manager",
   "bin": {
     "webdriver-manager": "bin/webdriver-manager"
