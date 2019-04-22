@@ -49,7 +49,6 @@ describe('chromedriver', () => {
           done();
         }
         const chromeDriver = new ChromeDriver({
-          ignoreSSL: true,
           osType: 'Darwin',
           osArch: 'x64',
           outDir: tmpDir,
