@@ -17,6 +17,7 @@ export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
   runAsNode?: boolean;
   runAsDetach?: boolean;
+  logLevel?: string;
 }
 
 export class SeleniumServer extends ProviderClass implements ProviderInterface {
@@ -32,6 +33,8 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
   seleniumProcess: childProcess.ChildProcess;
   runAsNode = false;
   runAsDetach = false;
+  logLevel: string = null;
+  javaOpts: {[key: string]: string} = {};
 
   constructor(config?: SeleniumServerProviderConfig) {
     super();
@@ -48,6 +51,10 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     this.runAsDetach = this.setVar('runAsDetach', this.runAsDetach, config);
     if (this.runAsDetach) {
       this.runAsNode = true;
+    }
+    this.logLevel = this.setVar('logLevel', this.logLevel, config);
+    if (this.logLevel) {
+      this.setJavaFlag('-Dselenium.LOGGER.level', this.logLevel);
     }
   }
 
@@ -143,6 +150,17 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
       return getBinaryPathFromConfig(configFilePath, version);
     } catch (_) {
       return null;
+    }
+  }
+
+  /**
+   * Sets a java flag option.
+   * @param key The java option flag.
+   * @param value The value of the flag.
+   */
+  setJavaFlag(key: string, value: string) {
+    if (value) {
+      this.javaOpts[key] = value;
     }
   }
 

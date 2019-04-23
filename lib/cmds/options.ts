@@ -45,4 +45,6 @@ export interface Server {
   runAsDetach?: boolean;
   // Port number to start the server.
   port?: number;
+  // Set the log level when starting the server. -Dselenium.LOGGER.level
+  logLevel?: string;
 }
