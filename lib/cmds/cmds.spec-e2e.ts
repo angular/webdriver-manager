@@ -39,8 +39,8 @@ describe('using the cli', () => {
     it('should download the files', async () => {
       const argv = {
         _: ['foobar'],
-        chrome: true,
-        standalone: true,
+        chromedriver: true,
+        selenium: true,
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
@@ -70,9 +70,9 @@ describe('using the cli', () => {
     it('should start the selenium server standalone in role=node', async () => {
       const argv = {
         _: ['foobar'],
-        chrome: true,
-        standalone: true,
-        standalone_node: true,
+        chromedriver: true,
+        selenium: true,
+        selenium_node: true,
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };
@@ -104,8 +104,8 @@ describe('using the cli', () => {
     it('should start the selenium server standalone', async () => {
       const argv = {
         _: ['foobar'],
-        chrome: true,
-        standalone: true,
+        chromedriver: true,
+        selenium: true,
         out_dir: tmpDir,
         '$0': 'bin\\webdriver-manager'
       };

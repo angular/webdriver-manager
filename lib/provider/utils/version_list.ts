@@ -39,12 +39,13 @@ export interface VersionObj {
  * @param versionList The version list object.
  * @param osMatch The OS name and architecture.
  * @param version Optional field for the semver version number or latest.
- * * @returns Either a VersionObj or null.
+ * @param maxVersion Optional field to find the max version matching a value.
+ * @returns Either a VersionObj or null.
  */
 export function getVersion(
-    versionList: VersionList, osMatch: string, version?: string): VersionObj|
-    null {
-  const versionObjs = getVersionObjs(versionList, version);
+    versionList: VersionList, osMatch: string, version?: string,
+    maxVersion?: string): VersionObj| null {
+  const versionObjs = getVersionObjs(versionList, version, maxVersion);
   return getVersionObj(versionObjs, osMatch);
 }
 
@@ -55,21 +56,37 @@ export function getVersion(
  * @returns The object with paritial urls associated with the binary size.
  */
 export function getVersionObjs(
-    versionList: VersionList, version?: string): {[key: string]: VersionObj} {
+    versionList: VersionList, version?: string, maxVersion?: string
+    ): {[key: string]: VersionObj} {
   if (version && version !== 'latest') {
+    // Exact matches are easy.
     return versionList[version];
   } else {
-    let latestVersion = null;
+    // Either we want the latest or we want to match with the max version.
+    let retVersion = null;
     for (const versionKey of Object.keys(versionList)) {
-      if (!latestVersion) {
-        latestVersion = versionKey;
+      if (maxVersion) {
+        // Only find the greatest of the max version.
+        // An example:
+        //   maxVersion = 0.1 might match 0.13, 0.1, 0.14, result is 0.14.
+        //   if the user wants 0.1., then the maxVersion should be "0.1."
+        if (versionKey.startsWith(maxVersion)) {
+          if (!retVersion) {
+            retVersion = versionKey;
+          } else if (semver.gt(versionKey, retVersion)) {
+            retVersion = versionKey;
+          }
+        }
       } else {
-        if (semver.gt(versionKey, latestVersion)) {
-          latestVersion = versionKey;
+        // Always find the latest.
+        if (!retVersion) {
+          retVersion = versionKey;
+        } else if (semver.gt(versionKey, retVersion)) {
+          retVersion = versionKey;
         }
       }
     }
-    return versionList[latestVersion];
+    return versionList[retVersion];
   }
 }
 

@@ -35,6 +35,8 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
   runAsDetach = false;
   logLevel: string = null;
   javaOpts: {[key: string]: string} = {};
+  version: string = null;
+  maxVersion: string = null;
 
   constructor(config?: SeleniumServerProviderConfig) {
     super();
@@ -52,6 +54,8 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     if (this.runAsDetach) {
       this.runAsNode = true;
     }
+    this.version = this.setVar('version', this.version, config);
+    this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
     this.logLevel = this.setVar('logLevel', this.logLevel, config);
     if (this.logLevel) {
       this.setJavaFlag('-Dselenium.LOGGER.level', this.logLevel);
@@ -62,8 +66,15 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
    * Should update the cache and download, find the version to download,
    * then download that binary.
    * @param version Optional to provide the version number or latest.
+   * @param maxVersion Optional to provide the max version.
    */
-  async updateBinary(version?: string): Promise<void> {
+  async updateBinary(version?: string, maxVersion?: string): Promise<void> {
+    if (!version) {
+      version = this.version;
+    }
+    if (!maxVersion) {
+      maxVersion = this.maxVersion;
+    }
     await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
@@ -72,7 +83,7 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     const versionList = convertXmlToVersionList(
         path.resolve(this.outDir, this.cacheFileName),
         'selenium-server-standalone', versionParser, semanticVersionParser);
-    const versionObj = getVersion(versionList, '', version);
+    const versionObj = getVersion(versionList, '', version, maxVersion);
 
     const seleniumServerUrl = this.requestUrl + versionObj.url;
     const seleniumServerJar = path.resolve(this.outDir, versionObj.name);
