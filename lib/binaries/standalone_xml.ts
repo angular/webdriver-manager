@@ -39,23 +39,23 @@ export class StandaloneXml extends XmlConfigSource {
       let standaloneVersion: string = null;
       let latest = '';
       let latestVersion = '';
-      for (let item of list) {
+      // Use jar files that are not beta and not alpha versions.
+      const jarList = list.filter((i) => {
+        return i.endsWith('.jar') && !i.includes('beta') && !i.includes('alpha');
+      });
+      for (let item of jarList) {
         // Get a semantic version.
         let version = item.split('selenium-server-standalone-')[1].replace('.jar', '');
-
-        // Do not do beta versions for latest.
-        if (!version.includes('beta')) {
-          if (standaloneVersion == null) {
-            // First time: use the version found.
-            standaloneVersion = version;
-            latest = item;
-            latestVersion = version;
-          } else if (semver.gt(version, standaloneVersion)) {
-            // Get the latest.
-            standaloneVersion = version;
-            latest = item;
-            latestVersion = version;
-          }
+        if (standaloneVersion == null) {
+          // First time: use the version found.
+          standaloneVersion = version;
+          latest = item;
+          latestVersion = version;
+        } else if (semver.gt(version, standaloneVersion)) {
+          // Get the latest.
+          standaloneVersion = version;
+          latest = item;
+          latestVersion = version;
         }
       }
       return {url: Config.cdnUrls().selenium + latest, version: latestVersion};
