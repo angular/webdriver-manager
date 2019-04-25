@@ -1,3 +1,19 @@
+# 12.1.2
+
+Fixes download issues for the selenium jar file.
+
+- ([7dc17ef](https://github.com/angular/webdriver-manager/commit/7dc17ef36e93f71bc63475612e343ffb84efec0f))
+  fix(selenium): download jar files and not zip files (#371)
+
+  This fix is here because selenium now has .zip files in the .xml. This worked previously since
+  there were no .zip files and it would find a version that matched the latest jar file.
+
+  Also do not download alpha versions since we are also not downloading beta versions of the jar
+  file.
+
+  closes #370
+
+
 # 12.1.1
 
 ## Bug Fix
