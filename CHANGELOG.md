@@ -1,6 +1,29 @@
+# 12.1.3
+
+Fixes download issues for chromedriver version 74+.
+
+## Bug Fix
+
+- ([476c117](https://github.com/angular/webdriver-manager/commit/476c117ac10539634d1c8f8973aa94012ed017a4))
+  fix(chromedriver): support downloads for chromedriver beyond 2.46 (#377)
+
+  Versions of Chromdriver were versioned as 2.xx. We previously used to
+tack on a '.0' at the end to make it a semver version. This is why it
+was not downloading 74.0.3729.6. We now have to change 74.0.3729.6 to be
+a semver. We will do this by grabbing 74.0.3729 with a regex.
+
+  This should work when downloading the latest chromedriver version since
+2.46.0 < 74.0.3729. If Chromedriver releases 75 but we are still on
+Chrome 74, this will still break in this version of webdriver-manager.
+This does not prevent latest Chromedriver and latest Chrome mismatches.
+If you run into an issue where Chromedriver is mismatched with Chrome,
+use the `--versions.chrome` flag to pass in the version to download.
+
 # 12.1.2
 
 Fixes download issues for the selenium jar file.
+
+## Bug Fix
 
 - ([7dc17ef](https://github.com/angular/webdriver-manager/commit/7dc17ef36e93f71bc63475612e343ffb84efec0f))
   fix(selenium): download jar files and not zip files (#371)
