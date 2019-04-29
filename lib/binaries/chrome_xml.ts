@@ -68,25 +68,47 @@ export class ChromeXml extends XmlConfigSource {
         // Get a semantic version
         let version = item.split('/')[0];
         if (semver.valid(version) == null) {
-          version += '.0';
-          if (semver.valid(version)) {
-            // First time: use the version found.
-            if (chromedriverVersion == null) {
-              chromedriverVersion = version;
-              latest = item;
-              latestVersion = item.split('/')[0];
-            } else if (semver.gt(version, chromedriverVersion)) {
-              // After the first time, make sure the semantic version is greater.
-              chromedriverVersion = version;
-              latest = item;
-              latestVersion = item.split('/')[0];
-            } else if (version === chromedriverVersion) {
-              // If the semantic version is the same, check os arch.
-              // For 64-bit systems, prefer the 64-bit version.
-              if (this.osarch === 'x64') {
-                if (item.includes(this.getOsTypeName() + '64')) {
-                  latest = item;
-                }
+          // This supports downloading 74.0.3729.6
+          try {
+            const newRegex = /(\d+.\d+.\d+).\d+/g;
+            const exec = newRegex.exec(version);
+            if (exec) {
+              version = exec[1];
+            }
+          } catch (_) {
+            // no-op: if this does not work, use the other regex pattern.
+          }
+
+          // This supports downloading 2.46
+          try {
+            const oldRegex = /(\d+.\d+)/g;
+            const exec = oldRegex.exec(version);
+            if (exec) {
+              version = exec[1] + '.0';
+            }
+          } catch (_) {
+            // no-op: is this is not valid, do not throw here.
+          }
+
+          if (!semver.valid(version)) {
+            throw new Error('invalid Chromedriver version');
+          }
+          // First time: use the version found.
+          if (chromedriverVersion == null) {
+            chromedriverVersion = version;
+            latest = item;
+            latestVersion = item.split('/')[0];
+          } else if (semver.gt(version, chromedriverVersion)) {
+            // After the first time, make sure the semantic version is greater.
+            chromedriverVersion = version;
+            latest = item;
+            latestVersion = item.split('/')[0];
+          } else if (version === chromedriverVersion) {
+            // If the semantic version is the same, check os arch.
+            // For 64-bit systems, prefer the 64-bit version.
+            if (this.osarch === 'x64') {
+              if (item.includes(this.getOsTypeName() + '64')) {
+                latest = item;
               }
             }
           }
