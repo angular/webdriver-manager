@@ -1,3 +1,24 @@
+# 12.1.4
+
+Fixes issues introduced by 12.1.3 (--versions.chrome flag and status command did not work). Also prevents downloading version 75 using the config.json file.
+
+## Bug Fix
+
+- ([0a6ce24](https://github.com/angular/webdriver-manager/commit/0a6ce24e73ae06319bcafa472e22a2fe99d139e1))
+  fix(chromedriver): version fixes for update, status, and start (#380)
+
+  - Set the max versioning set in config.json. This will need to be updated on
+every release of chromedriver. This will "fix" chrome and chromedriver
+mismatches until Chrome 75 comes out. When it does there will have to be
+an update for this again. Possible future work would allow a user
+to set this via flag. Example --maxVersions.chrome "74."
+  - Create a generic way to get a valid version for Chromedriver. If
+presented with 2.x, change this to 2.x.0. If presented with a 74.x.x.x,
+chop off the last set of numbers and change this to 74.x.x
+    - Fixes the status command during a semver check.
+    - Fixes the update and start command when starting a specific version of
+chromedriver
+
 # 12.1.3
 
 Fixes download issues for chromedriver version 74+.
