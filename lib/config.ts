@@ -15,6 +15,7 @@ export interface ConfigFile {
   ie?: string;
   android?: string;
   appium?: string;
+  maxChrome?: string;
 }
 
 /**
@@ -94,6 +95,7 @@ export class Config {
     configVersions.ie = configFile.webdriverVersions.iedriver;
     configVersions.android = configFile.webdriverVersions.androidsdk;
     configVersions.appium = configFile.webdriverVersions.appium;
+    configVersions.maxChrome = configFile.webdriverVersions.maxChromedriver;
     return configVersions;
   }
 

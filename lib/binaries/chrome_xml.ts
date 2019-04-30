@@ -6,6 +6,8 @@ import {BinaryUrl} from './binary';
 import {XmlConfigSource} from './config_source';
 
 export class ChromeXml extends XmlConfigSource {
+  maxVersion = Config.binaryVersions().maxChrome;
+
   constructor() {
     super('chrome', Config.cdnUrls()['chrome']);
   }
@@ -66,44 +68,26 @@ export class ChromeXml extends XmlConfigSource {
       let latestVersion = '';
       for (let item of list) {
         // Get a semantic version
-        let version = item.split('/')[0];
+        const version = item.split('/')[0];
         if (semver.valid(version) == null) {
-          // This supports downloading 74.0.3729.6
-          try {
-            const newRegex = /(\d+.\d+.\d+).\d+/g;
-            const exec = newRegex.exec(version);
-            if (exec) {
-              version = exec[1];
-            }
-          } catch (_) {
-            // no-op: if this does not work, use the other regex pattern.
-          }
+          const iterVersion = getValidSemver(version);
 
-          // This supports downloading 2.46
-          try {
-            const oldRegex = /(\d+.\d+)/g;
-            const exec = oldRegex.exec(version);
-            if (exec) {
-              version = exec[1] + '.0';
-            }
-          } catch (_) {
-            // no-op: is this is not valid, do not throw here.
-          }
-
-          if (!semver.valid(version)) {
+          if (!semver.valid(iterVersion)) {
             throw new Error('invalid Chromedriver version');
           }
           // First time: use the version found.
           if (chromedriverVersion == null) {
-            chromedriverVersion = version;
+            chromedriverVersion = iterVersion;
             latest = item;
             latestVersion = item.split('/')[0];
-          } else if (semver.gt(version, chromedriverVersion)) {
+          } else if (
+              iterVersion.startsWith(this.maxVersion) &&
+              semver.gt(iterVersion, chromedriverVersion)) {
             // After the first time, make sure the semantic version is greater.
-            chromedriverVersion = version;
+            chromedriverVersion = iterVersion;
             latest = item;
             latestVersion = item.split('/')[0];
-          } else if (version === chromedriverVersion) {
+          } else if (iterVersion === chromedriverVersion) {
             // If the semantic version is the same, check os arch.
             // For 64-bit systems, prefer the 64-bit version.
             if (this.osarch === 'x64') {
@@ -123,17 +107,18 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-      let itemFound = '';
-      let specificVersion = semver.valid(inputVersion) ? inputVersion : inputVersion + '.0';
+      const specificVersion = getValidSemver(inputVersion);
 
+      let itemFound = '';
       for (let item of list) {
         // Get a semantic version.
         let version = item.split('/')[0];
         if (semver.valid(version) == null) {
-          version += '.0';
-          if (semver.valid(version)) {
+          const lookUpVersion = getValidSemver(version);
+
+          if (semver.valid(lookUpVersion)) {
             // Check to see if the specified version matches.
-            if (version === specificVersion) {
+            if (lookUpVersion === specificVersion) {
               // When item found is null, check the os arch
               // 64-bit version works OR not 64-bit version and the path does not have '64'
               if (itemFound == '') {
@@ -161,4 +146,41 @@ export class ChromeXml extends XmlConfigSource {
       }
     });
   }
+}
+
+/**
+ * Chromedriver is the only binary that does not conform to semantic versioning
+ * and either has too little number of digits or too many. To get this to be in
+ * semver, we will either add a '.0' at the end or chop off the last set of
+ * digits. This is so we can compare to find the latest and greatest.
+ *
+ * Example:
+ *   2.46 -> 2.46.0
+ *   75.0.3770.8 -> 75.0.3770
+ *
+ * @param version
+ */
+export function getValidSemver(version: string): string {
+  let lookUpVersion = '';
+  // This supports downloading 2.46
+  try {
+    const oldRegex = /(\d+.\d+)/g;
+    const exec = oldRegex.exec(version);
+    if (exec) {
+      lookUpVersion = exec[1] + '.0';
+    }
+  } catch (_) {
+    // no-op: is this is not valid, do not throw here.
+  }
+  // This supports downloading 74.0.3729.6
+  try {
+    const newRegex = /(\d+.\d+.\d+).\d+/g;
+    const exec = newRegex.exec(version);
+    if (exec) {
+      lookUpVersion = exec[1];
+    }
+  } catch (_) {
+    // no-op: if this does not work, use the other regex pattern.
+  }
+  return lookUpVersion;
 }
