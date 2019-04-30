@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as semver from 'semver';
 
 import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
+import {getValidSemver} from '../binaries/chrome_xml';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -88,8 +89,8 @@ function status(options: Options) {
     // - last: the last binary downloaded by webdriver-manager per the update-config.json
     downloaded.versions = downloaded.versions.sort((a: string, b: string): number => {
       if (!semver.valid(a)) {
-        a += '.0';
-        b += '.0';
+        a = getValidSemver(a);
+        b = getValidSemver(b);
       }
       if (semver.gt(a, b)) {
         return 1;
