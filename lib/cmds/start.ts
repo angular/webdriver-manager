@@ -23,6 +23,7 @@ let prog = new Program()
                .action(start)
                .addOption(Opts[Opt.OUT_DIR])
                .addOption(Opts[Opt.SELENIUM_PORT])
+               .addOption(opts_1.Opts[Opt.RUN_AS_NODE_FOR_HUB])
                .addOption(Opts[Opt.APPIUM_PORT])
                .addOption(Opts[Opt.AVD_PORT])
                .addOption(Opts[Opt.VERSIONS_STANDALONE])
@@ -75,6 +76,7 @@ function start(options: Options) {
   let stdio = options[Opt.QUIET].getBoolean() ? 'pipe' : 'inherit';
   let binaries = FileManager.setupBinaries();
   let seleniumPort = options[Opt.SELENIUM_PORT].getString();
+  let runAsNodeForHub = options[Opt.RUN_AS_NODE_FOR_HUB].getString();
   let appiumPort = options[Opt.APPIUM_PORT].getString();
   let avdPort = options[Opt.AVD_PORT].getNumber();
   let android = options[Opt.ANDROID].getBoolean();
@@ -226,10 +228,14 @@ function start(options: Options) {
         })
         .then(() => {
           // Add the port parameter, has to declared after the jar file
-          if (seleniumPort) {
-            args.push('-port', seleniumPort);
+          if (seleniumPort && !runAsNodeForHub) {
+              args.push('-port', seleniumPort);
           }
-
+          // Add parameters for running as a node for hub
+          if (runAsNodeForHub) {
+              args.push('-role', 'node');
+              args.push('-hub', runAsNodeForHub);
+          }
           let argsToString = '';
           for (let arg in args) {
             argsToString += ' ' + args[arg];
