@@ -4,6 +4,7 @@ import {Config} from '../config';
 
 export const OUT_DIR = 'out_dir';
 export const SELENIUM_PORT = 'seleniumPort';
+export const RUN_AS_NODE_FOR_HUB = 'runAsNodeForHub';
 export const APPIUM_PORT = 'appium-port';
 export const AVD_PORT = 'avd-port';
 export const IGNORE_SSL = 'ignore_ssl';
@@ -46,6 +47,8 @@ var opts: Options = {};
 opts[OUT_DIR] = new Option(OUT_DIR, 'Location to output/expect', 'string', Config.getSeleniumDir());
 opts[SELENIUM_PORT] =
     new Option(SELENIUM_PORT, 'Optional port for the selenium standalone server', 'string', '4444');
+opts[RUN_AS_NODE_FOR_HUB] =
+    new Option(RUN_AS_NODE_FOR_HUB, 'Run as node for hub', 'string', 'http://localhost:4444/grid/register');
 opts[APPIUM_PORT] =
     new Option(APPIUM_PORT, 'Optional port for the appium server', 'string', '4723');
 opts[AVD_PORT] = new Option(
