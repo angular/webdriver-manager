@@ -67,7 +67,7 @@ export class SeleniumServer implements ProviderInterface {
         this.runAsNode = providerConfig.runAsNode;
       }
       if (providerConfig.runAsGrid) {
-	      this.runAsGrid = providerConfig.runAsGrid;
+	this.grid_node = providerConfig.runAsGrid;
       }
       if (providerConfig.runAsDetach) {
         this.runAsDetach = providerConfig.runAsDetach;
@@ -199,11 +199,11 @@ export class SeleniumServer implements ProviderInterface {
       options.push('0');
     }
     if (this.runAsGrid) {
-	    options.push('-role');
-	    options.push('node');
+      options.push('-role');
+      options.push('node');
 	
-	    options.push('-hub');
-	    options.push(this.runAsNode);
+      options.push('-hub');
+      options.push(this.grid_node);
     }
     options.push('-port');
     options.push(this.port.toString());
