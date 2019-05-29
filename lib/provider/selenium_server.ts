@@ -15,6 +15,7 @@ const log = loglevel.getLogger('webdriver-manager');
 
 export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
+  grid_node?: string;
   runAsNode?: boolean;
   runAsGrid?: boolean;
   runAsDetach?: boolean;
@@ -67,7 +68,7 @@ export class SeleniumServer implements ProviderInterface {
         this.runAsNode = providerConfig.runAsNode;
       }
       if (providerConfig.runAsGrid) {
-	this.grid_node = providerConfig.runAsGrid;
+	        this.runAsGrid = providerConfig.runAsGrid;
       }
       if (providerConfig.runAsDetach) {
         this.runAsDetach = providerConfig.runAsDetach;
