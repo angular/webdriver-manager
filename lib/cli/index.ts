@@ -85,6 +85,11 @@ const standaloneNodeOption: yargs.Options = {
   describe: 'Start the selenium server standalone with role set to "node".',
   type: 'boolean'
 };
+const GRID_NODE = 'grid_node';
+const gridNodeOption: yargs.Options = {
+	  describe: 'Start the selenium grid with role set to "node".',
+	  type: 'string'
+};
 const VERSIONS_CHROME = 'versions.chrome';
 const versionsChromeOption: yargs.Options = {
   describe: 'The chromedriver version.',
@@ -139,6 +144,7 @@ yargs
               .option(SELENIUM_PORT, seleniumPort)
               .option(STANDALONE, standaloneOption)
               .option(STANDALONE_NODE, standaloneNodeOption)
+              .option(GRID_NODE, gridNodeOption)
               .option(VERSIONS_CHROME, versionsChromeOption)
               .option(VERSIONS_GECKO, versionsGeckoOption)
               .option(VERSIONS_IE, versionsIeOption)

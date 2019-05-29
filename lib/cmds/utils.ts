@@ -116,6 +116,7 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     options.server = {};
     options.server.name = 'selenium';
     options.server.runAsNode = argv.standalone_node as boolean;
+    options.server.runAsGrid = argv.grid_node as string;
     options.server.runAsDetach = argv.detach as boolean;
     options.server.version = versionsStandalone;
     options.server.chromeLogs = argv.chrome_logs as string;

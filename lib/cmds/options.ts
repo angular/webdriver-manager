@@ -37,6 +37,8 @@ export interface Server {
   version?: string;
   // Run as role = node option.
   runAsNode?: boolean;
+  // Run as grid node role = hub registration URI option.
+  runAsGrid?: string;
   // The relative or full path to the chrome logs file.
   chromeLogs?: string;
   // The full path to the edge driver server.
