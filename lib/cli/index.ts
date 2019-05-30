@@ -87,8 +87,8 @@ const standaloneNodeOption: yargs.Options = {
 };
 const GRID_NODE = 'grid_node';
 const gridNodeOption: yargs.Options = {
-	  describe: 'Start the selenium grid with role set to "node".',
-	  type: 'boolean'
+  describe: 'Start the selenium grid with role set to "node".',
+  type: 'boolean'
 };
 const VERSIONS_CHROME = 'versions.chrome';
 const versionsChromeOption: yargs.Options = {

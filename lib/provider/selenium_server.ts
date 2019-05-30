@@ -15,7 +15,7 @@ const log = loglevel.getLogger('webdriver-manager');
 
 export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
-  grid_node?: string;
+  gridNode?: string;
   runAsNode?: boolean;
   runAsGrid?: boolean;
   runAsDetach?: boolean;
@@ -29,7 +29,7 @@ export class SeleniumServer implements ProviderInterface {
   osArch = os.arch();
   outDir = OUT_DIR;
   port = 4444;
-  grid_node = 'http://localhost:4444/grid/register'
+  gridNode = 'http://localhost:4444/grid/register';
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
@@ -68,7 +68,7 @@ export class SeleniumServer implements ProviderInterface {
         this.runAsNode = providerConfig.runAsNode;
       }
       if (providerConfig.runAsGrid) {
-	        this.runAsGrid = providerConfig.runAsGrid;
+        this.runAsGrid = providerConfig.runAsGrid;
       }
       if (providerConfig.runAsDetach) {
         this.runAsDetach = providerConfig.runAsDetach;
@@ -202,9 +202,9 @@ export class SeleniumServer implements ProviderInterface {
     if (this.runAsGrid) {
       options.push('-role');
       options.push('node');
-	
+
       options.push('-hub');
-      options.push(this.grid_node);
+      options.push(this.gridNode);
     }
     options.push('-port');
     options.push(this.port.toString());
