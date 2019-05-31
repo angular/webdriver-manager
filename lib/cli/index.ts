@@ -85,10 +85,10 @@ const standaloneNodeOption: yargs.Options = {
   describe: 'Start the selenium server standalone with role set to "node".',
   type: 'boolean'
 };
-const GRID_NODE = 'grid_node';
+const GRID_NODE = 'gridNode';
 const gridNodeOption: yargs.Options = {
   describe: 'Start the selenium grid with role set to "node".',
-  type: 'boolean'
+  type: 'string'
 };
 const VERSIONS_CHROME = 'versions.chrome';
 const versionsChromeOption: yargs.Options = {

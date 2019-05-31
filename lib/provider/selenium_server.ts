@@ -29,7 +29,7 @@ export class SeleniumServer implements ProviderInterface {
   osArch = os.arch();
   outDir = OUT_DIR;
   port = 4444;
-  gridNode = 'http://localhost:4444/grid/register';
+  gridNode = '';
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
@@ -67,8 +67,9 @@ export class SeleniumServer implements ProviderInterface {
       if (providerConfig.runAsNode) {
         this.runAsNode = providerConfig.runAsNode;
       }
-      if (providerConfig.runAsGrid) {
-        this.runAsGrid = providerConfig.runAsGrid;
+      if (providerConfig.gridNode) {
+        this.runAsGrid = true;
+        this.gridNode = providerConfig.gridNode;
       }
       if (providerConfig.runAsDetach) {
         this.runAsDetach = providerConfig.runAsDetach;
@@ -206,8 +207,10 @@ export class SeleniumServer implements ProviderInterface {
       options.push('-hub');
       options.push(this.gridNode);
     }
-    options.push('-port');
-    options.push(this.port.toString());
+    if (!this.runAsGrid) {
+      options.push('-port');
+      options.push(this.port.toString());
+    }
 
     return options;
   }

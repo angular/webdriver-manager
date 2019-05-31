@@ -42,6 +42,7 @@ export function addOptionsBinary(options: Options): OptionsBinary {
     seleniumProviderConfig.port = optionsBinary.server.port;
     seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsDetach;
     seleniumProviderConfig.runAsNode = optionsBinary.server.runAsNode;
+    seleniumProviderConfig.gridNode = optionsBinary.server.gridNode;
     optionsBinary.server.binary = new SeleniumServer(seleniumProviderConfig);
   }
   return optionsBinary;
@@ -112,11 +113,15 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
   if (argv.iedriver as boolean) {
     options.browserDrivers.push({name: 'iedriver', version: versionsIe});
   }
+  if (argv.gridNode as string === '') {
+    console.log('Please specify a grid hub URL...');
+    process.exit();
+  }
   if (argv.standalone as boolean) {
     options.server = {};
     options.server.name = 'selenium';
     options.server.runAsNode = argv.standalone_node as boolean;
-    options.server.runAsGrid = argv.grid_node as boolean;
+    options.server.gridNode = argv.gridNode as string;
     options.server.runAsDetach = argv.detach as boolean;
     options.server.version = versionsStandalone;
     options.server.chromeLogs = argv.chrome_logs as string;
