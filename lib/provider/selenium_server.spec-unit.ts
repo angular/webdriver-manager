@@ -38,6 +38,8 @@ describe('selenium_server', () => {
       const javaArgs = '-role node ' +
           '-servlet org.openqa.grid.web.servlet.LifecycleServlet ' +
           '-registerCycle 0 -port 4444';
+      const javaGridArgs = '-role node ' +
+          '-hub ';
       const javaArgsPort = '-port 4444';
       it('should use a selenium server with no options', () => {
         spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
@@ -70,6 +72,20 @@ describe('selenium_server', () => {
             .toContain(
                 '-Dwebdriver.chrome.driver=path/to/chromedriver ' +
                 '-jar path/to/selenium-server-3.0.jar ' + javaArgs);
+      });
+
+      it('should use a selenium server with a grid node option', () => {
+        spyOn(fs, 'readFileSync').and.returnValue(configBinaries);
+        const seleniumServer = new SeleniumServer();
+        seleniumServer.runAsDetach = true;
+        seleniumServer.runAsNode = true;
+        seleniumServer.runAsGrid = true;
+        const cmd = seleniumServer.getCmdStartServer(
+            {'-Dwebdriver.chrome.driver': 'path/to/chromedriver'});
+        expect(cmd.join(' '))
+            .toContain(
+                '-Dwebdriver.chrome.driver=path/to/chromedriver ' +
+                '-jar path/to/selenium-server-3.0.jar ' + javaGridArgs);
       });
     });
 
