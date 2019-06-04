@@ -1,3 +1,7 @@
+# 12.1.5
+
+Update the max Chrome version to 75.
+
 # 12.1.4
 
 Fixes issues introduced by 12.1.3 (--versions.chrome flag and status command did not work). Also prevents downloading version 75 using the config.json file.
