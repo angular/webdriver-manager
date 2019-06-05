@@ -42,6 +42,7 @@ export function addOptionsBinary(options: Options): OptionsBinary {
     seleniumProviderConfig.port = optionsBinary.server.port;
     seleniumProviderConfig.runAsDetach = optionsBinary.server.runAsDetach;
     seleniumProviderConfig.runAsNode = optionsBinary.server.runAsNode;
+    seleniumProviderConfig.logLevel = optionsBinary.server.logLevel;
     optionsBinary.server.binary = new SeleniumServer(seleniumProviderConfig);
   }
   return optionsBinary;
@@ -121,6 +122,7 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     options.server.chromeLogs = argv.chrome_logs as string;
     options.server.edge = argv.edge as string;
     options.server.port = argv.seleniumPort as number;
+    options.server.logLevel = argv.seleniumLogLevel as string;
   }
   return options;
 }
