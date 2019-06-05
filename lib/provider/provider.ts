@@ -5,7 +5,7 @@ import * as path from 'path';
 export const OUT_DIR = path.resolve(__dirname, '..', '..', '..', 'downloads');
 
 /**
- * The provider updateBinary interface implemented by all providers.
+ * The provider interface implemented by all providers.
  */
 export interface ProviderInterface {
   cleanFiles?: () => string;
@@ -14,6 +14,34 @@ export interface ProviderInterface {
   updateBinary: (version?: string) => Promise<void>;
   seleniumFlag?: string;
   osType?: string;
+  versionConfig?: string;
+}
+
+/**
+ * The provider class with commonmethods by all providers.
+ */
+export class ProviderClass {
+  /**
+   * Setting values from either the npmrc or config object:
+   *   1. Use the default value
+   *   2. If the npmrc value exists, use the npmrc value
+   *   2. If the value is set in the config, use that instead.
+   * @param key 
+   * @param defaultValue
+   * @param providerConfig
+   * @return The value of the variable. The type needs to be fixed.
+   */
+  setVar<T>(key: string, defaultValue: T,
+    providerConfig: ProviderConfig): T {
+  let value: T = defaultValue;
+  if (process.env[`npm_config_${key}`]) {
+    value = process.env[`npm_config_${key}`] as any as T;
+  }
+  if (providerConfig && providerConfig[key]) {
+    value = providerConfig[key] as any as T;
+  }
+  return value;
+  }
 }
 
 /**
@@ -41,6 +69,8 @@ export interface ProviderConfig {
   proxy?: string;
   // Set the requests to ignore SSL (optional).
   ignoreSSL?: boolean;
+  // Allow to pass a config for the max versions to download (optional).
+  versionConfig?: string;
   // Catch all for other things.
   [key: string]: string|boolean|number;
 }
