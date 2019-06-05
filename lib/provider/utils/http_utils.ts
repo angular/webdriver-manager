@@ -82,7 +82,7 @@ export function optionsProxy(
     optProxy: string): RequestOptionsValue {
   if (optProxy) {
     options.proxy = resolveProxy(requestUrl, optProxy);
-    if (url.parse(requestUrl).protocol === 'https:') {
+    if (url.parse(options.proxy).protocol === 'http:') {
       options.url = requestUrl.replace('https:', 'http:');
     }
   }
