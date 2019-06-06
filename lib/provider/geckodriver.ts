@@ -23,6 +23,8 @@ export class GeckoDriver extends ProviderClass implements ProviderInterface {
   proxy: string = null;
   requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
   seleniumFlag = '-Dwebdriver.gecko.driver';
+  version: string = null;
+  maxVersion: string = null;
 
   constructor(config?: GeckoDriverProviderConfig) {
     super();
@@ -35,14 +37,23 @@ export class GeckoDriver extends ProviderClass implements ProviderInterface {
     this.proxy = this.setVar('proxy', this.proxy, config);
     this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
     this.oauthToken = this.setVar('oauthToken', this.oauthToken, config);
+    this.version = this.setVar('version', this.version, config);
+    this.maxVersion = this.setVar('maxVersion', this.version, config);
   }
 
   /**
    * Should update the cache and download, find the version to download,
    * then download that binary.
    * @param version Optional to provide the version number or latest.
+   * @param maxVersion Optional to provide the max version.
    */
-  async updateBinary(version?: string): Promise<void> {
+  async updateBinary(version?: string, maxVersion?: string): Promise<void> {
+    if (!version) {
+      version = this.version;
+    }
+    if (!maxVersion) {
+      maxVersion = this.maxVersion;
+    }
     await updateJson(
         this.requestUrl, {
           fileName: path.resolve(this.outDir, this.cacheFileName),
@@ -54,7 +65,8 @@ export class GeckoDriver extends ProviderClass implements ProviderInterface {
     const versionList =
         convertJsonToVersionList(path.resolve(this.outDir, this.cacheFileName));
     const versionObj =
-        getVersion(versionList, osHelper(this.osType, this.osArch), version);
+        getVersion(versionList, osHelper(this.osType, this.osArch), version,
+        maxVersion);
 
     const geckoDriverUrl = versionObj.url;
     const geckoDriverCompressed = path.resolve(this.outDir, versionObj.name);

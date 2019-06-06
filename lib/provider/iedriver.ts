@@ -18,6 +18,8 @@ export class IEDriver extends ProviderClass implements ProviderInterface {
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumFlag = '-Dwebdriver.ie.driver';
+  version: string = null;
+  maxVersion: string = null;
 
   constructor(config?: ProviderConfig) {
     super();
@@ -29,14 +31,23 @@ export class IEDriver extends ProviderClass implements ProviderInterface {
     this.outDir = this.setVar('outDir', this.outDir, config);
     this.proxy = this.setVar('proxy', this.proxy, config);
     this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
+    this.version = this.setVar('version', this.version, config);
+    this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
   }
 
   /**
    * Should update the cache and download, find the version to download,
    * then download that binary.
    * @param version Optional to provide the version number or latest.
+   * @param maxVersion Optional to provide the max version.
    */
-  async updateBinary(version?: string): Promise<void> {
+  async updateBinary(version?: string, maxVersion?: string): Promise<void> {
+    if (!version) {
+      version = this.version;
+    }
+    if (!maxVersion) {
+      maxVersion = this.maxVersion;
+    }
     await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
@@ -46,7 +57,8 @@ export class IEDriver extends ProviderClass implements ProviderInterface {
         path.resolve(this.outDir, this.cacheFileName), '.zip', versionParser,
         semanticVersionParser);
     const versionObj =
-        getVersion(versionList, osHelper(this.osType, this.osArch), version);
+        getVersion(versionList, osHelper(this.osType, this.osArch), version,
+        maxVersion);
 
     const chromeDriverUrl = this.requestUrl + versionObj.url;
     const chromeDriverZip = path.resolve(this.outDir, versionObj.name);
