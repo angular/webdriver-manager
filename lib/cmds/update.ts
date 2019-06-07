@@ -247,7 +247,11 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   // unzip the file
   logger.info(binary.name + ': unzipping ' + fileName);
   if (fileName.slice(-4) == '.zip') {
-    let zip = new AdmZip(path.resolve(outputDir, fileName));
+    try {
+      let zip = new AdmZip(path.resolve(outputDir, fileName));
+    } catch (e) {
+      throw new Error(`Invalid filename: ${path.resolve(outputDir, fileName)}`)
+    }
     zip.extractAllTo(outputDir, true);
   } else {
     // We will only ever get .tar files on linux
