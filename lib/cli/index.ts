@@ -121,6 +121,12 @@ const seleniumNodeOption: yargs.Options = {
   describe: 'Start the selenium server standalone with role set to "node".',
   type: 'boolean'
 };
+const SELENIUM_GRID_URL_ALIAS = 'standalone_grid_url';
+const SELENIUM_GRID_URL = 'selenium_grid_url';
+const seleniumGridNodeOption: yargs.Options = {
+  describe: 'Start the selenium grid with role set to "node".',
+  type: 'string'
+};
 const VERSIONS_CHROMEDRIVER_ALIAS = 'versions.chrome';
 const VERSIONS_CHROMEDRIVER = 'versions.chromedriver';
 const versionsChromedriverOption: yargs.Options = {
@@ -186,6 +192,8 @@ yargs
               .option(SELENIUM_LOG_LEVEL, seleniumLogLevelOption)
               .option(SELENIUM_NODE, seleniumNodeOption)
               .alias(SELENIUM_NODE_ALIAS, SELENIUM_NODE)
+              .option(SELENIUM_GRID_URL, seleniumGridNodeOption)
+              .alias(SELENIUM_GRID_URL_ALIAS, SELENIUM_GRID_URL)
               .option(SELENIUM_PORT, seleniumPort)
               .option(VERSIONS_CHROMEDRIVER, versionsChromedriverOption)
               .alias(VERSIONS_CHROMEDRIVER_ALIAS, VERSIONS_CHROMEDRIVER)

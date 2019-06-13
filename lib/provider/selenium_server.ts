@@ -15,7 +15,7 @@ const log = loglevel.getLogger('webdriver-manager');
 
 export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
-  gridNode?: string;
+  gridUrl?: string;
   runAsNode?: boolean;
   runAsGrid?: boolean;
   runAsDetach?: boolean;
@@ -30,7 +30,7 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
   osArch = os.arch();
   outDir = OUT_DIR;
   port = 4444;
-  gridNode = '';
+  gridUrl = '';
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
@@ -54,9 +54,13 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     this.proxy = this.setVar('proxy', this.proxy, config);
     this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
     this.runAsNode = this.setVar('runAsNode', this.runAsNode, config);
+    this.gridUrl = this.setVar('gridUrl', this.gridUrl, config);
     this.runAsDetach = this.setVar('runAsDetach', this.runAsDetach, config);
     if (this.runAsDetach) {
       this.runAsNode = true;
+    }
+    if (this.gridUrl !== '') {
+        this.runAsGrid = true;
     }
     this.version = this.setVar('version', this.version, config);
     this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
@@ -211,7 +215,7 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
       options.push('node');
 
       options.push('-hub');
-      options.push(this.gridNode);
+      options.push(this.gridUrl);
     }
     if (!this.runAsGrid) {
       options.push('-port');
