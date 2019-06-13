@@ -50,28 +50,30 @@ export function start(options: Options): Promise<number> {
  * @returns Promise starting the server with the resolved exit code.
  */
 export function startBinary(optionsBinary: OptionsBinary): Promise<number> {
-  const javaOpts: {[key: string]: string} = {};
-  for (const browserDriver of optionsBinary.browserDrivers) {
-    if (browserDriver.binary) {
-      javaOpts[browserDriver.binary.seleniumFlag] =
-          browserDriver.binary.getBinaryPath(browserDriver.version);
-    }
-  }
-
-  if (optionsBinary.server) {
+  if (optionsBinary.server && optionsBinary.server.binary) {
+    const seleniumServer = (optionsBinary.server.binary as SeleniumServer);
     if (optionsBinary.server.chromeLogs) {
       const chromeLogs =
           optionsBinary.server.chromeLogs.replace('"', '').replace('\'', '');
-      javaOpts['-Dwebdriver.chrome.logfile'] = path.resolve(chromeLogs);
+      seleniumServer.setJavaFlag('-Dwebdriver.chrome.logfile',
+        path.resolve(chromeLogs));
     }
     if (optionsBinary.server.edge) {
       const edge = optionsBinary.server.edge.replace('"', '').replace('\'', '');
-      javaOpts['-Dwebdriver.edge.driver'] = path.resolve(edge);
+      seleniumServer.setJavaFlag('-Dwebdriver.edge.driver', path.resolve(edge));
     }
-    if (optionsBinary.server.binary) {
-      return (optionsBinary.server.binary as SeleniumServer)
-          .startServer(javaOpts, optionsBinary.server.version);
+    if (optionsBinary.server.logLevel) {
+      const logLevel = optionsBinary.server.logLevel;
+      seleniumServer.setJavaFlag('-Dselenium.LOGGER.level', logLevel);
     }
+    for (const browserDriver of optionsBinary.browserDrivers) {
+      if (browserDriver.binary) {
+        seleniumServer.setJavaFlag(browserDriver.binary.seleniumFlag,
+          browserDriver.binary.getBinaryPath(browserDriver.version));
+      }
+    }
+    return seleniumServer.startServer(seleniumServer.javaOpts,
+      optionsBinary.server.version);
   }
   return Promise.reject('Could not start the server');
 }

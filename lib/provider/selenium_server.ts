@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as request from 'request';
 
-import {OUT_DIR, ProviderConfig, ProviderInterface,} from './provider';
+import {OUT_DIR, ProviderClass, ProviderConfig, ProviderInterface} from './provider';
 import {convertXmlToVersionList, updateXml} from './utils/cloud_storage_xml';
 import {generateConfigFile, getBinaryPathFromConfig, removeFiles,} from './utils/file_utils';
 import {curlCommand, initOptions, requestBinary} from './utils/http_utils';
@@ -17,9 +17,10 @@ export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
   runAsNode?: boolean;
   runAsDetach?: boolean;
+  logLevel?: string;
 }
 
-export class SeleniumServer implements ProviderInterface {
+export class SeleniumServer extends ProviderClass implements ProviderInterface {
   cacheFileName = 'selenium-server.xml';
   configFileName = 'selenium-server.config.json';
   ignoreSSL = false;
@@ -32,41 +33,32 @@ export class SeleniumServer implements ProviderInterface {
   seleniumProcess: childProcess.ChildProcess;
   runAsNode = false;
   runAsDetach = false;
+  logLevel: string = null;
+  javaOpts: {[key: string]: string} = {};
+  version: string = null;
+  maxVersion: string = null;
 
-  constructor(providerConfig?: SeleniumServerProviderConfig) {
-    if (providerConfig) {
-      if (providerConfig.cacheFileName) {
-        this.cacheFileName = providerConfig.cacheFileName;
-      }
-      if (providerConfig.configFileName) {
-        this.configFileName = providerConfig.configFileName;
-      }
-      this.ignoreSSL = providerConfig.ignoreSSL;
-      if (providerConfig.osArch) {
-        this.osArch = providerConfig.osArch;
-      }
-      if (providerConfig.osType) {
-        this.osType = providerConfig.osType;
-      }
-      if (providerConfig.outDir) {
-        this.outDir = providerConfig.outDir;
-      }
-      if (providerConfig.port) {
-        this.port = providerConfig.port;
-      }
-      if (providerConfig.proxy) {
-        this.proxy = providerConfig.proxy;
-      }
-      if (providerConfig.requestUrl) {
-        this.requestUrl = providerConfig.requestUrl;
-      }
-      if (providerConfig.runAsNode) {
-        this.runAsNode = providerConfig.runAsNode;
-      }
-      if (providerConfig.runAsDetach) {
-        this.runAsDetach = providerConfig.runAsDetach;
-        this.runAsNode = true;
-      }
+  constructor(config?: SeleniumServerProviderConfig) {
+    super();
+    this.cacheFileName = this.setVar('cacheFileName', this.cacheFileName, config);
+    this.configFileName = this.setVar('configFileName', this.configFileName, config);
+    this.ignoreSSL = this.setVar('ignoreSSL', this.ignoreSSL, config);
+    this.osArch = this.setVar('osArch', this.osArch, config);
+    this.osType = this.setVar('osType', this.osType, config);
+    this.outDir = this.setVar('outDir', this.outDir, config);
+    this.port = this.setVar('port', this.port, config);
+    this.proxy = this.setVar('proxy', this.proxy, config);
+    this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
+    this.runAsNode = this.setVar('runAsNode', this.runAsNode, config);
+    this.runAsDetach = this.setVar('runAsDetach', this.runAsDetach, config);
+    if (this.runAsDetach) {
+      this.runAsNode = true;
+    }
+    this.version = this.setVar('version', this.version, config);
+    this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
+    this.logLevel = this.setVar('logLevel', this.logLevel, config);
+    if (this.logLevel) {
+      this.setJavaFlag('-Dselenium.LOGGER.level', this.logLevel);
     }
   }
 
@@ -74,8 +66,15 @@ export class SeleniumServer implements ProviderInterface {
    * Should update the cache and download, find the version to download,
    * then download that binary.
    * @param version Optional to provide the version number or latest.
+   * @param maxVersion Optional to provide the max version.
    */
-  async updateBinary(version?: string): Promise<void> {
+  async updateBinary(version?: string, maxVersion?: string): Promise<void> {
+    if (!version) {
+      version = this.version;
+    }
+    if (!maxVersion) {
+      maxVersion = this.maxVersion;
+    }
     await updateXml(this.requestUrl, {
       fileName: path.resolve(this.outDir, this.cacheFileName),
       ignoreSSL: this.ignoreSSL,
@@ -84,7 +83,7 @@ export class SeleniumServer implements ProviderInterface {
     const versionList = convertXmlToVersionList(
         path.resolve(this.outDir, this.cacheFileName),
         'selenium-server-standalone', versionParser, semanticVersionParser);
-    const versionObj = getVersion(versionList, '', version);
+    const versionObj = getVersion(versionList, '', version, maxVersion);
 
     const seleniumServerUrl = this.requestUrl + versionObj.url;
     const seleniumServerJar = path.resolve(this.outDir, versionObj.name);
@@ -162,6 +161,17 @@ export class SeleniumServer implements ProviderInterface {
       return getBinaryPathFromConfig(configFilePath, version);
     } catch (_) {
       return null;
+    }
+  }
+
+  /**
+   * Sets a java flag option.
+   * @param key The java option flag.
+   * @param value The value of the flag.
+   */
+  setJavaFlag(key: string, value: string) {
+    if (value) {
+      this.javaOpts[key] = value;
     }
   }
 
