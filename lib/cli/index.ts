@@ -18,6 +18,12 @@ const chromedriverLogsOption: yargs.Options = {
   describe: 'File path to chrome logs.',
   type: 'string'
 };
+const CHROMIUM = 'chromium';
+const chromiumOptions: yargs.Options = {
+  describe: 'Download chromium.',
+  default: false,
+  type: 'boolean'
+};
 const DETACH = 'detach';
 const detachOption: yargs.Options = {
   describe: 'Once the selenium server is up and running, return ' +
@@ -66,6 +72,11 @@ const MAX_VERSIONS_CHROMEDRIVER_ALIAS = 'max_versions.chrome';
 const MAX_VERSIONS_CHROMEDRIVER = 'max_versions.chromedriver';
 const maxVersionsChromedriverOption: yargs.Options = {
   describe: 'The chromedriver max version used only for update.',
+  type: 'string'
+};
+const MAX_VERSIONS_CHROMIUM = 'max_versions.chromium';
+const maxVersionsChromiumOptions: yargs.Options = {
+  describe: 'The chromium max version used only for update.',
   type: 'string'
 };
 const MAX_VERSIONS_GECKODRIVER_ALIAS = 'max_versions.gecko';
@@ -214,6 +225,7 @@ yargs
           return yargs.option(OUT_DIR, outDirOption)
               .option(CHROMEDRIVER, chromedriverOption)
               .alias(CHROMEDRIVER_ALIAS, CHROMEDRIVER)
+              .option(CHROMIUM, chromiumOptions)
               .option(GECKODRIVER, geckodriverOption)
               .alias(GECKODRIVER_ALIAS, GECKODRIVER)
               .option(GITHUB_TOKEN, githubTokenOption)
@@ -223,11 +235,13 @@ yargs
               .option(LOG_LEVEL, logLevelOption)
               .option(MAX_VERSIONS_CHROMEDRIVER, maxVersionsChromedriverOption)
               .alias(MAX_VERSIONS_CHROMEDRIVER_ALIAS, MAX_VERSIONS_CHROMEDRIVER)
+              .option(MAX_VERSIONS_CHROMIUM, maxVersionsChromiumOptions)
               .option(MAX_VERSIONS_GECKODRIVER, maxVersionsGeckodriverOption)
               .alias(MAX_VERSIONS_GECKODRIVER_ALIAS, MAX_VERSIONS_GECKODRIVER)
               .option(MAX_VERSIONS_IEDRIVER, maxVersionsIedriverOption)
               .alias(MAX_VERSIONS_IEDRIVER_ALIAS, MAX_VERSIONS_IEDRIVER)
               .option(MAX_VERSIONS_SELENIUM, maxVersionsSeleniumOption)
+              .alias(MAX_VERSIONS_SELENIUM_ALIAS, MAX_VERSIONS_SELENIUM)
               .option(OUT_DIR, outDirOption)
               .option(PROXY, proxyOption)
               .option(SELENIUM, seleniumOption)

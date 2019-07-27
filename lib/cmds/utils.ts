@@ -7,6 +7,7 @@ import {SeleniumServer, SeleniumServerProviderConfig} from '../provider/selenium
 
 import {BrowserDriver, BrowserDriverName, Options} from './options';
 import {OptionsBinary} from './options_binary';
+import { Chromium } from '../provider/chromium';
 
 /**
  * Converts an options object into an options binary object.
@@ -27,6 +28,8 @@ export function addOptionsBinary(options: Options): OptionsBinary {
     for (const browserDriver of optionsBinary.browserDrivers) {
       if (browserDriver.name === 'chromedriver') {
         browserDriver.binary = new ChromeDriver(providerConfig);
+      } else if (browserDriver.name === 'chromium') {
+        browserDriver.binary = new Chromium(providerConfig);
       } else if (browserDriver.name === 'geckodriver') {
         const geckoProviderConfig = providerConfig;
         geckoProviderConfig.oauthToken = optionsBinary.githubToken;
@@ -57,6 +60,7 @@ export function convertArgs2AllOptions(argv: yargs.Arguments): Options {
   return {
     browserDrivers: [
       {name: 'chromedriver'},
+      {name: 'chromium'},
       {name: 'geckodriver'},
       {name: 'iedriver'}
     ],
@@ -82,6 +86,9 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
 
   if (argv['chromedriver'] as boolean) {
     setVersions('chromedriver', argv, options.browserDrivers);
+  }
+  if (argv['chromium'] as boolean) {
+    setVersions('chromium', argv, options.browserDrivers);
   }
   if (argv['geckodriver'] as boolean) {
     setVersions('geckodriver', argv, options.browserDrivers);

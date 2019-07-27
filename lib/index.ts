@@ -13,6 +13,7 @@ export {start} from './cmds/start';
 export {status} from './cmds/status';
 export {update} from './cmds/update';
 export {ChromeDriver} from './provider/chromedriver';
+export {Chromium} from './provider/chromium';
 export {GeckoDriver} from './provider/geckodriver';
 export {IEDriver} from './provider/iedriver';
 export {ProviderConfig, ProviderInterface} from './provider/provider';

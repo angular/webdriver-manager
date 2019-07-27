@@ -16,7 +16,8 @@ export interface Options {
   githubToken?: string;
 }
 
-export type BrowserDriverName = 'chromedriver'|'geckodriver'|'iedriver';
+export type BrowserDriverName =
+  'chromedriver'|'geckodriver'|'iedriver'|'chromium';
 
 /**
  * Contains information about a browser driver.
