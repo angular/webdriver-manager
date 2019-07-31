@@ -1,3 +1,7 @@
+# 12.1.6
+
+Update the max Chrome version to 76.
+
 # 12.1.5
 
 Update the max Chrome version to 75.

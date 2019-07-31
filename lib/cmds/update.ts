@@ -249,10 +249,10 @@ function unzip<T extends Binary>(binary: T, outputDir: string, fileName: string)
   if (fileName.slice(-4) == '.zip') {
     try {
       let zip = new AdmZip(path.resolve(outputDir, fileName));
+      zip.extractAllTo(outputDir, true);
     } catch (e) {
       throw new Error(`Invalid filename: ${path.resolve(outputDir, fileName)}`)
     }
-    zip.extractAllTo(outputDir, true);
   } else {
     // We will only ever get .tar files on linux
     child_process.spawnSync('tar', ['zxvf', path.resolve(outputDir, fileName), '-C', outputDir]);
