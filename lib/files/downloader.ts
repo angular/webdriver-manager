@@ -103,7 +103,7 @@ export class Downloader {
              });
            })
         .catch(error => {
-          logger.error((error as any).msg);
+          logger.error((error as any).msg || (error as any).message);
         });
   }
 }

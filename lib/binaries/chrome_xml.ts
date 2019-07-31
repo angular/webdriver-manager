@@ -108,7 +108,9 @@ export class ChromeXml extends XmlConfigSource {
   private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
       const specificVersion = getValidSemver(inputVersion);
-
+      if (specificVersion === "") {
+        throw new Error(`version ${inputVersion} ChromeDriver does not exist`)
+      }
       let itemFound = '';
       for (let item of list) {
         // Get a semantic version.
