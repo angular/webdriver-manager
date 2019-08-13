@@ -2,7 +2,8 @@
 
 * [Use as a dependency](#use-as-a-dependency)
 * [Use as a command line interface](#use-as-a-command-line-interface)
-* [The command line interface help commands](#the-command-line-interface-help-commands)
+* [Command line interface --help commands](#command-line-interface---help-commands)
+* [Older versions of webdriver-manager](#older-versions-of-webdriver-manager)
 * [Environment variables](docs/env_vars.md)
 
 
@@ -81,7 +82,7 @@ you should pin that ChromeDriver version to be
 downloaded: `webdriver-manager update --versions.chrome=73.0.3683.68`.
 To find out the latest version, check out http://chromedriver.chromium.org/ .
 
-## The command line interface help commands
+## Command line interface --help commands
 
 To get a list of commands for webdriver-manager, use the help flag.
 
@@ -130,3 +131,18 @@ Options:
   --versions.ie          The ie driver version.                         [string]
   --versions.standalone  The selenium server standalone version.        [string]
 ```
+
+## Older versions of webdriver-manager
+
+NOTE: It is recommended to use the latest since it will have improvements and bug
+fixes.
+
+If you are running versions 10 - 12, see the
+[Legacy branch](https://github.com/angular/webdriver-manager/tree/legacy).
+Please also see the [CHANGELOG.md](CHANGELOG.md) since there have been many bug
+fixes and it might be a good idea to upgrade to the latest.
+
+If you are running versions 9 or lower, reference
+[pose/webdriver-manager](https://github.com/pose/webdriver-manager). If there
+are features that existed in version 9 and lower, please open up an issue with
+the missing feature or a create a pull request.
