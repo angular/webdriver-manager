@@ -15,7 +15,9 @@ const log = loglevel.getLogger('webdriver-manager');
 
 export interface SeleniumServerProviderConfig extends ProviderConfig {
   port?: number;
+  gridUrl?: string;
   runAsNode?: boolean;
+  runAsGrid?: boolean;
   runAsDetach?: boolean;
   logLevel?: string;
 }
@@ -28,10 +30,12 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
   osArch = os.arch();
   outDir = OUT_DIR;
   port = 4444;
+  gridUrl = '';
   proxy: string = null;
   requestUrl = 'https://selenium-release.storage.googleapis.com/';
   seleniumProcess: childProcess.ChildProcess;
   runAsNode = false;
+  runAsGrid = false;
   runAsDetach = false;
   logLevel: string = null;
   javaOpts: {[key: string]: string} = {};
@@ -50,9 +54,13 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     this.proxy = this.setVar('proxy', this.proxy, config);
     this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
     this.runAsNode = this.setVar('runAsNode', this.runAsNode, config);
+    this.gridUrl = this.setVar('gridUrl', this.gridUrl, config);
     this.runAsDetach = this.setVar('runAsDetach', this.runAsDetach, config);
     if (this.runAsDetach) {
       this.runAsNode = true;
+    }
+    if (this.gridUrl !== '') {
+        this.runAsGrid = true;
     }
     this.version = this.setVar('version', this.version, config);
     this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
@@ -192,7 +200,7 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
     options.push('-jar');
     options.push(jarFile);
 
-    if (this.runAsNode) {
+    if (this.runAsNode && !this.runAsGrid) {
       options.push('-role');
       options.push('node');
 
@@ -202,8 +210,17 @@ export class SeleniumServer extends ProviderClass implements ProviderInterface {
       options.push('-registerCycle');
       options.push('0');
     }
-    options.push('-port');
-    options.push(this.port.toString());
+    if (this.runAsGrid) {
+      options.push('-role');
+      options.push('node');
+
+      options.push('-hub');
+      options.push(this.gridUrl);
+    }
+    if (!this.runAsGrid) {
+      options.push('-port');
+      options.push(this.port.toString());
+    }
 
     return options;
   }
