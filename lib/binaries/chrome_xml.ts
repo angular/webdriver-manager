@@ -175,11 +175,12 @@ export function getValidSemver(version: string): string {
     // no-op: is this is not valid, do not throw here.
   }
   // This supports downloading 74.0.3729.6
+  // Removing the 0 after 74, to keep patch version of webdriver
   try {
-    const newRegex = /(\d+.\d+.\d+).\d+/g;
+    const newRegex = /(\d+.)\d+.(\d+.\d+)/g;
     const exec = newRegex.exec(version);
     if (exec) {
-      lookUpVersion = exec[1];
+      lookUpVersion = exec[1] + exec[2];
     }
   } catch (_) {
     // no-op: if this does not work, use the other regex pattern.
