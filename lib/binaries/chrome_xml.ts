@@ -63,71 +63,70 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-        let chromedriverVersion: string = null;
-        // To support 4-number versions (e.g. 76.0.3809.68)
-        let chromedriverPatchVersion: string = null;
-        let latest = '';
-        let latestVersion = '';
-        for (let item of list) {
-          // Get a semantic version
-          const version = item.split('/')[0];
-          const isLong = version.split('.').length === 4;
+      let chromedriverVersion: string = null;
+      // To support 4-number versions (e.g. 76.0.3809.68)
+      let chromedriverPatchVersion: string = null;
+      let latest = '';
+      let latestVersion = '';
+      for (let item of list) {
+        // Get a semantic version
+        const version = item.split('/')[0];
+        const isLong = version.split('.').length === 4;
 
-          if (semver.valid(version) == null) {
-            let iterVersion;
-            let iterPatchVersion;
-            if (!isLong) {
-              iterVersion = getValidSemver(version);
-            } else {
-              // At first check first 3 numbers of version (for e.g. 76.0.3809.68)
-              iterVersion = getValidSemver(version.split('.').slice(0, 3).join('.'));
-              iterPatchVersion = getValidSemver(version.split('.').slice(1, 4).join('.'));
-            }
+        if (semver.valid(version) == null) {
+          let iterVersion;
+          let iterPatchVersion;
+          if (!isLong) {
+            iterVersion = getValidSemver(version);
+          } else {
+            // At first check first 3 numbers of version (for e.g. 76.0.3809.68)
+            iterVersion = getValidSemver(version.split('.').slice(0, 3).join('.'));
+            iterPatchVersion = getValidSemver(version.split('.').slice(1, 4).join('.'));
+          }
 
-            if (!semver.valid(iterVersion)) {
-              throw new Error('invalid Chromedriver version');
-            }
-            // First time: use the version found.
-            if (chromedriverVersion == null) {
-              chromedriverVersion = iterVersion;
-              latest = item;
-              latestVersion = item.split('/')[0];
-            } else if (
+          if (!semver.valid(iterVersion)) {
+            throw new Error('invalid Chromedriver version');
+          }
+          // First time: use the version found.
+          if (chromedriverVersion == null) {
+            chromedriverVersion = iterVersion;
+            latest = item;
+            latestVersion = item.split('/')[0];
+          } else if (
               iterVersion.startsWith(this.maxVersion) &&
               semver.gt(iterVersion, chromedriverVersion)) {
-              // After the first time, make sure the semantic version is greater.
-              chromedriverVersion = iterVersion;
-              latest = item;
-              latestVersion = item.split('/')[0];
-            } else if (iterVersion === chromedriverVersion) {
-              if (isLong && iterPatchVersion != chromedriverPatchVersion)
-              // Now check last 3 numbers of version to include patch (for e.g. 76.0.3809.68)
-              {
-                if (chromedriverPatchVersion == null) {
-                  chromedriverPatchVersion = iterPatchVersion;
+            // After the first time, make sure the semantic version is greater.
+            chromedriverVersion = iterVersion;
+            latest = item;
+            latestVersion = item.split('/')[0];
+          } else if (iterVersion === chromedriverVersion) {
+            if (isLong && iterPatchVersion != chromedriverPatchVersion)
+            // Now check last 3 numbers of version to include patch (for e.g. 76.0.3809.68)
+            {
+              if (chromedriverPatchVersion == null) {
+                chromedriverPatchVersion = iterPatchVersion;
+                latest = item;
+                latestVersion = item.split('/')[0];
+              } else if (semver.gt(iterPatchVersion, chromedriverPatchVersion)) {
+                // After the first time, make sure the semantic version is greater.
+                chromedriverPatchVersion = iterPatchVersion;
+                latest = item;
+                latestVersion = item.split('/')[0];
+              }
+            } else {
+              // If the semantic version is the same, check os arch.
+              // For 64-bit systems, prefer the 64-bit version.
+              if (this.osarch === 'x64') {
+                if (item.includes(this.getOsTypeName() + '64')) {
                   latest = item;
-                  latestVersion = item.split('/')[0];
-                } else if (semver.gt(iterPatchVersion, chromedriverPatchVersion)) {
-                  // After the first time, make sure the semantic version is greater.
-                  chromedriverPatchVersion = iterPatchVersion;
-                  latest = item;
-                  latestVersion = item.split('/')[0];
-                }
-              } else {
-                // If the semantic version is the same, check os arch.
-                // For 64-bit systems, prefer the 64-bit version.
-                if (this.osarch === 'x64') {
-                  if (item.includes(this.getOsTypeName() + '64')) {
-                    latest = item;
-                  }
                 }
               }
             }
           }
         }
-        return {url: Config.cdnUrls().chrome + latest, version: latestVersion};
       }
-    );
+      return {url: Config.cdnUrls().chrome + latest, version: latestVersion};
+    });
   }
 
   /**
@@ -135,7 +134,6 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-
       const isLong = inputVersion.split('.').length === 4;
       let itemFound = '';
 
@@ -157,7 +155,7 @@ export class ChromeXml extends XmlConfigSource {
                 // 64-bit version works OR not 64-bit version and the path does not have '64'
                 if (itemFound == '') {
                   if (this.osarch === 'x64' ||
-                    (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
+                      (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
                     itemFound = item;
                   }
 
@@ -200,7 +198,7 @@ export class ChromeXml extends XmlConfigSource {
                 // 64-bit version works OR not 64-bit version and the path does not have '64'
                 if (itemFound == '') {
                   if (this.osarch === 'x64' ||
-                    (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
+                      (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
                     itemFound = item;
                   }
                 } else if (this.osarch === 'x64') {
