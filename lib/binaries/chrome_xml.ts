@@ -81,8 +81,8 @@ export class ChromeXml extends XmlConfigSource {
             latest = item;
             latestVersion = item.split('/')[0];
           } else if (
-              iterVersion.startsWith(this.maxVersion) &&
-              semver.gt(iterVersion, chromedriverVersion)) {
+            iterVersion.startsWith(this.maxVersion) &&
+            semver.gt(iterVersion, chromedriverVersion)) {
             // After the first time, make sure the semantic version is greater.
             chromedriverVersion = iterVersion;
             latest = item;
@@ -107,34 +107,78 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
-      const specificVersion = getValidSemver(inputVersion);
-      if (specificVersion === '') {
-        throw new Error(`version ${inputVersion} ChromeDriver does not exist`)
-      }
+
+      const isLong = inputVersion.split('.').length === 4;
       let itemFound = '';
-      for (let item of list) {
-        // Get a semantic version.
-        let version = item.split('/')[0];
-        if (semver.valid(version) == null) {
-          const lookUpVersion = getValidSemver(version);
 
-          if (semver.valid(lookUpVersion)) {
-            // Check to see if the specified version matches.
-            if (lookUpVersion === specificVersion) {
-              // When item found is null, check the os arch
-              // 64-bit version works OR not 64-bit version and the path does not have '64'
-              if (itemFound == '') {
-                if (this.osarch === 'x64' ||
+      if (!isLong) {
+        const specificVersion = getValidSemver(inputVersion);
+        if (specificVersion === '') {
+          throw new Error(`version ${inputVersion} ChromeDriver does not exist`)
+        }
+        for (let item of list) {
+          // Get a semantic version.
+          let version = item.split('/')[0];
+          if (semver.valid(version) == null) {
+            const lookUpVersion = getValidSemver(version);
+
+            if (semver.valid(lookUpVersion)) {
+              // Check to see if the specified version matches.
+              if (lookUpVersion === specificVersion) {
+                // When item found is null, check the os arch
+                // 64-bit version works OR not 64-bit version and the path does not have '64'
+                if (itemFound == '') {
+                  if (this.osarch === 'x64' ||
                     (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
-                  itemFound = item;
-                }
+                    itemFound = item;
+                  }
 
+                }
+                // If the semantic version is the same, check os arch.
+                // For 64-bit systems, prefer the 64-bit version.
+                else if (this.osarch === 'x64') {
+                  if (item.includes(this.getOsTypeName() + '64')) {
+                    itemFound = item;
+                  }
+                }
               }
-              // If the semantic version is the same, check os arch.
-              // For 64-bit systems, prefer the 64-bit version.
-              else if (this.osarch === 'x64') {
-                if (item.includes(this.getOsTypeName() + '64')) {
-                  itemFound = item;
+            }
+          }
+        }
+      } else {
+        // Splitting to two semver objects because of clunky chromedriver versioning
+        // Supports e.g. 76.0.3809.68 while not ignoring the last patch number
+        const inputVersionPart1 = inputVersion.split('.').slice(0, 3).join('.');
+        const inputVersionPart2 = inputVersion.split('.').slice(1, 4).join('.');
+
+        const specificVersion1 = getValidSemver(inputVersionPart1);
+        const specificVersion2 = getValidSemver(inputVersionPart2);
+        if (specificVersion1 === '' || specificVersion2 === '') {
+          throw new Error(`version ${inputVersion} ChromeDriver does not exist`);
+        }
+
+        for (let item of list) {
+          // Get a semantic version.
+          let version = item.split('/')[0];
+          if (semver.valid(version) == null) {
+            const versionPt1 = version.split('.').slice(0, 3).join('.');
+            const versionPt2 = version.split('.').slice(1, 4).join('.');
+            const lookUpVersion1 = getValidSemver(versionPt1);
+            const lookUpVersion2 = getValidSemver(versionPt2);
+            if (semver.valid(lookUpVersion1) && semver.valid(lookUpVersion2)) {
+              // Check to see if the specified version matches.
+              if (lookUpVersion1 === specificVersion1 && lookUpVersion2 === specificVersion2) {
+                // When item found is null, check the os arch
+                // 64-bit version works OR not 64-bit version and the path does not have '64'
+                if (itemFound == '') {
+                  if (this.osarch === 'x64' ||
+                    (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
+                    itemFound = item;
+                  }
+                } else if (this.osarch === 'x64') {
+                  if (item.includes(this.getOsTypeName() + '64')) {
+                    itemFound = item;
+                  }
                 }
               }
             }
@@ -175,12 +219,11 @@ export function getValidSemver(version: string): string {
     // no-op: is this is not valid, do not throw here.
   }
   // This supports downloading 74.0.3729.6
-  // Removing the 0 after 74, to keep patch version of webdriver
   try {
-    const newRegex = /(\d+.)\d+.(\d+.\d+)/g;
+    const newRegex = /(\d+.\d+.\d+)/g;
     const exec = newRegex.exec(version);
     if (exec) {
-      lookUpVersion = exec[1] + exec[2];
+      lookUpVersion = exec[1];
     }
   } catch (_) {
     // no-op: if this does not work, use the other regex pattern.

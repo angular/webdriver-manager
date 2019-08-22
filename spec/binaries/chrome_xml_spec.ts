@@ -66,4 +66,26 @@ describe('chrome xml reader', () => {
       done();
     });
   });
+
+  it('should get 76.0.3809.68 version', (done) => {
+    let chromeXml = new ChromeXml();
+    chromeXml.out_dir = out_dir;
+    chromeXml.ostype = 'Windows_NT';
+    chromeXml.osarch = 'x64';
+    chromeXml.getUrl('76.0.3809.68').then((binaryUrl) => {
+      expect(binaryUrl.url).toContain('76.0.3809.68/chromedriver_win32.zip');
+      done();
+    });
+  });
+
+  it('should get 76.0.3809.12 version', (done) => {
+    let chromeXml = new ChromeXml();
+    chromeXml.out_dir = out_dir;
+    chromeXml.ostype = 'Windows_NT';
+    chromeXml.osarch = 'x64';
+    chromeXml.getUrl('76.0.3809.12').then((binaryUrl) => {
+      expect(binaryUrl.url).toContain('76.0.3809.12/chromedriver_win32.zip');
+      done();
+    });
+  });
 });
