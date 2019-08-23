@@ -119,16 +119,24 @@ function update(options: Options): Promise<void> {
 
   // setup versions for binaries
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
-  binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
-  if (options[Opt.VERSIONS_IE]) {
+  if (options[Opt.VERSIONS_STANDALONE]) {
+    binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
+  }
+  if (options[Opt.VERSIONS_CHROME]) {
+    binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  }
+  if (options[Opt.VERSIONS_IE] && binaries[IEDriver.id]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
   if (options[Opt.VERSIONS_GECKO]) {
     binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
   }
-  binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
-  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  if (options[Opt.VERSIONS_ANDROID]) {
+    binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
+  }
+  if (options[Opt.VERSIONS_APPIUM]) {
+    binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+  }
 
   // if the file has not been completely downloaded, download it
   // else if the file has already been downloaded, unzip the file, rename it, and give it
