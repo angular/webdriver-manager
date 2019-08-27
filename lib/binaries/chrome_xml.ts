@@ -5,6 +5,8 @@ import {Config} from '../config';
 import {BinaryUrl} from './binary';
 import {XmlConfigSource} from './config_source';
 
+import {request} from '../utils';
+
 export class ChromeXml extends XmlConfigSource {
   maxVersion = Config.binaryVersions().maxChrome;
 
@@ -62,43 +64,11 @@ export class ChromeXml extends XmlConfigSource {
    * Gets the latest item from the XML.
    */
   private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
-    return this.getVersionList().then(list => {
-      let chromedriverVersion: string = null;
-      let latest = '';
-      let latestVersion = '';
-      for (let item of list) {
-        // Get a semantic version
-        const version = item.split('/')[0];
-        if (semver.valid(version) == null) {
-          const iterVersion = getValidSemver(version);
-
-          if (!semver.valid(iterVersion)) {
-            throw new Error('invalid Chromedriver version');
-          }
-          // First time: use the version found.
-          if (chromedriverVersion == null) {
-            chromedriverVersion = iterVersion;
-            latest = item;
-            latestVersion = item.split('/')[0];
-          } else if (
-              iterVersion.startsWith(this.maxVersion) &&
-              semver.gt(iterVersion, chromedriverVersion)) {
-            // After the first time, make sure the semantic version is greater.
-            chromedriverVersion = iterVersion;
-            latest = item;
-            latestVersion = item.split('/')[0];
-          } else if (iterVersion === chromedriverVersion) {
-            // If the semantic version is the same, check os arch.
-            // For 64-bit systems, prefer the 64-bit version.
-            if (this.osarch === 'x64') {
-              if (item.includes(this.getOsTypeName() + '64')) {
-                latest = item;
-              }
-            }
-          }
-        }
-      }
-      return {url: Config.cdnUrls().chrome + latest, version: latestVersion};
+    const latestReleaseUrl = 
+      'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_';
+    const downloadUrlVersion = `${latestReleaseUrl}${this.maxVersion}`;
+    return request('GET', '80', downloadUrlVersion).then(latestVersion => {
+      return this.getSpecificChromeDriverVersion(latestVersion);
     });
   }
 
