@@ -2,7 +2,7 @@ import * as semver from 'semver';
 import {Config} from '../config';
 import {BinaryUrl} from './binary';
 import {XmlConfigSource} from './config_source';
-import {request} from '../utils';
+import {requestBody} from "../http_utils";
 
 export class ChromeXml extends XmlConfigSource {
   maxVersion = Config.binaryVersions().maxChrome;
@@ -64,7 +64,7 @@ export class ChromeXml extends XmlConfigSource {
     const latestReleaseUrl = 
       'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_';
     const downloadUrlVersion = `${latestReleaseUrl}${this.maxVersion}`;
-    return request('GET', '80', downloadUrlVersion).then(latestVersion => {
+    return requestBody(downloadUrlVersion).then(latestVersion => {
       return this.getSpecificChromeDriverVersion(latestVersion);
     });
   }
