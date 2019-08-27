@@ -2,9 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 
-import {Config} from '../../lib/config';
 import {Downloader} from '../../lib/files';
-import {HttpUtils} from '../../lib/http_utils';
 
 describe('downloader', () => {
   describe('get file', () => {

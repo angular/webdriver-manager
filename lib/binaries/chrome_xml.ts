@@ -1,10 +1,7 @@
 import * as semver from 'semver';
-
 import {Config} from '../config';
-
 import {BinaryUrl} from './binary';
 import {XmlConfigSource} from './config_source';
-
 import {request} from '../utils';
 
 export class ChromeXml extends XmlConfigSource {

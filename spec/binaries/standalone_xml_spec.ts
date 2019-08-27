@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import {StandaloneXml} from '../../lib/binaries/standalone_xml';
-import {Config} from '../../lib/config';
 
 describe('standalone xml reader', () => {
   let out_dir = path.resolve('selenium_test');
