@@ -62,7 +62,7 @@ export class ChromeXml extends XmlConfigSource {
    */
   private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
     const latestReleaseUrl = 
-      'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_';
+      'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
     const downloadUrlVersion = `${latestReleaseUrl}${this.maxVersion}`;
     return requestBody(downloadUrlVersion).then(latestVersion => {
       return this.getSpecificChromeDriverVersion(latestVersion);
