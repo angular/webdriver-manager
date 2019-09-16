@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import {ChromeXml} from '../../lib/binaries/chrome_xml';
-import {Config} from '../../lib/config';
 
 describe('chrome xml reader', () => {
   let out_dir = path.resolve('selenium_test');

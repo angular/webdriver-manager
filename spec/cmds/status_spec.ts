@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import {Logger, WriteTo} from '../../lib/cli/logger';
 import {program} from '../../lib/cmds/update';
-import {Config} from '../../lib/config';
 import {spawnSync} from '../../lib/utils';
 
 function getVersions(line: string): string[] {
