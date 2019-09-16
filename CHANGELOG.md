@@ -1,3 +1,12 @@
+# 12.1.7
+
+Updates to Chromedriver to the LATEST_RELEASE. This should work from here on in when Chrome is updated to a new version.
+
+- [64795b7](https://github.com/angular/webdriver-manager/commit/64795b753b3d00ad2d1f4ac98c531f9e147f3b3e)  chore(chrome) get latest chromedriver from LATEST_RELEASE (#418)
+
+  - changed the get latest chromedriver to use the URL getting the latest first, then downloading that specific version.
+  - removed unused imports.
+
 # 12.1.6
 
 Update the max Chrome version to 76.

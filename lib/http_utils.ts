@@ -97,36 +97,33 @@ export class HttpUtils {
     }
     return undefined;
   }
-
 }
 
 /**
-* Request the body from the url.
-* @param requestUrl The request url.
-* @returns A promise string of the response body.
-*/
-export function requestBody(
- requestUrl: string): Promise<string> {
- const options = HttpUtils.initOptions(requestUrl);
- options.followRedirect = true;
- return new Promise((resolve, reject) => {
-   const req = request(options);
-   req.on('response', response => {
-     if (response.statusCode === 200) {
-       let output = '';
-       response.on('data', (data) => {
-         output += data;
-       });
-       response.on('end', () => {
-         resolve(output);
-       });
-     } else {
-       reject(new Error('response status code is not 200'));
-     }
-   });
-   req.on('error', error => {
-     reject(error);
-   });
- });
+ * Request the body from the url.
+ * @param requestUrl The request url.
+ * @returns A promise string of the response body.
+ */
+export function requestBody(requestUrl: string): Promise<string> {
+  const options = HttpUtils.initOptions(requestUrl);
+  options.followRedirect = true;
+  return new Promise((resolve, reject) => {
+    const req = request(options);
+    req.on('response', response => {
+      if (response.statusCode === 200) {
+        let output = '';
+        response.on('data', (data) => {
+          output += data;
+        });
+        response.on('end', () => {
+          resolve(output);
+        });
+      } else {
+        reject(new Error('response status code is not 200'));
+      }
+    });
+    req.on('error', error => {
+      reject(error);
+    });
+  });
 }
-
