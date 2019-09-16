@@ -1,9 +1,9 @@
+import * as request from 'request';
 import {OptionsWithUrl} from 'request';
 import * as url from 'url';
 
 import {Logger} from './cli/logger';
 import {Config} from './config';
-import * as request from 'request';
 
 let logger = new Logger('http_utils');
 
