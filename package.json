@@ -1,6 +1,6 @@
 {
   "name": "webdriver-manager",
-  "version": "12.1.6",
+  "version": "12.1.7",
   "description": "A selenium server and browser driver manager for your end to end tests.",
   "scripts": {
     "format": "gulp format",
