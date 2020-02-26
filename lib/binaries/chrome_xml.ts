@@ -101,7 +101,14 @@ export class ChromeXml extends XmlConfigSource {
               // For 64-bit systems, prefer the 64-bit version.
               else if (this.osarch === 'x64') {
                 if (item.includes(this.getOsTypeName() + '64')) {
-                  itemFound = item;
+                  // Only override the previously found item if its sub-patch-version is less
+                  // than that of the current candidate.
+                  const itemFoundVersionParts = itemFound.split('/')[0].split('.');
+                  const versionParts = version.split('.');
+                  if (itemFoundVersionParts.length<4 ||
+                      (parseInt(versionParts[3] || '0')>parseInt(itemFoundVersionParts[3]))) {
+                    itemFound = item;
+                  }
                 }
               }
             }
