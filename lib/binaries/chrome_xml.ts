@@ -105,8 +105,8 @@ export class ChromeXml extends XmlConfigSource {
                   // than that of the current candidate.
                   const itemFoundVersionParts = itemFound.split('/')[0].split('.');
                   const versionParts = version.split('.');
-                  if (itemFoundVersionParts.length<4 ||
-                      (parseInt(versionParts[3] || '0')>parseInt(itemFoundVersionParts[3]))) {
+                  if (itemFoundVersionParts.length < 4 ||
+                      (parseInt(versionParts[3] || '0') > parseInt(itemFoundVersionParts[3]))) {
                     itemFound = item;
                   }
                 }
