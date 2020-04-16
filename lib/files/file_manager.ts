@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
 
-import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, OS, Standalone} from '../binaries';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, OS, Standalone, EdgeDriver} from '../binaries';
 import {Logger} from '../cli';
 import {Config} from '../config';
 
@@ -60,6 +60,9 @@ export class FileManager {
     }
     if (FileManager.checkOS_(osType, ChromeDriver)) {
       binaries[ChromeDriver.id] = new ChromeDriver(alternateCDN);
+    }
+    if (FileManager.checkOS_(osType, EdgeDriver)) {
+      binaries[EdgeDriver.id] = new EdgeDriver(alternateCDN);
     }
     if (FileManager.checkOS_(osType, GeckoDriver)) {
       binaries[GeckoDriver.id] = new GeckoDriver(alternateCDN);

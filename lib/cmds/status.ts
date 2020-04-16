@@ -3,7 +3,7 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 import * as semver from 'semver';
 
-import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone, EdgeDriver} from '../binaries';
 import {getValidSemver} from '../binaries/chrome_xml';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
@@ -77,6 +77,8 @@ function status(options: Options) {
       last = updateConfig[AndroidSDK.id]['last'];
     } else if (downloaded.binary instanceof ChromeDriver && updateConfig[ChromeDriver.id]) {
       last = updateConfig[ChromeDriver.id]['last'];
+    } else if (downloaded.binary instanceof EdgeDriver && updateConfig[EdgeDriver.id]) {
+      last = updateConfig[EdgeDriver.id]['last'];
     } else if (downloaded.binary instanceof GeckoDriver && updateConfig[GeckoDriver.id]) {
       last = updateConfig[GeckoDriver.id]['last'];
     } else if (downloaded.binary instanceof IEDriver && updateConfig[IEDriver.id]) {
