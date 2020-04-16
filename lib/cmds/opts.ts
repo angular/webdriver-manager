@@ -1,4 +1,4 @@
-import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone, EdgeDriver} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Cli, Option, Options} from '../cli';
 import {Config} from '../config';
 
@@ -71,7 +71,7 @@ opts[EDGE] = new Option(
     EDGE, 'Use installed Microsoft Edge driver', 'string',
     'C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe');
 opts[EDGE_CHROMIUM] =
-new Option(EDGE_CHROMIUM, 'Install or update msedgedriver', 'boolean', EdgeDriver.isDefault);
+    new Option(EDGE_CHROMIUM, 'Install or update msedgedriver', 'boolean', EdgeDriver.isDefault);
 opts[ANDROID] = new Option(ANDROID, 'Update/use the android sdk', 'boolean', AndroidSDK.isDefault);
 opts[IOS] = new Option(IOS, 'Update the iOS sdk', 'boolean', false);
 opts[VERSIONS_CHROME] = new Option(
@@ -79,9 +79,8 @@ opts[VERSIONS_CHROME] = new Option(
     'Optional chrome driver version (use \'latest\' to get the most recent version)', 'string',
     'latest');
 opts[VERSIONS_EDGE] = new Option(
-    VERSIONS_EDGE,
-    'Optional msedge driver version (use \'latest\' to get the most recent version)', 'string',
-    'latest');
+    VERSIONS_EDGE, 'Optional msedge driver version (use \'latest\' to get the most recent version)',
+    'string', 'latest');
 opts[VERSIONS_GECKO] =
     new Option(VERSIONS_GECKO, 'Optional gecko driver version', 'string', 'latest');
 opts[VERSIONS_ANDROID] = new Option(

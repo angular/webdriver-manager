@@ -9,7 +9,10 @@ import {XmlConfigSource} from './config_source';
 export class EdgeXml extends XmlConfigSource {
   maxVersion = Config.binaryVersions().maxEdge;
   constructor() {
-    super('edge', Config.cdnUrls().edge + 'edgewebdriver?delimiter=%2F&maxresults=5000&restype=container&comp=list&timeout=60000');
+    super(
+        'edge',
+        Config.cdnUrls().edge +
+            'edgewebdriver?delimiter=%2F&maxresults=5000&restype=container&comp=list&timeout=60000');
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
@@ -48,16 +51,16 @@ export class EdgeXml extends XmlConfigSource {
     }
   }
 
-  
+
   private getLatestMsedgeDriverVersion(): Promise<BinaryUrl> {
     const latestReleaseUrl = 'https://msedgedriver.azureedge.net/LATEST_STABLE';
     return requestBody(latestReleaseUrl).then(latestVersion => {
-      return this.getSpecificMsedgeDriverVersion(latestVersion.replace(/\s|\uFFFD|\u0000|/g,""));
+      return this.getSpecificMsedgeDriverVersion(latestVersion.replace(/\s|\uFFFD|\u0000|/g, ''));
     });
   }
 
   private toValidSemver(version: string) {
-    return version.replace(".0.",".")
+    return version.replace('.0.', '.')
   }
 
   /**
@@ -102,7 +105,7 @@ export class EdgeXml extends XmlConfigSource {
       if (itemFound == '') {
         return {url: '', version: inputVersion};
       } else {
-        return {url: "https://msedgedriver.azureedge.net/" + itemFound, version: inputVersion};
+        return {url: 'https://msedgedriver.azureedge.net/' + itemFound, version: inputVersion};
       }
     });
   }

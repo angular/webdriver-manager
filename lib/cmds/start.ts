@@ -5,7 +5,7 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 import * as q from 'q';
 
-import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, Standalone, EdgeDriver} from '../binaries';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -160,16 +160,15 @@ function start(options: Options) {
   }
   if (downloadedBinaries[EdgeDriver.id] != null) {
     let edge: EdgeDriver = binaries[EdgeDriver.id];
-    promises.push(
-        edge.getUrl(edge.versionCustom)
-            .then(() => {
-              args.push(
-                  '-Dwebdriver.edge.driver=' +
-                  path.resolve(outputDir, binaries[EdgeDriver.id].executableFilename()));
-            })
-            .catch(err => {
-              console.log(err);
-            }));
+    promises.push(edge.getUrl(edge.versionCustom)
+                      .then(() => {
+                        args.push(
+                            '-Dwebdriver.edge.driver=' +
+                            path.resolve(outputDir, binaries[EdgeDriver.id].executableFilename()));
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      }));
   }
   if (downloadedBinaries[GeckoDriver.id] != null) {
     let gecko: GeckoDriver = binaries[GeckoDriver.id];

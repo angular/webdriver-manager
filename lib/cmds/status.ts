@@ -3,7 +3,7 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 import * as semver from 'semver';
 
-import {AndroidSDK, Appium, ChromeDriver, GeckoDriver, IEDriver, Standalone, EdgeDriver} from '../binaries';
+import {AndroidSDK, Appium, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {getValidSemver} from '../binaries/chrome_xml';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';

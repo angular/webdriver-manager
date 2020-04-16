@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as q from 'q';
 
-import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, OS, Standalone, EdgeDriver} from '../binaries';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, OS, Standalone} from '../binaries';
 import {Logger} from '../cli';
 import {Config} from '../config';
 

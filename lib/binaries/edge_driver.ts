@@ -2,7 +2,7 @@ import {Config} from '../config';
 
 import {Binary, BinaryUrl, OS} from './binary';
 import {ChromeXml} from './chrome_xml';
-import { EdgeXml } from './edge_xml';
+import {EdgeXml} from './edge_xml';
 
 export class EdgeDriver extends Binary {
   static id = 'edge';
