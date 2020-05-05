@@ -80,7 +80,7 @@ opts[VERSIONS_ANDROID] = new Option(
     VERSIONS_ANDROID, 'Optional android sdk version', 'string', AndroidSDK.versionDefault);
 opts[VERSIONS_STANDALONE] = new Option(
     VERSIONS_STANDALONE,
-    'Optional seleniuim standalone server version (use \'latest\' to get the most recent version)',
+    'Optional selenium standalone server version (use \'latest\' to get the most recent version)',
     'string', 'latest');
 opts[VERSIONS_APPIUM] =
     new Option(VERSIONS_APPIUM, 'Optional appium version', 'string', Appium.versionDefault);
