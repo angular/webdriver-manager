@@ -9,8 +9,8 @@ import {XmlConfigSource} from './config_source';
 export class ChromeXml extends XmlConfigSource {
   maxVersion = Config.binaryVersions().maxChrome;
 
-  constructor() {
-    super('chrome', Config.cdnUrls()['chrome']);
+  constructor(opt_alternativeCdn?: string) {
+    super('chrome', opt_alternativeCdn || Config.cdnUrls()['chrome']);
   }
 
   getUrl(version: string): Promise<BinaryUrl> {
@@ -63,7 +63,7 @@ export class ChromeXml extends XmlConfigSource {
    * Gets the latest item from the XML.
    */
   private getLatestChromeDriverVersion(): Promise<BinaryUrl> {
-    const latestReleaseUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
+    const latestReleaseUrl = `${this.xmlUrl}/LATEST_RELEASE`;
     return requestBody(latestReleaseUrl).then(latestVersion => {
       return this.getSpecificChromeDriverVersion(latestVersion);
     });
@@ -111,7 +111,7 @@ export class ChromeXml extends XmlConfigSource {
       if (itemFound == '') {
         return {url: '', version: inputVersion};
       } else {
-        return {url: Config.cdnUrls().chrome + itemFound, version: inputVersion};
+        return {url: this.xmlUrl + itemFound, version: inputVersion};
       }
     });
   }
