@@ -118,14 +118,19 @@ function update(options: Options): Promise<void> {
   let verbose = options[Opt.VERBOSE].getBoolean();
 
   // setup versions for binaries
+  let environment = process.env;
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
-  binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  binaries[Standalone.id].versionCustom =
+      environment.VERSIONS_STANDALONE || options[Opt.VERSIONS_STANDALONE].getString();
+  binaries[ChromeDriver.id].versionCustom =
+      environment.VERSIONS_CHROME || options[Opt.VERSIONS_CHROME].getString();
   if (options[Opt.VERSIONS_IE]) {
-    binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
+    binaries[IEDriver.id].versionCustom =
+        environment.VERSIONS_IE || options[Opt.VERSIONS_IE].getString();
   }
   if (options[Opt.VERSIONS_GECKO]) {
-    binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
+    binaries[GeckoDriver.id].versionCustom =
+        environment.VERSIONS_GECKO || options[Opt.VERSIONS_GECKO].getString();
   }
   binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
   binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
