@@ -65,4 +65,17 @@ describe('chrome xml reader', () => {
       done();
     });
   });
+
+  // This test case covers a bug when all the following conditions were true.
+  //  arch was 64 with multiple major versions available.
+  fit('should note get the 85.0.4183.83, 32-bit version (arch = x64)', (done) => {
+    let chromeXml = new ChromeXml();
+    chromeXml.out_dir = out_dir;
+    chromeXml.ostype = 'Windows_NT';
+    chromeXml.osarch = 'x64';
+    chromeXml.getUrl('85.0.4183.87').then((binaryUrl) => {
+      expect(binaryUrl.url).toContain('85.0.4183.87/chromedriver_win32.zip');
+      done();
+    });
+  });
 });
