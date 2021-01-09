@@ -104,7 +104,11 @@ export class ChromeXml extends XmlConfigSource {
               // If the semantic version is the same, check os arch.
               // For 64-bit systems, prefer the 64-bit version.
               else if (this.osarch === 'x64') {
-                if (item.includes(this.getOsTypeName() + '64')) {
+                // No win64 version exists, so even on x64 we need to look for win32
+                const osTypeNameAndArch =
+                    this.getOsTypeName() + (this.getOsTypeName() === 'win' ? '32' : '64');
+
+                if (item.includes(osTypeNameAndArch)) {
                   itemFound = item;
                 }
               }
