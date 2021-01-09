@@ -1,3 +1,16 @@
+# 12.1.8
+
+Fixes for macOS ChromeDriver download. If you are using a macOS and are
+running into a `WebDriver.createSession` error, run
+`webdriver-manager clean` to remove the downloaded ChromeDriver
+before running `webdriver-manager update`.
+
+- ([4f5f736](https://github.com/angular/webdriver-manager/commit/4f5f7369790c9ae604b8b51a08b645a89cc4c7b7))
+  fix(chromedriver): get most recent version on x64 windows if multiple major versions exist (#473)
+
+- ([17db8a2](https://github.com/angular/webdriver-manager/commit/17db8a2ad5401ab68c7a400f419760edd9c3e9e3))
+  fix(binaries): filter m1 mac chromedriver versions (#478)
+
 # 12.1.7
 
 Updates to Chromedriver to the LATEST_RELEASE. This should work from here on in when Chrome is updated to a new version.
