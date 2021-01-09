@@ -77,6 +77,7 @@ describe('chrome xml reader', () => {
     chromeXml.getUrl('85.0.4183.87').then((binaryUrl) => {
       expect(binaryUrl.url).toContain('85.0.4183.87/chromedriver_win32.zip');
       done();
+    });
   });
 
   it('should get the 87.0.4280.88, 64-bit, m1 version (arch = arm64)', (done) => {
