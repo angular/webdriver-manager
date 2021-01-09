@@ -32,9 +32,11 @@ export class ChromeXml extends XmlConfigSource {
       for (let content of xml.ListBucketResult.Contents) {
         let contentKey: string = content.Key[0];
 
-
-        // Filter for 32-bit devices, make sure x64 is not an option
-        if (this.osarch === 'x64' || !contentKey.includes('64')) {
+        if (
+            // Filter for 32-bit devices, make sure x64 is not an option
+            (this.osarch.includes('64') || !contentKey.includes('64')) &&
+            // Filter for x86 macs, make sure m1 is not an option
+            ((this.ostype === 'Darwin' && this.osarch === 'arm64') || !contentKey.includes('m1'))) {
           // Filter for only the osType
           if (contentKey.includes(osType)) {
             versionPaths.push(contentKey);
@@ -95,7 +97,9 @@ export class ChromeXml extends XmlConfigSource {
                     (this.osarch !== 'x64' && !item.includes(this.getOsTypeName() + '64'))) {
                   itemFound = item;
                 }
-
+                if (this.osarch === 'arm64' && this.ostype === 'Darwin' && item.includes('m1')) {
+                  itemFound = item;
+                }
               }
               // If the semantic version is the same, check os arch.
               // For 64-bit systems, prefer the 64-bit version.

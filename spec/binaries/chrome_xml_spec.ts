@@ -17,6 +17,7 @@ describe('chrome xml reader', () => {
     chromeXml.getVersionList().then(list => {
       for (let item of list) {
         expect(item).toContain('/chromedriver_mac');
+        expect(item).not.toContain('m1');
       }
       done();
     });
@@ -62,6 +63,17 @@ describe('chrome xml reader', () => {
     chromeXml.osarch = 'x86';
     chromeXml.getUrl('2.20').then((binaryUrl) => {
       expect(binaryUrl.url).toContain('2.20/chromedriver_mac32.zip');
+      done();
+    });
+  });
+
+  it('should get the 87.0.4280.88, 64-bit, m1 version (arch = arm64)', (done) => {
+    let chromeXml = new ChromeXml();
+    chromeXml.out_dir = out_dir;
+    chromeXml.ostype = 'Darwin';
+    chromeXml.osarch = 'arm64';
+    chromeXml.getUrl('87.0.4280.88').then((binaryUrl) => {
+      expect(binaryUrl.url).toContain('87.0.4280.88/chromedriver_mac64_m1.zip');
       done();
     });
   });
