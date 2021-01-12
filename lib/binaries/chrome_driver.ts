@@ -11,7 +11,7 @@ export class ChromeDriver extends Binary {
 
   constructor(opt_alternativeCdn?: string) {
     super(opt_alternativeCdn || Config.cdnUrls().chrome);
-    this.configSource = new ChromeXml();
+    this.configSource = new ChromeXml(opt_alternativeCdn);
     this.name = 'chromedriver';
     this.versionDefault = ChromeDriver.versionDefault;
     this.versionCustom = this.versionDefault;
