@@ -41,6 +41,7 @@ describe('update', () => {
         'versions': {'chrome': '2.20'},
         'standalone': false,
         'gecko': false,
+        'msedge': false,
         'out_dir': tmpDir
       };
       program.run(JSON.parse(JSON.stringify(argv)))
@@ -66,6 +67,7 @@ describe('update', () => {
         'versions': {'standalone': '2.53.1'},
         'chrome': false,
         'gecko': false,
+        'msedge': false,
         'out_dir': tmpDir
       };
       program.run(JSON.parse(JSON.stringify(argv)))

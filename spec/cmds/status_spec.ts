@@ -20,6 +20,7 @@ describe('status', () => {
     argv = {
       '_': ['update'],
       'gecko': 'false',
+      'msedge': 'false',
       'versions': {'chrome': '2.24', 'standalone': '2.44.0'},
       'out_dir': tmpDir
     };
