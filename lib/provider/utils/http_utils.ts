@@ -237,12 +237,6 @@ export function requestBinary(
         }
       } else if (response.statusCode === 302) {
         const location = response.headers['location'] as string;
-        if (!httpOptions.headers) {
-          httpOptions.headers = {};
-        }
-        for (const header of Object.keys(response.headers)) {
-          httpOptions.headers[header] = response.headers[header];
-        }
         resolve(requestBinary(location, httpOptions, false));
       } else {
         reject(new Error('response status code is not 200'));
