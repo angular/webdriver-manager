@@ -44,13 +44,9 @@ describe('config', () => {
             <Key>0.01/foobar.zip</Key>  
           </Contents>
         </ListBucketResult>
-        `;
+        ` as any;
       });
-      spyOn(fs, 'statSync').and.callFake(() => {
-        return {
-          mtime: 0
-        }
-      });
+      spyOn(fs, 'statSync').and.callFake(() => {return {mtime: 0} as any});
       Config.runCommand = 'start';
       let xmlConfig = new XMLConfig('xml', 'url');
       xmlConfig.testGetXml()
@@ -66,13 +62,9 @@ describe('config', () => {
     it('on udpate: should check the timestamp, invaidate cache, and try to make a web request',
        done => {
          spyOn(fs, 'readFileSync').and.callFake(() => {
-           return 'foobar';
+           return 'foobar' as any;
          });
-         spyOn(fs, 'statSync').and.callFake(() => {
-           return {
-             mtime: 0
-           }
-         });
+         spyOn(fs, 'statSync').and.callFake(() => {return {mtime: 0} as any});
          Config.runCommand = 'update';
          let xmlConfig = new XMLConfig('xml', 'url');
          xmlConfig.testGetXml()
@@ -88,7 +80,7 @@ describe('config', () => {
 
     it('on update: if the size of the file is zero, invalidate the cache', done => {
       spyOn(fs, 'statSync').and.callFake(() => {
-        return {size: 0};
+        return {size: 0} as any;
       });
       Config.runCommand = 'update';
       let xmlConfig = new XMLConfig('json', 'url');
@@ -107,12 +99,10 @@ describe('config', () => {
   describe('github json', () => {
     it('on start: should read the json file and not check the timestamp', done => {
       spyOn(fs, 'readFileSync').and.callFake(() => {
-        return '{ "foo": "bar" }';
+        return '{ "foo": "bar" }' as any;
       });
       spyOn(fs, 'statSync').and.callFake(() => {
-        return {
-          mtime: 0
-        }
+        return {mtime: 0} as any;
       });
       Config.runCommand = 'start';
       let jsonConfig = new JSONConfig('json', 'url');
@@ -129,12 +119,10 @@ describe('config', () => {
     it('on udpate: should check the timestamp, invaidate cache, and try to make a web request',
        done => {
          spyOn(fs, 'readFileSync').and.callFake(() => {
-           return 'foobar';
+           return 'foobar' as any;
          });
          spyOn(fs, 'statSync').and.callFake(() => {
-           return {
-             mtime: 0
-           }
+           return {mtime: 0} as any;
          });
          Config.runCommand = 'update';
          let jsonConfig = new JSONConfig('json', 'url');
@@ -151,7 +139,7 @@ describe('config', () => {
 
     it('on update: if the size of the file is zero, invalidate the cache', done => {
       spyOn(fs, 'statSync').and.callFake(() => {
-        return {size: 0};
+        return {size: 0} as any;
       });
       Config.runCommand = 'update';
       let jsonConfig = new JSONConfig('json', 'url');

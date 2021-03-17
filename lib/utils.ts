@@ -12,11 +12,11 @@ function spawnFactory(sync: true):
     (cmd: string, args: string[], stdio?: any, opts?: child_process.SpawnSyncOptions) =>
         child_process.SpawnSyncReturns<any>;
 function spawnFactory(sync: boolean):
-    (cmd: string, args: string[], stdio?: string,
+    (cmd: string, args: string[], stdio?: child_process.StdioOptions,
      opts?: child_process.SpawnOptions|child_process.SpawnSyncOptions) =>
         child_process.ChildProcess | child_process.SpawnSyncReturns<any> {
-  return (cmd: string, args: string[], stdio?: string,
-          opts?: child_process.SpawnOptions|child_process.SpawnSyncOptions) => {
+  return (cmd: string, args: string[], stdio?: child_process.StdioOptions,
+          opts: child_process.SpawnOptions|child_process.SpawnSyncOptions = {}) => {
     if ((Config.osType() === 'Windows_NT') && (cmd.slice(-4) !== '.exe')) {
       if (fs.existsSync(cmd + '.exe')) {
         cmd += '.exe';
@@ -26,7 +26,6 @@ function spawnFactory(sync: boolean):
       }
     }
     if (stdio) {
-      opts = opts || {};
       opts.stdio = stdio;
     }
     if (sync) {

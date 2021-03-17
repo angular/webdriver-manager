@@ -73,12 +73,17 @@ export class ChromeXml extends XmlConfigSource {
 
   /**
    * Gets a specific item from the XML.
+   *
+   * Resolves with URL, or rejects if there is an error retrieving the XML, or the requested
+   * was not found in the list.
    */
   private getSpecificChromeDriverVersion(inputVersion: string): Promise<BinaryUrl> {
     return this.getVersionList().then(list => {
       const specificVersion = getValidSemver(inputVersion);
       if (specificVersion === '') {
-        throw new Error(`version ${inputVersion} ChromeDriver does not exist`)
+        const msg = `Requested version ${inputVersion} does not look like a Chrome version.
+Expected e.g. "2.34" or "89.0.4389.0".`;
+        throw new Error(msg);
       }
       let itemFound = '';
       for (let item of list) {
@@ -117,7 +122,7 @@ export class ChromeXml extends XmlConfigSource {
         }
       }
       if (itemFound == '') {
-        return {url: '', version: inputVersion};
+        throw new Error(`There is no chromedriver available for version ${specificVersion}.`);
       } else {
         return {url: Config.cdnUrls().chrome + itemFound, version: inputVersion};
       }

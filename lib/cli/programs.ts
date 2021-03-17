@@ -1,7 +1,8 @@
-import * as minimist from 'minimist';
+import {Logger} from './logger';
+import {MinimistArgs, Option, Options} from './options';
 
-import {Args, MinimistArgs, Option, Options} from './options';
 
+const logger = new Logger('program');
 
 /**
  * Dictionary that maps the command and the program.
@@ -71,11 +72,22 @@ export class Program {
    * method.
    * @param args The arguments that will be parsed to run the method.
    */
-  run(json: JSON): Promise<void> {
+  run(json: JSON): void;
+  run(json: JSON, testing: true): Promise<void>;
+  run(json: JSON, testing?: true): void|Promise<void> {
     for (let opt in this.options) {
       this.options[opt].value = this.getValue_(opt, json);
     }
-    return Promise.resolve(this.runMethod(this.options));
+    const promise = Promise.resolve(this.runMethod(this.options));
+    if (testing) {
+      return promise;
+    } else {
+      promise.catch(err => {
+        // Exit gracefully when the program promise rejects
+        logger.error(err);
+        process.exit(-1);
+      });
+    }
   }
 
   private getValue_(key: string, json: JSON): number|boolean|string {

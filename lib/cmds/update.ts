@@ -125,34 +125,27 @@ function update(options: Options): Promise<void> {
   if (standalone) {
     let binary: Standalone = binaries[Standalone.id];
     binary.versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-    promises.push(FileManager.downloadFile(binary, outputDir)
-                      .then<void>((downloaded: boolean) => {
-                        if (!downloaded) {
-                          logger.info(
-                              binary.name + ': file exists ' +
-                              path.resolve(outputDir, binary.filename()));
-                          logger.info(binary.name + ': ' + binary.filename() + ' up to date');
-                        }
-                      })
-                      .then(() => {
-                        updateBrowserFile(binary, outputDir);
-                      }));
+    promises.push(FileManager.downloadFile(binary, outputDir).then(downloaded => {
+      if (!downloaded) {
+        logger.info(binary.name + ': file exists ' + path.resolve(outputDir, binary.filename()));
+        logger.info(binary.name + ': ' + binary.filename() + ' up to date');
+      }
+      updateBrowserFile(binary, outputDir);
+    }));
   }
   if (chrome) {
     let binary: ChromeDriver = binaries[ChromeDriver.id];
     binary.versionCustom = options[Opt.VERSIONS_CHROME].getString();
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      return Promise.resolve(updateBrowserFile(binary, outputDir));
-    }));
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL)
+                      .then(() => updateBrowserFile(binary, outputDir)));
   }
   if (gecko) {
     let binary: GeckoDriver = binaries[GeckoDriver.id];
     if (options[Opt.VERSIONS_GECKO]) {
       binary.versionCustom = options[Opt.VERSIONS_GECKO].getString();
     }
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      return Promise.resolve(updateBrowserFile(binary, outputDir));
-    }));
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL)
+                      .then(() => updateBrowserFile(binary, outputDir)));
   }
   if (ie64) {
     let binary: IEDriver = binaries[IEDriver.id];
@@ -160,16 +153,14 @@ function update(options: Options): Promise<void> {
       binary.versionCustom = options[Opt.VERSIONS_IE].getString();
     }
     binary.osarch = Config.osArch();  // Win32 or x64
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      return Promise.resolve(updateBrowserFile(binary, outputDir));
-    }));
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL)
+                      .then(() => updateBrowserFile(binary, outputDir)));
   }
   if (ie32) {
     let binary: IEDriver = binaries[IEDriver.id];
     binary.osarch = 'Win32';
-    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
-      return Promise.resolve(updateBrowserFile(binary, outputDir));
-    }));
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL)
+                      .then(() => updateBrowserFile(binary, outputDir)));
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
@@ -178,24 +169,15 @@ function update(options: Options): Promise<void> {
     let oldAVDList: string;
 
     updateBrowserFile(binary, outputDir);
-    promises.push(q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
-                      .then(
-                          (oldAVDs: string) => {
-                            oldAVDList = oldAVDs;
-                          },
-                          () => {
-                            oldAVDList = '[]';
-                          })
-                      .then(() => {
-                        return updateBinary(binary, outputDir, proxy, ignoreSSL);
-                      })
-                      .then<void>(() => {
-                        initializeAndroid(
-                            path.resolve(outputDir, binary.executableFilename()),
-                            android_api_levels, android_architectures, android_platforms,
-                            android_accept_licenses, binary.versionCustom,
-                            JSON.parse(oldAVDList), logger, verbose);
-                      }));
+    promises.push(
+        q.nfcall(fs.readFile, path.resolve(sdk_path, 'available_avds.json'))
+            .then((oldAVDs: string) => oldAVDList = oldAVDs, () => oldAVDList = '[]')
+            .then(() => updateBinary(binary, outputDir, proxy, ignoreSSL))
+            .then(
+                () => initializeAndroid(
+                    path.resolve(outputDir, binary.executableFilename()), android_api_levels,
+                    android_architectures, android_platforms, android_accept_licenses,
+                    binary.versionCustom, JSON.parse(oldAVDList), logger, verbose)));
   }
   if (ios) {
     checkIOS(logger);
@@ -207,9 +189,7 @@ function update(options: Options): Promise<void> {
     updateBrowserFile(binary, outputDir);
   }
 
-  return Promise.all(promises).then(() => {
-    writeBrowserFile(outputDir);
-  });
+  return Promise.all(promises as Promise<void>[]).then(() => writeBrowserFile(outputDir));
 }
 
 function updateBinary<T extends Binary>(
