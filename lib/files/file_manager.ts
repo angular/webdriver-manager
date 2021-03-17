@@ -171,42 +171,36 @@ export class FileManager {
    */
   static downloadFile<T extends Binary>(binary: T, outputDir: string, callback?: Function):
       Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      let outDir = Config.getSeleniumDir();
-      let downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
-      let contentLength = 0;
+    const downloaded: BinaryMap<DownloadedBinary> = FileManager.downloadedBinaries(outputDir);
 
-      // Pass options down to binary to make request to get the latest version to download.
-      binary.getUrl(binary.version()).then(fileUrl => {
-        binary.versionCustom = fileUrl.version;
-        let filePath = path.resolve(outputDir, binary.filename());
-        let fileName = binary.filename();
+    // Pass options down to binary to make request to get the latest version to download.
+    return binary.getUrl(binary.version()).then(fileUrl => {
+      const url = fileUrl.url;
+      if (!url) {
+        logger.debug('Bad binary entry from FileManager', binary);
+        throw new Error('Developer error: tried to download a binary with no URL.');
+      }
+      const version = binary.versionCustom = fileUrl.version;
+      const filePath = path.resolve(outputDir, binary.filename());
+      const fileName = binary.filename();
 
-        // If we have downloaded the file before, check the content length
-        if (downloaded[binary.id()]) {
-          let downloadedBinary = downloaded[binary.id()];
-          let versions = downloadedBinary.versions;
-          let version = binary.versionCustom;
+      // If we have downloaded the file before, check the content length
+      if (downloaded[binary.id()]) {
+        const downloadedBinary = downloaded[binary.id()];
+        const versions = downloadedBinary.versions;
 
-          for (let index in versions) {
-            let v = versions[index];
-            if (v === version) {
-              contentLength = fs.statSync(filePath).size;
-
-              Downloader.getFile(binary, fileUrl.url, fileName, outputDir, contentLength, callback)
-                  .then(downloaded => {
-                    resolve(downloaded);
-                  });
-            }
+        for (let index in versions) {
+          let v = versions[index];
+          if (v === version) {
+            const contentLength = fs.statSync(filePath).size;
+            return Downloader.getFile(binary, url, fileName, outputDir, contentLength, callback);
           }
         }
-        // We have not downloaded it before, or the version does not exist. Use the default content
-        // length of zero and download the file.
-        Downloader.getFile(binary, fileUrl.url, fileName, outputDir, contentLength, callback)
-            .then(downloaded => {
-              resolve(downloaded);
-            });
-      });
+      }
+
+      // We have not downloaded it before, or the version does not exist. Use the default content
+      // length of zero and download the file.
+      return Downloader.getFile(binary, url, fileName, outputDir, 0, callback)
     });
   }
 

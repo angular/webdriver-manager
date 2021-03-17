@@ -53,7 +53,7 @@ describe('program', () => {
       expect(options['fooNumber3'].getNumber()).toEqual(30);
     };
     program.action(callbackTest);
-    program.run(json);
+    return program.run(json, true);
   });
 
   it('should be able to extract the mixed type and get the right type', () => {
@@ -76,6 +76,6 @@ describe('program', () => {
       expect(options['fooNumber3'].getNumber()).toEqual(null);
     };
     program.action(callbackTest);
-    program.run(json);
+    return program.run(json, true);
   });
 });

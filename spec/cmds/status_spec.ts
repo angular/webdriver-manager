@@ -16,23 +16,17 @@ describe('status', () => {
   // chrome 2.20[last], 2.24
   // geckodriver {{config version}} [last]
   // standalone 2.24 [last], {{config version}}
-  beforeAll((done) => {
+  beforeAll(() => {
     argv = {
       '_': ['update'],
       'gecko': 'false',
       'versions': {'chrome': '2.24', 'standalone': '2.44.0'},
       'out_dir': tmpDir
     };
-    program.run(JSON.parse(JSON.stringify(argv)))
-        .then(() => {
-          argv['versions']['chrome'] = '2.20';
-          program.run(JSON.parse(JSON.stringify(argv))).then(() => {
-            done();
-          });
-        })
-        .catch(err => {
-          done.fail();
-        });
+    return program.run(JSON.parse(JSON.stringify(argv)), true).then(() => {
+      argv['versions']['chrome'] = '2.20';
+      return program.run(JSON.parse(JSON.stringify(argv)), true);
+    });
   });
 
   it('should show the version number of the default and latest versions', () => {

@@ -40,70 +40,65 @@ export class Downloader {
     let resContentLength: number;
 
     return new Promise<boolean>((resolve, reject) => {
-             req = request(options);
-             req.on('response', response => {
-               if (response.statusCode === 200) {
-                 resContentLength = +response.headers['content-length'];
-                 if (contentLength === resContentLength) {
-                   // if the size is the same, do not download and stop here
-                   response.destroy();
-                   resolve(false);
-                 } else {
-                   let curl = outputDir + '/' + fileName + ' ' + options.url;
-                   if (HttpUtils.requestOpts.proxy) {
-                     let pathUrl = url.parse(options.url.toString()).path;
-                     let host = url.parse(options.url.toString()).host;
-                     let newFileUrl = url.resolve(HttpUtils.requestOpts.proxy, pathUrl);
-                     curl = outputDir + '/' + fileName + ' \'' + newFileUrl +
-                         '\' -H \'host:' + host + '\'';
-                   }
-                   if (HttpUtils.requestOpts.ignoreSSL) {
-                     curl = 'k ' + curl;
-                   }
-                   logger.info('curl -o' + curl);
+      req = request(options);
+      req.on('response', response => {
+        if (response.statusCode === 200) {
+          resContentLength = +response.headers['content-length'];
+          if (contentLength === resContentLength) {
+            // if the size is the same, do not download and stop here
+            response.destroy();
+            resolve(false);
+          } else {
+            let curl = outputDir + '/' + fileName + ' ' + options.url;
+            if (HttpUtils.requestOpts.proxy) {
+              let pathUrl = url.parse(options.url.toString()).path;
+              let host = url.parse(options.url.toString()).host;
+              let newFileUrl = url.resolve(HttpUtils.requestOpts.proxy, pathUrl);
+              curl =
+                  outputDir + '/' + fileName + ' \'' + newFileUrl + '\' -H \'host:' + host + '\'';
+            }
+            if (HttpUtils.requestOpts.ignoreSSL) {
+              curl = 'k ' + curl;
+            }
+            logger.info('curl -o' + curl);
 
-                   // only pipe if the headers are different length
-                   file = fs.createWriteStream(filePath);
-                   req.pipe(file);
-                   file.on('close', () => {
-                     fs.stat(filePath, (error, stats) => {
-                       if (error) {
-                         (error as any).msg = 'Error: Got error ' + error + ' from ' + fileUrl;
-                         return reject(error);
-                       }
-                       if (stats.size != resContentLength) {
-                         (error as any).msg = 'Error: corrupt download for ' + fileName +
-                             '. Please re-run webdriver-manager update';
-                         fs.unlinkSync(filePath);
-                         reject(error);
-                       }
-                       if (callback) {
-                         callback(binary, outputDir, fileName);
-                       }
-                       resolve(true);
-                     });
-                   });
-                 }
+            // only pipe if the headers are different length
+            file = fs.createWriteStream(filePath);
+            req.pipe(file);
+            file.on('close', () => {
+              fs.stat(filePath, (error, stats) => {
+                if (error) {
+                  (error as any).msg = 'Error: Got error ' + error + ' from ' + fileUrl;
+                  return reject(error);
+                }
+                if (stats.size != resContentLength) {
+                  (error as any).msg = 'Error: corrupt download for ' + fileName +
+                      '. Please re-run webdriver-manager update';
+                  fs.unlinkSync(filePath);
+                  reject(error);
+                }
+                if (callback) {
+                  callback(binary, outputDir, fileName);
+                }
+                resolve(true);
+              });
+            });
+          }
 
-               } else {
-                 let error = new Error();
-                 (error as any).msg =
-                     'Expected response code 200, received: ' + response.statusCode;
-                 reject(error);
-               }
-             });
-             req.on('error', error => {
-               if ((error as any).code === 'ETIMEDOUT') {
-                 (error as any).msg = 'Connection timeout downloading: ' + fileUrl +
-                     '. Default timeout is 4 minutes.';
-               } else if ((error as any).connect) {
-                 (error as any).msg = 'Could not connect to the server to download: ' + fileUrl;
-               }
-               reject(error);
-             });
-           })
-        .catch(error => {
-          logger.error((error as any).msg || (error as any).message);
-        });
+        } else {
+          let error = new Error('Expected response code 200, received: ' + response.statusCode);
+          reject(error);
+        }
+      });
+      req.on('error', error => {
+        if ((error as any).code === 'ETIMEDOUT') {
+          (error as any).msg =
+              'Connection timeout downloading: ' + fileUrl + '. Default timeout is 4 minutes.';
+        } else if ((error as any).connect) {
+          (error as any).msg = 'Could not connect to the server to download: ' + fileUrl;
+        }
+        reject(error);
+      });
+    });
   }
 }

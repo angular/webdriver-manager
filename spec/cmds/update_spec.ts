@@ -33,7 +33,7 @@ describe('update', () => {
       clearBrowserFile();
     });
 
-    it('should create a file for chrome', (done) => {
+    it('should create a file for chrome', () => {
       Config.osType_ = 'Linux';
       Config.osArch_ = 'x64';
       argv = {
@@ -43,22 +43,18 @@ describe('update', () => {
         'gecko': false,
         'out_dir': tmpDir
       };
-      program.run(JSON.parse(JSON.stringify(argv)))
-          .then(() => {
-            let updateConfig =
-                fs.readFileSync(path.resolve(tmpDir, 'update-config.json')).toString();
-            let updateObj = JSON.parse(updateConfig);
-            expect(updateObj['chrome']['last']).toContain('chromedriver_2.20');
-            expect(updateObj['chrome']['all'].length).toEqual(1);
-            expect(updateObj['chrome']['last']).toEqual(updateObj['chrome']['all'][0]);
-            expect(updateObj['standalone']).toBeUndefined();
-            expect(updateObj['ie']).toBeUndefined();
-            done();
-          })
-          .catch((err: Error) => {done.fail()});
+      return program.run(JSON.parse(JSON.stringify(argv)), true).then(() => {
+        let updateConfig = fs.readFileSync(path.resolve(tmpDir, 'update-config.json')).toString();
+        let updateObj = JSON.parse(updateConfig);
+        expect(updateObj['chrome']['last']).toContain('chromedriver_2.20');
+        expect(updateObj['chrome']['all'].length).toEqual(1);
+        expect(updateObj['chrome']['last']).toEqual(updateObj['chrome']['all'][0]);
+        expect(updateObj['standalone']).toBeUndefined();
+        expect(updateObj['ie']).toBeUndefined();
+      });
     });
 
-    it('should create a file for standalone', (done) => {
+    it('should create a file for standalone', () => {
       Config.osType_ = 'Linux';
       Config.osArch_ = 'x64';
       argv = {
@@ -68,19 +64,15 @@ describe('update', () => {
         'gecko': false,
         'out_dir': tmpDir
       };
-      program.run(JSON.parse(JSON.stringify(argv)))
-          .then(() => {
-            let updateConfig =
-                fs.readFileSync(path.resolve(tmpDir, 'update-config.json')).toString();
-            let updateObj = JSON.parse(updateConfig);
-            expect(updateObj['standalone']['last']).toContain('standalone-2.53.1.jar');
-            expect(updateObj['standalone']['all'].length).toEqual(1);
-            expect(updateObj['standalone']['last']).toEqual(updateObj['standalone']['all'][0]);
-            expect(updateObj['chrome']).toBeUndefined();
-            expect(updateObj['ie']).toBeUndefined();
-            done();
-          })
-          .catch((err: Error) => {done.fail()});
+      return program.run(JSON.parse(JSON.stringify(argv)), true).then(() => {
+        const updateConfig = fs.readFileSync(path.resolve(tmpDir, 'update-config.json')).toString();
+        const updateObj = JSON.parse(updateConfig);
+        expect(updateObj['standalone']['last']).toContain('standalone-2.53.1.jar');
+        expect(updateObj['standalone']['all'].length).toEqual(1);
+        expect(updateObj['standalone']['last']).toEqual(updateObj['standalone']['all'][0]);
+        expect(updateObj['chrome']).toBeUndefined();
+        expect(updateObj['ie']).toBeUndefined();
+      });
     });
 
     // TODO(cnishina): Create a test for Windows for IE driver. This will require rewriting
