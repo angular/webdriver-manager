@@ -9,7 +9,7 @@ import * as rimraf from 'rimraf';
 import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
-import {Downloader, FileManager} from '../files';
+import {FileManager} from '../files';
 import {HttpUtils} from '../http_utils';
 import {spawn} from '../utils';
 
@@ -117,24 +117,14 @@ function update(options: Options): Promise<void> {
   HttpUtils.assignOptions({ignoreSSL, proxy});
   let verbose = options[Opt.VERBOSE].getBoolean();
 
-  // setup versions for binaries
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
-  binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
-  binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
-  if (options[Opt.VERSIONS_IE]) {
-    binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
-  }
-  if (options[Opt.VERSIONS_GECKO]) {
-    binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
-  }
-  binaries[AndroidSDK.id].versionCustom = options[Opt.VERSIONS_ANDROID].getString();
-  binaries[Appium.id].versionCustom = options[Opt.VERSIONS_APPIUM].getString();
 
   // if the file has not been completely downloaded, download it
   // else if the file has already been downloaded, unzip the file, rename it, and give it
   // permissions
   if (standalone) {
     let binary: Standalone = binaries[Standalone.id];
+    binary.versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
     promises.push(FileManager.downloadFile(binary, outputDir)
                       .then<void>((downloaded: boolean) => {
                         if (!downloaded) {
@@ -150,18 +140,25 @@ function update(options: Options): Promise<void> {
   }
   if (chrome) {
     let binary: ChromeDriver = binaries[ChromeDriver.id];
+    binary.versionCustom = options[Opt.VERSIONS_CHROME].getString();
     promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
       return Promise.resolve(updateBrowserFile(binary, outputDir));
     }));
   }
   if (gecko) {
     let binary: GeckoDriver = binaries[GeckoDriver.id];
+    if (options[Opt.VERSIONS_GECKO]) {
+      binary.versionCustom = options[Opt.VERSIONS_GECKO].getString();
+    }
     promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
       return Promise.resolve(updateBrowserFile(binary, outputDir));
     }));
   }
   if (ie64) {
     let binary: IEDriver = binaries[IEDriver.id];
+    if (options[Opt.VERSIONS_IE]) {
+      binary.versionCustom = options[Opt.VERSIONS_IE].getString();
+    }
     binary.osarch = Config.osArch();  // Win32 or x64
     promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
       return Promise.resolve(updateBrowserFile(binary, outputDir));
@@ -176,6 +173,7 @@ function update(options: Options): Promise<void> {
   }
   if (android) {
     let binary = binaries[AndroidSDK.id];
+    binary.versionCustom = options[Opt.VERSIONS_ANDROID].getString();
     let sdk_path = path.resolve(outputDir, binary.executableFilename());
     let oldAVDList: string;
 
@@ -195,7 +193,7 @@ function update(options: Options): Promise<void> {
                         initializeAndroid(
                             path.resolve(outputDir, binary.executableFilename()),
                             android_api_levels, android_architectures, android_platforms,
-                            android_accept_licenses, binaries[AndroidSDK.id].versionCustom,
+                            android_accept_licenses, binary.versionCustom,
                             JSON.parse(oldAVDList), logger, verbose);
                       }));
   }
@@ -203,8 +201,10 @@ function update(options: Options): Promise<void> {
     checkIOS(logger);
   }
   if (android || ios) {
-    installAppium(binaries[Appium.id], outputDir);
-    updateBrowserFile(binaries[Appium.id], outputDir);
+    const binary = binaries[Appium.id];
+    binary.versionCustom = options[Opt.VERSIONS_APPIUM].getString();
+    installAppium(binary, outputDir);
+    updateBrowserFile(binary, outputDir);
   }
 
   return Promise.all(promises).then(() => {
