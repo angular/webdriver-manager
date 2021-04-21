@@ -73,7 +73,7 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
           if (item.version === inputVersion) {
             let assetsArray = json[item.index].assets;
             for (let asset of assetsArray) {
-              if ((asset.name as string).includes(this.oshelper())) {
+              if ((asset.name as string).includes(this.oshelper() + '.')) {
                 return {url: asset.browser_download_url, version: inputVersion};
               }
             }
@@ -87,7 +87,7 @@ export class GeckoDriverGithub extends GithubApiConfigSource {
   private oshelper(): string {
     // Get the os type name.
     if (this.ostype === 'Darwin') {
-      return 'macos';
+      return this.osarch === 'x64' ? 'macos' : 'macos-aarch64';
     } else if (this.ostype === 'Windows_NT') {
       return this.osarch === 'x64' ? 'win64' : 'win32';
     } else {
