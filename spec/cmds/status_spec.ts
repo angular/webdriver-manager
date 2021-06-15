@@ -33,7 +33,7 @@ describe('status', () => {
         .catch(err => {
           done.fail();
         });
-  });
+  }, 30000);
 
   it('should show the version number of the default and latest versions', () => {
     let lines =
