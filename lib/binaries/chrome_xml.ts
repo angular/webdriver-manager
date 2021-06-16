@@ -129,11 +129,12 @@ export class ChromeXml extends XmlConfigSource {
  * Chromedriver is the only binary that does not conform to semantic versioning
  * and either has too little number of digits or too many. To get this to be in
  * semver, we will either add a '.0' at the end or chop off the last set of
- * digits. This is so we can compare to find the latest and greatest.
+ * digits (the patch number) and use it as a pre-release version. This is so we
+ * can compare to find the latest and greatest.
  *
  * Example:
  *   2.46 -> 2.46.0
- *   75.0.3770.8 -> 75.0.3770
+ *   75.0.3770.8 -> 75.0.3770-patch.8
  *
  * @param version
  */
@@ -151,10 +152,10 @@ export function getValidSemver(version: string): string {
   }
   // This supports downloading 74.0.3729.6
   try {
-    const newRegex = /(\d+.\d+.\d+).\d+/g;
+    const newRegex = /(\d+.\d+.\d+).(\d+)/g;
     const exec = newRegex.exec(version);
     if (exec) {
-      lookUpVersion = exec[1];
+      lookUpVersion = `${exec[1]}-patch.${exec[2]}`;
     }
   } catch (_) {
     // no-op: if this does not work, use the other regex pattern.

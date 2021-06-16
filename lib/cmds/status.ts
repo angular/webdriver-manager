@@ -95,7 +95,7 @@ function status(options: Options) {
       if (semver.gt(a, b)) {
         return 1;
       } else {
-        return 0;
+        return -1;
       }
     });
     for (let ver in downloaded.versions) {
