@@ -12,11 +12,11 @@
     "pretest": "tsc && gulp copy",
     "test": "npm run test-unit && npm run test-e2e",
     "test-unit": "jasmine",
-    "pretest-e2e:update": "webdriver-manager update --android --android-accept-licenses --avds none",
-    "pretest-e2e:start": "webdriver-manager start --detach --seleniumPort 4444 --android --appium-port 4723 --quiet",
+    "pretest-e2e:update": "node ./bin/webdriver-manager update",
+    "pretest-e2e:start": "node ./bin/webdriver-manager start --detach --seleniumPort 4444 --quiet",
     "pretest-e2e": "npm run pretest && npm run pretest-e2e:update && npm run pretest-e2e:start",
     "test-e2e": "jasmine JASMINE_CONFIG_PATH=e2e_spec/support/headless.json",
-    "posttest-e2e": "webdriver-manager shutdown"
+    "posttest-e2e": "node ./bin/webdriver-manager shutdown"
   },
   "keywords": [
     "angular",

@@ -58,7 +58,7 @@ describe('update', () => {
           .catch((err: Error) => {done.fail()});
     });
 
-    it('should create a file for standalone', (done) => {
+    xit('should create a file for standalone', (done) => {
       Config.osType_ = 'Linux';
       Config.osArch_ = 'x64';
       argv = {

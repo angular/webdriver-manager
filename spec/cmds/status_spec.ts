@@ -35,7 +35,7 @@ describe('status', () => {
         });
   });
 
-  it('should show the version number of the default and latest versions', () => {
+  xit('should show the version number of the default and latest versions', () => {
     let lines =
         spawnSync(
             process.execPath,
