@@ -1,3 +1,7 @@
+# 13.0.1
+
+Updates `adm-zip` to version `0.5.2`.
+
 # 13.0.0
 
 Rewrite webdriver-manager. Highlights:
