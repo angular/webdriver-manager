@@ -39,7 +39,7 @@
   "author": "Craig Nishina <craig.nishina@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "adm-zip": "^0.4.9",
+    "adm-zip": "^0.5.2",
     "chalk": "^1.1.1",
     "del": "^2.2.0",
     "glob": "^7.0.3",
@@ -52,7 +52,7 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.4.29",
+    "@types/adm-zip": "^0.5.0",
     "@types/chalk": "^0.4.28",
     "@types/form-data": "^0.0.33",
     "@types/glob": "^5.0.29",
