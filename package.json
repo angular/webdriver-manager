@@ -56,7 +56,7 @@
   },
   "homepage": "https://github.com/angular/webdriver-manager#readme",
   "dependencies": {
-    "adm-zip": "^0.4.13",
+    "adm-zip": "^0.5.2",
     "loglevel": "^1.6.1",
     "request": "^2.88.0",
     "semver": "^5.6.0",
@@ -65,7 +65,7 @@
     "yargs": "^12.0.5"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.4.31",
+    "@types/adm-zip": "^0.5.0",
     "@types/http-proxy": "^1.16.2",
     "@types/jasmine": "^3.3.1",
     "@types/loglevel": "^1.5.3",
