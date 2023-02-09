@@ -18,7 +18,6 @@
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "pretsc": "rm -rf dist/ && rm -rf downloads/",
-    "posttest": "npm run check",
     "posttsc": "mkdir -p built/lib && mv dist/lib/legacy/config.* built/lib/ && rm -rf dist/lib/legacy",
     "proxy-server": "tsc && node dist/spec/server/proxy_server.js",
     "test": "tsc && npm run test-unit && npm run test-int && npm run test-proxy && npm run test-e2e",

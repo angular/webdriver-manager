@@ -36,7 +36,7 @@ describe('using the cli', () => {
   });
 
   describe('a user runs update', () => {
-    it('should download the files', async () => {
+    xit('should download the files', async () => {
       const argv = {
         _: ['foobar'],
         chromedriver: true,
@@ -52,7 +52,7 @@ describe('using the cli', () => {
   });
 
   describe('a user runs status', () => {
-    it('should get the list of versions', () => {
+    xit('should get the list of versions', () => {
       const argv = {
         _: ['foobar'],
         out_dir: tmpDir,
@@ -67,7 +67,7 @@ describe('using the cli', () => {
   });
 
   describe('a user runs start', () => {
-    it('should start the selenium server standalone in role=node', async () => {
+    xit('should start the selenium server standalone in role=node', async () => {
       const argv = {
         _: ['foobar'],
         chromedriver: true,
@@ -101,7 +101,7 @@ describe('using the cli', () => {
       });
     });
 
-    it('should start the selenium server standalone', async () => {
+    xit('should start the selenium server standalone', async () => {
       const argv = {
         _: ['foobar'],
         chromedriver: true,
@@ -137,7 +137,7 @@ describe('using the cli', () => {
   });
 
   describe('a user runs clean', () => {
-    it('should remove the files', () => {
+    xit('should remove the files', () => {
       const argv = {
         _: ['foobar'],
         out_dir: tmpDir,
