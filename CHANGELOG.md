@@ -1,3 +1,7 @@
+# 12.1.9
+
+Updates `adm-zip` to version `0.5.2`.
+
 # 12.1.8
 
 Fixes for macOS ChromeDriver download. If you are using a macOS and are
