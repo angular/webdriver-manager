@@ -5,24 +5,31 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as semver from 'semver';
 
-import {ProviderClass, ProviderConfig, ProviderInterface} from './provider';
+import {ProviderConfig, ProviderInterface} from './provider';
 import {requestBody} from './utils/http_utils';
 
 const log = loglevel.getLogger('webdriver-manager');
 
-export class Appium extends ProviderClass implements ProviderInterface {
+export class Appium implements ProviderInterface {
   ignoreSSL: boolean;
   outDir: string;
   outDirAppium: string;
   proxy: string;
   requestUrl = 'http://registry.npmjs.org/appium';
 
-  constructor(config?: ProviderConfig) {
-    super();
-    this.ignoreSSL = this.setVar('ignoreSSL', this.ignoreSSL, config);
-    this.outDir = this.setVar('outDir', this.outDir, config);
-    this.proxy = this.setVar('proxy', this.proxy, config);
-    this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
+  constructor(providerConfig?: ProviderConfig) {
+    if (providerConfig) {
+      this.ignoreSSL = providerConfig.ignoreSSL;
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+    }
   }
 
   /**

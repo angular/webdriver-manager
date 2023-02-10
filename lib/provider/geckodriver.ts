@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import {OUT_DIR, ProviderClass, ProviderConfig, ProviderInterface} from './provider';
+import {OUT_DIR, ProviderConfig, ProviderInterface} from './provider';
 import {changeFilePermissions, generateConfigFile, getBinaryPathFromConfig, removeFiles, renameFileWithVersion, tarFileList, uncompressTarball, unzipFile, zipFileList,} from './utils/file_utils';
 import {convertJsonToVersionList, updateJson} from './utils/github_json';
 import {requestBinary} from './utils/http_utils';
@@ -12,7 +12,7 @@ export interface GeckoDriverProviderConfig extends ProviderConfig {
   oauthToken?: string;
 }
 
-export class GeckoDriver extends ProviderClass implements ProviderInterface {
+export class GeckoDriver implements ProviderInterface {
   cacheFileName = 'geckodriver.json';
   configFileName = 'geckodriver.config.json';
   ignoreSSL = false;
@@ -24,17 +24,34 @@ export class GeckoDriver extends ProviderClass implements ProviderInterface {
   requestUrl = 'https://api.github.com/repos/mozilla/geckodriver/releases';
   seleniumFlag = '-Dwebdriver.gecko.driver';
 
-  constructor(config?: GeckoDriverProviderConfig) {
-    super();
-    this.cacheFileName = this.setVar('cacheFileName', this.cacheFileName, config);
-    this.configFileName = this.setVar('configFileName', this.configFileName, config);
-    this.ignoreSSL = this.setVar('ignoreSSL', this.ignoreSSL, config);
-    this.osArch = this.setVar('osArch', this.osArch, config);
-    this.osType = this.setVar('osType', this.osType, config);
-    this.outDir = this.setVar('outDir', this.outDir, config);
-    this.proxy = this.setVar('proxy', this.proxy, config);
-    this.requestUrl = this.setVar('requestUrl', this.requestUrl, config);
-    this.oauthToken = this.setVar('oauthToken', this.oauthToken, config);
+  constructor(providerConfig?: GeckoDriverProviderConfig) {
+    if (providerConfig) {
+      if (providerConfig.cacheFileName) {
+        this.cacheFileName = providerConfig.cacheFileName;
+      }
+      if (providerConfig.configFileName) {
+        this.configFileName = providerConfig.configFileName;
+      }
+      this.ignoreSSL = providerConfig.ignoreSSL;
+      if (providerConfig.osArch) {
+        this.osArch = providerConfig.osArch;
+      }
+      if (providerConfig.osType) {
+        this.osType = providerConfig.osType;
+      }
+      if (providerConfig.outDir) {
+        this.outDir = providerConfig.outDir;
+      }
+      if (providerConfig.proxy) {
+        this.proxy = providerConfig.proxy;
+      }
+      if (providerConfig.requestUrl) {
+        this.requestUrl = providerConfig.requestUrl;
+      }
+      if (providerConfig.oauthToken) {
+        this.oauthToken = providerConfig.oauthToken;
+      }
+    }
   }
 
   /**
