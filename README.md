@@ -68,18 +68,9 @@ webdriver-manager update      // Downloads the latest binaries.
 webdriver-manager start       // Starts the selenium server standalone.
 ```
 
-Notes:
-* Installing globally will not work with Protractor if you are trying to
+Note: Installing globally will not work with Protractor if you are trying to
 start a Selenium Standalone server with a "local" or "directConnect", because
 Protractor installs its own version of webdriver-manager as a dependency.
-* Right now there is an issue with downloading the latest ChromeDriver.
-It might not be compatible with the current version of Chrome.
-The latest available version of ChromeDriver is the *v74.x.x.x*
-but this one only works with Chrome *v74.x.x.x* which is in Beta right now.
-So, if you have installed the latest stable version of Chrome (*v73.x.x.x*)
-you should pin that ChromeDriver version to be
-downloaded: `webdriver-manager update --versions.chrome=73.0.3683.68`.
-To find out the latest version, check out http://chromedriver.chromium.org/ .
 
 ## The command line interface help commands
 
