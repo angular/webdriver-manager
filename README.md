@@ -69,8 +69,9 @@ webdriver-manager start       // Starts the selenium server standalone.
 ```
 
 Note: Installing globally will not work with Protractor if you are trying to
-start a Selenium Standalone server with a "local" or "directConnect", because
-Protractor installs its own version of webdriver-manager as a dependency.
+start a Selenium Standalone server with a "local" or "directConnect". It will
+not work for these since Protractor is looking files downloaded locally to
+the project.
 
 ## The command line interface help commands
 
