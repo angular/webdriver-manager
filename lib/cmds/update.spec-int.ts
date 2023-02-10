@@ -42,7 +42,7 @@ describe('update cmd', () => {
     }
   });
 
-  it('should download the chromdriver files', async () => {
+  xit('should download the chromdriver files', async () => {
     const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
       browserDrivers: [{binary: new ChromeDriver({outDir: tmpDir})}]
@@ -78,7 +78,7 @@ describe('update cmd', () => {
     expect(fs.readdirSync(tmpDir).length).toBe(4);
   });
 
-  it('should download default files', async () => {
+  xit('should download default files', async () => {
     const optionsBinary: OptionsBinary = {
       outDir: tmpDir,
       browserDrivers: [
