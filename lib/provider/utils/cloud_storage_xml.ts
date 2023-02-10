@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
-import {convertXml2js, isExpired, readXml} from './file_utils';
+import {convertXml2js, readXml} from './file_utils';
+import {isExpired} from './file_utils';
 import {HttpOptions, JsonObject, requestBody} from './http_utils';
 import {VersionList} from './version_list';
 

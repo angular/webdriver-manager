@@ -105,7 +105,6 @@ export function unzipFile(zipFileName: string, dstDir: string): string[] {
   const zip = new AdmZip(zipFileName);
   zip.extractAllTo(dstDir, true);
   for (const fileItem of zipFileList(zipFileName)) {
-    console.log(fileItem);
     fileList.push(path.resolve(dstDir, fileItem));
   }
   return fileList;
@@ -116,16 +115,18 @@ export function unzipFile(zipFileName: string, dstDir: string): string[] {
  * @param tarball The tarball file.
  * @returns A lsit of files in the tarball file.
  */
-export async function tarFileList(tarball: string): Promise<string[]> {
+export function tarFileList(tarball: string): Promise<string[]> {
   const fileList: string[] = [];
-  await tar
+  return tar
       .list({
         file: tarball,
         onentry: entry => {
           fileList.push(entry['path'].toString());
         }
-      });    
-  return fileList;
+      })
+      .then(() => {
+        return fileList;
+      });
 }
 
 /**
@@ -182,7 +183,7 @@ export function generateConfigFile(
     configData['last'] = lastFileBinaryPath;
   }
   configData['all'] = getMatchingFiles(outDir, fileBinaryPathRegex);
-  fs.writeFileSync(fileName, JSON.stringify(configData, null, 2));
+  fs.writeFileSync(fileName, JSON.stringify(configData));
 }
 
 /**
