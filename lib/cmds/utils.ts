@@ -120,7 +120,6 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     options.server.version = versionsStandalone;
     options.server.chromeLogs = argv.chrome_logs as string;
     options.server.edge = argv.edge as string;
-    options.server.port = argv.seleniumPort as number;
   }
   return options;
 }

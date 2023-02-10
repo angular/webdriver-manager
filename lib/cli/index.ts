@@ -68,12 +68,6 @@ const proxyOption: yargs.Options = {
   describe: 'Use a proxy server to download files.',
   type: 'string'
 };
-const SELENIUM_PORT = 'seleniumPort';
-const seleniumPort: yargs.Options = {
-  describe: 'Optional port for the selenium standalone server',
-  default: 4444,
-  type: 'number'
-};
 const STANDALONE = 'standalone';
 const standaloneOption: yargs.Options = {
   describe: 'Install or update selenium server standalone.',
@@ -136,7 +130,6 @@ yargs
               .option(IEDRIVER, ieOption)
               .option(LOG_LEVEL, logLevelOption)
               .option(OUT_DIR, outDirOption)
-              .option(SELENIUM_PORT, seleniumPort)
               .option(STANDALONE, standaloneOption)
               .option(STANDALONE_NODE, standaloneNodeOption)
               .option(VERSIONS_CHROME, versionsChromeOption)
