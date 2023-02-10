@@ -74,11 +74,6 @@ const seleniumPort: yargs.Options = {
   default: 4444,
   type: 'number'
 };
-const SELENIUM_LOG_LEVEL = 'seleniumLogLevel';
-const seleniumLogLevelOption: yargs.Options = {
-  describe: 'Set the -Dselenium.LOGGER.level flag when starting the server',
-  type: 'string'
-};
 const STANDALONE = 'standalone';
 const standaloneOption: yargs.Options = {
   describe: 'Install or update selenium server standalone.',
@@ -142,7 +137,6 @@ yargs
               .option(LOG_LEVEL, logLevelOption)
               .option(OUT_DIR, outDirOption)
               .option(SELENIUM_PORT, seleniumPort)
-              .option(SELENIUM_LOG_LEVEL, seleniumLogLevelOption)
               .option(STANDALONE, standaloneOption)
               .option(STANDALONE_NODE, standaloneNodeOption)
               .option(VERSIONS_CHROME, versionsChromeOption)
