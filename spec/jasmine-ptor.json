@@ -1,8 +1,0 @@
-{
-  "spec_dir": "",
-  "spec_files": [
-    "**/*.spec-ptor.js"
-  ],
-  "stopSpecOnExpectationFailure": false,
-  "random": false
-}

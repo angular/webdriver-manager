@@ -1,7 +1,6 @@
 .circleci/
 dist/spec/
 dist/**/*.spec-*
-built/**/*.spec-*
 downloads/
 lib/
 spec/

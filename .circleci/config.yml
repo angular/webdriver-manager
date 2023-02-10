@@ -19,7 +19,6 @@ jobs:
       - run: npm run test-int
       - run: npm run test-proxy
       - run: npm run test-e2e
-      - run: npm run test-ptor
 workflows:
   version: 2
   default_workflow:
