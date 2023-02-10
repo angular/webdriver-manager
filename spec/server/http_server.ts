@@ -13,8 +13,9 @@ http.createServer(
           let fileName = path.join(process.cwd(), uri);
 
           try {
-            if (!fs.statSync(fileName).isFile() &&
-                !fs.statSync(fileName).isDirectory()) {
+            if (fs.statSync(fileName).isFile() ||
+                fs.statSync(fileName).isDirectory) {
+            } else {
               response.writeHead(404, {'Content-Type': 'text/plain'});
               response.write('404 Not Found\n');
               response.end();
