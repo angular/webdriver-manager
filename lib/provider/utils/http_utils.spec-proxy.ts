@@ -14,7 +14,6 @@ log.setLevel('debug');
 
 const tmpDir = path.resolve(os.tmpdir(), 'test');
 const fileName = path.resolve(tmpDir, 'bar.zip');
-const ignoreSSL = true;
 const binaryUrl = proxyBaseUrl + '/spec/support/files/bar.zip';
 const fooJsonUrl = proxyBaseUrl + '/spec/support/files/foo_json.json';
 const fooArrayUrl = proxyBaseUrl + '/spec/support/files/foo_array.json';
@@ -23,29 +22,31 @@ const barZipSize = 171;
 const headers = {
   'host': httpBaseUrl
 };
-const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-let httpProc: childProcess.ChildProcess;
-let proxyProc: childProcess.ChildProcess;
 
-describe('binary_utils', () => {  
-  beforeAll(async () => {
+describe('binary_utils', () => {
+  const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  let httpProc: childProcess.ChildProcess;
+  let proxyProc: childProcess.ChildProcess;
+
+  beforeAll((done) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     httpProc = spawnProcess('node', ['dist/spec/server/http_server.js']);
     log.debug('http-server: ' + httpProc.pid);
     proxyProc = spawnProcess('node', ['dist/spec/server/proxy_server.js']);
     log.debug('proxy-server: ' + proxyProc.pid);
-    await new Promise(resolve => {
-      setTimeout(resolve, 3000);
-    });
+    setTimeout(done, 3000);
 
     try {
       fs.mkdirSync(tmpDir);
+    } catch (err) {
+    }
+    try {
       fs.unlinkSync(fileName);
     } catch (err) {
     }
   });
 
-  afterAll(async () => {
+  afterAll((done) => {
     try {
       fs.unlinkSync(fileName);
       fs.rmdirSync(tmpDir);
@@ -54,48 +55,48 @@ describe('binary_utils', () => {
 
     process.kill(httpProc.pid);
     process.kill(proxyProc.pid);
-    await new Promise(resolve => {
-      setTimeout(resolve, 5000);
-    });
+    setTimeout(done, 5000);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = origTimeout;
   });
 
   describe('requestBinary', () => {
-    it('should download the file if no file exists or the content lenght ' + 
-       'is different', async () => {
-      try {
-        const result = await requestBinary(
-          binaryUrl, {fileName, fileSize: 0, headers, ignoreSSL});
-        expect(result).toBeTruthy();
-        expect(fs.statSync(fileName).size).toBe(barZipSize);
-      } catch (err) {
-        fail(err);
-      }
-    });
+    it('should download the file if no file exists or ' +
+           'the content lenght is different',
+       (done) => {
+         requestBinary(binaryUrl, {fileName, fileSize: 0, headers})
+             .then((result) => {
+               expect(result).toBeTruthy();
+               expect(fs.statSync(fileName).size).toBe(barZipSize);
+               done();
+             })
+             .catch(err => {
+               done.fail(err);
+             });
+       });
 
-    it('should not download the file if the file exists', async () => {
-      try {
-        const result = await requestBinary(
-          binaryUrl, {fileName, fileSize: barZipSize, headers,
-          ignoreSSL});
-        expect(result).toBeFalsy();
-        expect(fs.statSync(fileName).size).toBe(barZipSize);
-      } catch (err) {
-        fail(err);
-      }
+    it('should not download the file if the file exists', (done) => {
+      requestBinary(binaryUrl, {fileName, fileSize: barZipSize, headers})
+          .then((result) => {
+            expect(result).toBeFalsy();
+            expect(fs.statSync(fileName).size).toBe(barZipSize);
+            done();
+          })
+          .catch(err => {
+            done.fail(err);
+          });
     });
   });
 
   describe('requestBody', () => {
     it('should download a json object file', async () => {
-      const foo = await requestBody(fooJsonUrl, {headers, ignoreSSL});
+      const foo = await requestBody(fooJsonUrl, {headers});
       const fooJson = JSON.parse(foo);
       expect(fooJson['foo']).toBe('abc');
       expect(fooJson['bar']).toBe(123);
     });
 
     it('should download a json array file', async () => {
-      const foo = await requestBody(fooArrayUrl, {headers, ignoreSSL});
+      const foo = await requestBody(fooArrayUrl, {headers});
       const fooJson = JSON.parse(foo);
       expect(fooJson.length).toBe(3);
       expect(fooJson[0]['foo']).toBe('abc');
@@ -104,7 +105,7 @@ describe('binary_utils', () => {
     });
 
     it('should get the xml file', async () => {
-      const text = await requestBody(fooXmlUrl, {headers, ignoreSSL});
+      const text = await requestBody(fooXmlUrl, {headers});
       expect(text.length).toBeGreaterThan(0);
     });
   });

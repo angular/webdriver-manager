@@ -19,11 +19,10 @@ const fooArrayUrl = httpBaseUrl + '/spec/support/files/foo_array.json';
 const fooXmlUrl = httpBaseUrl + '/spec/support/files/foo.xml';
 const barZipSize = 171;
 
-const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-let proc: childProcess.ChildProcess;
-
 describe('http_utils', () => {
-  
+  const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  let proc: childProcess.ChildProcess;
+
   beforeAll(() => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
   });
@@ -42,6 +41,9 @@ describe('http_utils', () => {
 
       try {
         fs.mkdirSync(tmpDir);
+      } catch (err) {
+      }
+      try {
         fs.unlinkSync(fileName);
       } catch (err) {
       }
@@ -61,27 +63,30 @@ describe('http_utils', () => {
     });
 
     describe('requestBinary', () => {
-      it('should download the file if no file exists or the content lenght ' +
-         'is different', async () => {
-        try {
-          const result = await requestBinary(
-            binaryUrl, {fileName, fileSize: 0});
-          expect(result).toBeTruthy();
-          expect(fs.statSync(fileName).size).toBe(barZipSize);
-        } catch (err) {
-          fail(err);
-        }
-      });
+      it('should download the file if no file exists or ' +
+             'the content lenght is different',
+         (done) => {
+           requestBinary(binaryUrl, {fileName, fileSize: 0})
+               .then((result) => {
+                 expect(result).toBeTruthy();
+                 expect(fs.statSync(fileName).size).toBe(barZipSize);
+                 done();
+               })
+               .catch(err => {
+                 done.fail(err);
+               });
+         });
 
-      it('should not download the file if the file exists', async () => {
-        try {
-          const result = await requestBinary(
-            binaryUrl, {fileName, fileSize: barZipSize});
-          expect(result).toBeFalsy();
-          expect(fs.statSync(fileName).size).toBe(barZipSize);
-        } catch (err) {
-          fail(err);
-        }
+      it('should not download the file if the file exists', (done) => {
+        requestBinary(binaryUrl, {fileName, fileSize: barZipSize})
+            .then((result) => {
+              expect(result).toBeFalsy();
+              expect(fs.statSync(fileName).size).toBe(barZipSize);
+              done();
+            })
+            .catch(err => {
+              done.fail(err);
+            });
       });
     });
 
