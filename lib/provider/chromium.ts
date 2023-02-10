@@ -47,7 +47,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
    * Step 1: Download the json file that contains all the releases by OS. Each
    * OS will have a list of release versions. The requested body will also be
    * written to the out directory.
-   *
+   * 
    * The requested url is https://omahaproxy.appspot.com/all.json. Some other
    * urls include a timestamped csv https://omahaproxy.appspot.com/history.
    * @return Promise of the all-json file.
@@ -60,7 +60,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
       this.makeDirectory(fileName);
       const httpOptions = { fileName, ignoreSSL: this.ignoreSSL,
         proxy: this.proxy };
-
+    
       if (isExpired(fileName)) {
         const allJsonUrl = 'https://omahaproxy.appspot.com/all.json';
         let contents = await requestBody(allJsonUrl, httpOptions);
@@ -79,7 +79,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
    * Step 2: From the all-json object, make a request that matches the major
    * version requested. The requested body will also be written to file in the
    * out directory.
-   *
+   * 
    * An example of a requsted url is
    * https://omahaproxy.appspot.com/deps.json?version=72.0.3626.81
    * @param allJson The all-json object.
@@ -109,11 +109,11 @@ export class Chromium extends ProviderClass implements ProviderInterface {
     }
 
     let workingFullVersion = '';
-    const workingSemanticVersion = '0.0.0';
-    for (const item of all) {
+    let workingSemanticVersion = '0.0.0';
+    for (let item of all) {
       if (item['os'] === os) {
         const versions = item['versions'];
-        for (const version of versions) {
+        for (let version of versions) {
           const fullVersion = version['current_version'];
           const major = fullVersion.split('.')[0];
           const minor = fullVersion.split('.')[1];
@@ -145,11 +145,11 @@ export class Chromium extends ProviderClass implements ProviderInterface {
    * This is the "chromium_base_position" and make a request to the storage
    * bucket. If the returned value is {"kind": "storage#objects"}, then
    * decrement the revision number.
-   *
+   * 
    * An example is the chromium_base_position revision number (612437).
    * https://www.googleapis.com/storage/v1/b/chromium-browser-snapshots/o?delimiter=/&prefix=Linux_x64/612437/
    * returns {"kind": "storage#objects"}.
-   *
+   * 
    * We keep decrementing the number until we reach 612434 where there is a list
    * of items.
    * @param downloadJson The download-version-json object.
@@ -181,7 +181,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
     }
     revisionUrl += os + '/';
     let chromiumBasePosition: number = downloadJson['chromium_base_position'];
-
+    
     const httpOptions = { fileName, ignoreSSL: this.ignoreSSL,
       proxy: this.proxy };
     while(chromiumBasePosition > 0) {
@@ -203,23 +203,23 @@ export class Chromium extends ProviderClass implements ProviderInterface {
    * Step 4: Get the download url for the chromium zip. Unzipping the zip file
    * directory. The folders and binaries uncompressed are different for each OS.
    * The following is examples of each OS:
-   *
+   * 
    * downloads/
    *  |- chrome-linux/chrome
    *  |- chrome-mac/Chromium.app
    *  |- chrome-win/chrome.exe
-   *
+   * 
    * @param storageObject The download-storage-json object
    * @param majorVersion The major version, this must be a whole number.
    */
   async downloadUrl(storageObject: JsonObject, majorVersion: string
       ): Promise<void> {
-    const fileName = path.resolve(this.outDir,
+    const fileName = path.resolve(this.outDir, 
       this.compressedBinaryFileName.replace('.zip', `-${majorVersion}.zip`));
     if (isExpired(fileName)) {
       const httpOptions = { fileName, ignoreSSL: this.ignoreSSL,
         proxy: this.proxy };
-      for (const item of storageObject['items'] as JsonObject[]) {
+      for (let item of storageObject['items'] as JsonObject[]) {
         const name: string = item['name'];
         if (name.indexOf('chrome') >= 0) {
           const downloadUrl = item['mediaLink'];
@@ -253,41 +253,41 @@ export class Chromium extends ProviderClass implements ProviderInterface {
       downloadVersionJson, majorVersion);
     await this.downloadUrl(storageObject, majorVersion);
 
-    const binaryFolder = (): string => {
+    let binaryFolder = (): string => {
       if (this.osType === 'Linux') {
         return path.resolve(this.outDir, 'chrome-linux');
       } else if (this.osType === 'Darwin') {
         return path.resolve(this.outDir,
           'chrome-mac/Chromium.app/Contents/MacOS');
       } else if (this.osType === 'Windows_NT') {
-        return path.resolve(this.outDir, 'chrome-win');
+        return 'fix me';
       }
       throw new Error('os does not exist');
-    };
+    }
 
-    const binaryRegex = (): RegExp => {
+    let binaryRegex = (): RegExp => {
       if (this.osType === 'Linux') {
         return /chrome$/g;
       } else if (this.osType === 'Darwin') {
         return /Chromium/g;
       } else if (this.osType === 'Windows_NT') {
-        return /chrome\.exe/g;
+        return /fix-me/g;
       }
       throw new Error('os does not exist');
     };
 
-    const binaryFile = (): string => {
+    let binaryFile = (): string => {
       if (this.osType === 'Linux') {
         return path.resolve(this.outDir, 'chrome-linux/chrome');
       } else if (this.osType === 'Darwin') {
         return path.resolve(this.outDir,
           'chrome-mac/Chromium.app/Contents/MacOS/Chromium');
       } else if (this.osType === 'Windows_NT') {
-        return 'chrome-win/chrome.exe';
+        return 'fix me';
       }
       throw new Error('os does not exist');
-    };
-
+    }
+    
     generateConfigFile(binaryFolder(),
       path.resolve(this.outDir, this.configFileName),
       binaryRegex(), binaryFile());
@@ -310,7 +310,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
           const regex = /chromium\-version\-(\d+)\.json/g;
           const exec = regex.exec(existFile);
           if (exec) {
-            return exec[1];
+            return exec[1]; 
           }
         }
       }
@@ -329,7 +329,7 @@ export class Chromium extends ProviderClass implements ProviderInterface {
     } else if (this.osType === 'Windows_NT') {
       chromiumPath = 'chrome-win/';
     }
-
+    
     rimraf.sync(path.resolve(this.outDir, chromiumPath));
     const files = removeFiles(this.outDir, [/chromium.*/g]);
     try {
