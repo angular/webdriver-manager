@@ -48,19 +48,6 @@ describe('version_list', () => {
       expect(version['foo_win32']['size']).toBe(10101);
       expect(version['foo_linux64']['size']).toBe(10102);
     });
-
-    it('should return the max version for "2."', () => {
-      const version = getVersionObjs(versionList, null, '2.');
-      expect(Object.keys(version).length).toBe(3);
-      expect(version['foo_mac32']['size']).toBe(20100);
-      expect(version['foo_win32']['size']).toBe(20101);
-      expect(version['foo_linux64']['size']).toBe(20102);
-    });
-
-    it('should return undefined with a max version of "4."', () => {
-      const version = getVersionObjs(versionList, null, '4.');
-      expect(version).toBeUndefined();
-    });
   });
 
   describe('getVersionObj', () => {

@@ -11,7 +11,7 @@ const log = loglevel.getLogger('webdriver-manager');
  * @param argv The argv from yargs.
  */
 export async function handler(argv: yargs.Arguments) {
-  log.setLevel(argv['log_level']);
+  log.setLevel(argv.log_level);
   const options = convertArgs2Options(argv);
   await update(options);
 }
@@ -35,14 +35,12 @@ export function updateBinary(optionsBinary: OptionsBinary): Promise<void[]> {
   const promises = [];
   if (optionsBinary.browserDrivers) {
     for (const provider of optionsBinary.browserDrivers) {
-      promises.push(provider.binary.updateBinary(provider.version,
-        provider.maxVersion));
+      promises.push(provider.binary.updateBinary(provider.version));
     }
   }
   if (optionsBinary.server && optionsBinary.server.binary) {
     promises.push(
-        optionsBinary.server.binary.updateBinary(optionsBinary.server.version,
-          optionsBinary.server.maxVersion));
+        optionsBinary.server.binary.updateBinary(optionsBinary.server.version));
   }
   return Promise.all(promises);
 }

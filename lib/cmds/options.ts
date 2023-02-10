@@ -16,18 +16,14 @@ export interface Options {
   githubToken?: string;
 }
 
-export type BrowserDriverName = 'chromedriver'|'geckodriver'|'iedriver';
-
 /**
  * Contains information about a browser driver.
  */
 export interface BrowserDriver {
   // The name of the browser driver.
-  name?: BrowserDriverName;
+  name?: 'chromedriver'|'geckodriver'|'iedriver';
   // The version which does not have to follow semver.
   version?: string;
-  // A max version that either fully or partially matches the version.
-  maxVersion?: string;
 }
 
 /**
@@ -39,8 +35,6 @@ export interface Server {
   name?: 'selenium';
   // The version which does not have to follow semver.
   version?: string;
-  // A max version that either fully or partially matches the version.
-  maxVersion?: string;
   // Run as role = node option.
   runAsNode?: boolean;
   // The relative or full path to the chrome logs file.

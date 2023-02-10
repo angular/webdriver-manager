@@ -5,16 +5,14 @@ import * as start from '../cmds/start';
 import * as status from '../cmds/status';
 import * as update from '../cmds/update';
 
-const CHROMEDRIVER_ALIAS = 'chrome';
-const CHROMEDRIVER = 'chromedriver';
-const chromedriverOption: yargs.Options = {
+const CHROME = 'chrome';
+const chromeOption: yargs.Options = {
   describe: 'Install or update chromedriver.',
   default: true,
   type: 'boolean'
 };
-const CHROMEDRIVER_LOGS_ALIAS = 'chrome_logs';
-const CHROMEDRIVER_LOGS = 'chromedriver_logs';
-const chromedriverLogsOption: yargs.Options = {
+const CHROME_LOGS = 'chrome_logs';
+const chromeLogsOption: yargs.Options = {
   describe: 'File path to chrome logs.',
   type: 'string'
 };
@@ -32,9 +30,8 @@ const edgeOption: yargs.Options = {
       '"C:\Program Files (x86)\Microsoft Web Driver\MirosoftWebDriver.exe"',
   type: 'string'
 };
-const GECKODRIVER_ALIAS = 'gecko';
-const GECKODRIVER = 'geckodriver';
-const geckodriverOption: yargs.Options = {
+const GECKO = 'gecko';
+const geckoOption: yargs.Options = {
   describe: 'Install or update geckodriver.',
   default: true,
   type: 'boolean'
@@ -44,9 +41,8 @@ const githubTokenOption: yargs.Options = {
   describe: 'Use a GitHub token to prevent rate limit issues.',
   type: 'string'
 };
-const IEDRIVER_ALIAS = 'ie';
 const IEDRIVER = 'iedriver';
-const iedriverOption: yargs.Options = {
+const ieOption: yargs.Options = {
   describe: 'Install or update ie driver.',
   default: false,
   type: 'boolean'
@@ -62,31 +58,6 @@ const logLevelOption: yargs.Options = {
   default: 'info',
   type: 'string'
 };
-const MAX_VERSIONS_CHROMEDRIVER_ALIAS = 'max_versions.chrome';
-const MAX_VERSIONS_CHROMEDRIVER = 'max_versions.chromedriver';
-const maxVersionsChromedriverOption: yargs.Options = {
-  describe: 'The chromedriver max version used only for update.',
-  type: 'string'
-};
-const MAX_VERSIONS_GECKODRIVER_ALIAS = 'max_versions.gecko';
-const MAX_VERSIONS_GECKODRIVER = 'max_versions.geckodriver';
-const maxVersionsGeckodriverOption: yargs.Options = {
-  describe: 'The geckodriver max version used only for update.',
-  type: 'string'
-};
-const MAX_VERSIONS_IEDRIVER_ALIAS = 'max_versions.ie';
-const MAX_VERSIONS_IEDRIVER = 'max_versions.iedriver';
-const maxVersionsIedriverOption: yargs.Options = {
-  describe: 'The ie driver max version used only for update.',
-  type: 'string'
-};
-const MAX_VERSIONS_SELENIUM_ALIAS = 'max_versions.standalone';
-const MAX_VERSIONS_SELENIUM = 'max_versions.selenium';
-const maxVersionsSeleniumOption: yargs.Options = {
-  describe: 'The selenium server standalone max version used only for update.',
-  type: 'string'
-};
-
 const OUT_DIR = 'out_dir';
 const outDirOption: yargs.Options = {
   describe: 'Location of output.',
@@ -108,40 +79,34 @@ const seleniumLogLevelOption: yargs.Options = {
   describe: 'Set the -Dselenium.LOGGER.level flag when starting the server',
   type: 'string'
 };
-const SELENIUM_ALIAS = 'standalone';
-const SELENIUM = 'selenium';
-const seleniumOption: yargs.Options = {
+const STANDALONE = 'standalone';
+const standaloneOption: yargs.Options = {
   describe: 'Install or update selenium server standalone.',
   default: true,
   type: 'boolean'
 };
-const SELENIUM_NODE_ALIAS = 'standalone_node';
-const SELENIUM_NODE = 'selenium_node';
-const seleniumNodeOption: yargs.Options = {
+const STANDALONE_NODE = 'standalone_node';
+const standaloneNodeOption: yargs.Options = {
   describe: 'Start the selenium server standalone with role set to "node".',
   type: 'boolean'
 };
-const VERSIONS_CHROMEDRIVER_ALIAS = 'versions.chrome';
-const VERSIONS_CHROMEDRIVER = 'versions.chromedriver';
-const versionsChromedriverOption: yargs.Options = {
+const VERSIONS_CHROME = 'versions.chrome';
+const versionsChromeOption: yargs.Options = {
   describe: 'The chromedriver version.',
   type: 'string'
 };
-const VERSIONS_GECKODRIVER_ALIAS = 'versions.gecko';
-const VERSIONS_GECKODRIVER = 'versions.geckodriver';
-const versionsGeckodriverOption: yargs.Options = {
+const VERSIONS_GECKO = 'versions.gecko';
+const versionsGeckoOption: yargs.Options = {
   describe: 'The geckodriver version.',
   type: 'string'
 };
-const VERSIONS_IEDRIVER_ALIAS = 'versions.ie';
-const VERSIONS_IEDRIVER = 'versions.iedriver';
-const versionsIedriverOption: yargs.Options = {
+const VERSIONS_IE = 'versions.ie';
+const versionsIeOption: yargs.Options = {
   describe: 'The ie driver version.',
   type: 'string'
 };
-const VERSIONS_SELENIUM_ALIAS = 'versions.standalone';
-const VERSIONS_SELENIUM = 'versions.selenium';
-const versionsSeleniumOption: yargs.Options = {
+const VERSIONS_STANDALONE = 'versions.standalone';
+const versionsStandaloneOption: yargs.Options = {
   describe: 'The selenium server standalone version.',
   type: 'string'
 };
@@ -168,33 +133,22 @@ yargs
     .command(
         'start', 'Start up the selenium server.',
         (yargs: yargs.Argv) => {
-          return yargs
-              .option(CHROMEDRIVER, chromedriverOption)
-              .alias(CHROMEDRIVER_ALIAS, CHROMEDRIVER)
-              .option(CHROMEDRIVER_LOGS, chromedriverLogsOption)
-              .alias(CHROMEDRIVER_LOGS_ALIAS, CHROMEDRIVER_LOGS)
+          return yargs.option(CHROME, chromeOption)
+              .option(CHROME_LOGS, chromeLogsOption)
               .option(DETACH, detachOption)
               .option(EDGE, edgeOption)
-              .option(GECKODRIVER, geckodriverOption)
-              .alias(GECKODRIVER_ALIAS, GECKODRIVER)
-              .option(IEDRIVER, iedriverOption)
-              .alias(IEDRIVER_ALIAS, IEDRIVER)
+              .option(GECKO, geckoOption)
+              .option(IEDRIVER, ieOption)
               .option(LOG_LEVEL, logLevelOption)
               .option(OUT_DIR, outDirOption)
-              .option(SELENIUM, seleniumOption)
-              .alias(SELENIUM_ALIAS, SELENIUM)
-              .option(SELENIUM_LOG_LEVEL, seleniumLogLevelOption)
-              .option(SELENIUM_NODE, seleniumNodeOption)
-              .alias(SELENIUM_NODE_ALIAS, SELENIUM_NODE)
               .option(SELENIUM_PORT, seleniumPort)
-              .option(VERSIONS_CHROMEDRIVER, versionsChromedriverOption)
-              .alias(VERSIONS_CHROMEDRIVER_ALIAS, VERSIONS_CHROMEDRIVER)
-              .option(VERSIONS_GECKODRIVER, versionsGeckodriverOption)
-              .alias(VERSIONS_GECKODRIVER_ALIAS, VERSIONS_GECKODRIVER)
-              .option(VERSIONS_IEDRIVER, versionsIedriverOption)
-              .alias(VERSIONS_IEDRIVER_ALIAS, VERSIONS_IEDRIVER)
-              .option(VERSIONS_SELENIUM, versionsSeleniumOption)
-              .alias(VERSIONS_SELENIUM_ALIAS, VERSIONS_SELENIUM);
+              .option(SELENIUM_LOG_LEVEL, seleniumLogLevelOption)
+              .option(STANDALONE, standaloneOption)
+              .option(STANDALONE_NODE, standaloneNodeOption)
+              .option(VERSIONS_CHROME, versionsChromeOption)
+              .option(VERSIONS_GECKO, versionsGeckoOption)
+              .option(VERSIONS_IE, versionsIeOption)
+              .option(VERSIONS_STANDALONE, versionsStandaloneOption);
         },
         (argv: yargs.Arguments) => {
           start.handler(argv);
@@ -212,34 +166,19 @@ yargs
         'update', 'Install or update selected binaries.',
         (yargs: yargs.Argv) => {
           return yargs.option(OUT_DIR, outDirOption)
-              .option(CHROMEDRIVER, chromedriverOption)
-              .alias(CHROMEDRIVER_ALIAS, CHROMEDRIVER)
-              .option(GECKODRIVER, geckodriverOption)
-              .alias(GECKODRIVER_ALIAS, GECKODRIVER)
+              .option(CHROME, chromeOption)
+              .option(GECKO, geckoOption)
               .option(GITHUB_TOKEN, githubTokenOption)
-              .option(IEDRIVER, iedriverOption)
-              .alias(IEDRIVER_ALIAS, IEDRIVER)
+              .option(IEDRIVER, ieOption)
               .option(IGNORE_SSL, ignoreSSLOption)
               .option(LOG_LEVEL, logLevelOption)
-              .option(MAX_VERSIONS_CHROMEDRIVER, maxVersionsChromedriverOption)
-              .alias(MAX_VERSIONS_CHROMEDRIVER_ALIAS, MAX_VERSIONS_CHROMEDRIVER)
-              .option(MAX_VERSIONS_GECKODRIVER, maxVersionsGeckodriverOption)
-              .alias(MAX_VERSIONS_GECKODRIVER_ALIAS, MAX_VERSIONS_GECKODRIVER)
-              .option(MAX_VERSIONS_IEDRIVER, maxVersionsIedriverOption)
-              .alias(MAX_VERSIONS_IEDRIVER_ALIAS, MAX_VERSIONS_IEDRIVER)
-              .option(MAX_VERSIONS_SELENIUM, maxVersionsSeleniumOption)
               .option(OUT_DIR, outDirOption)
               .option(PROXY, proxyOption)
-              .option(SELENIUM, seleniumOption)
-              .alias(SELENIUM_ALIAS, SELENIUM)
-              .option(VERSIONS_CHROMEDRIVER, versionsChromedriverOption)
-              .alias(VERSIONS_CHROMEDRIVER_ALIAS, VERSIONS_CHROMEDRIVER)
-              .option(VERSIONS_GECKODRIVER, versionsGeckodriverOption)
-              .alias(VERSIONS_GECKODRIVER_ALIAS, VERSIONS_GECKODRIVER)
-              .option(VERSIONS_IEDRIVER, versionsIedriverOption)
-              .alias(VERSIONS_IEDRIVER_ALIAS, VERSIONS_IEDRIVER)
-              .option(VERSIONS_SELENIUM, versionsSeleniumOption)
-              .alias(VERSIONS_SELENIUM_ALIAS, VERSIONS_SELENIUM);
+              .option(STANDALONE, standaloneOption)
+              .option(VERSIONS_CHROME, versionsChromeOption)
+              .option(VERSIONS_GECKO, versionsGeckoOption)
+              .option(VERSIONS_IE, versionsIeOption)
+              .option(VERSIONS_STANDALONE, versionsStandaloneOption);
         },
         (argv: yargs.Arguments) => {
           update.handler(argv);

@@ -5,7 +5,7 @@ import {IEDriver} from '../provider/iedriver';
 import {ProviderConfig} from '../provider/provider';
 import {SeleniumServer, SeleniumServerProviderConfig} from '../provider/selenium_server';
 
-import {BrowserDriver, BrowserDriverName, Options} from './options';
+import {Options} from './options';
 import {OptionsBinary} from './options_binary';
 
 /**
@@ -49,25 +49,41 @@ export function addOptionsBinary(options: Options): OptionsBinary {
 }
 
 /**
- * For the clean and status commands ONLY.
- * Create the options with all providers.
+ * Create the options with all providers. Used for clean and status commands.
  * @param argv
  */
 export function convertArgs2AllOptions(argv: yargs.Arguments): Options {
+  let versionsChrome, versionsGecko, versionsIe, versionsStandalone = undefined;
+  if (argv.versions) {
+    versionsChrome = argv.versions.chrome as string;
+    versionsGecko = argv.versions.gecko as string;
+    versionsIe = argv.versions.ie as string;
+    versionsStandalone = argv.versions.standalone as string;
+  }
   return {
     browserDrivers: [
-      {name: 'chromedriver'},
-      {name: 'geckodriver'},
-      {name: 'iedriver'}
+      {name: 'chromedriver', version: versionsChrome},
+      {name: 'geckodriver', version: versionsGecko},
+      {name: 'iedriver', version: versionsIe}
     ],
-    server: {name: 'selenium'},
-    outDir: argv['out_dir'] as string
+    server: {
+      name: 'selenium',
+      version: versionsStandalone,
+      runAsNode: argv.standalone_node as boolean,
+      runAsDetach: argv.detach as boolean,
+      chromeLogs: argv.chrome_logs as string,
+      edge: argv.edge as string,
+    },
+    ignoreSSL: argv.ignore_ssl as boolean,
+    outDir: argv.out_dir as string,
+    proxy: argv.proxy as string,
+    githubToken: argv.github_token as string,
   };
 }
 
 /**
- * For the update and start commands ONLY.
- * Create the options with providers depending on argv's.
+ * Create the options with providers depending on argv's. Used for update and
+ * start commands.
  * @param argv
  */
 export function convertArgs2Options(argv: yargs.Arguments): Options {
@@ -80,39 +96,33 @@ export function convertArgs2Options(argv: yargs.Arguments): Options {
     githubToken: argv.github_token as string,
   };
 
-  if (argv['chromedriver'] as boolean) {
-    setVersions('chromedriver', argv, options.browserDrivers);
+  let versionsChrome, versionsGecko, versionsIe, versionsStandalone = undefined;
+  if (argv.versions) {
+    versionsChrome = argv.versions.chrome as string;
+    versionsGecko = argv.versions.gecko as string;
+    versionsIe = argv.versions.ie as string;
+    versionsStandalone = argv.versions.standalone as string;
   }
-  if (argv['geckodriver'] as boolean) {
-    setVersions('geckodriver', argv, options.browserDrivers);
+  if (argv.chrome as boolean) {
+    options.browserDrivers.push(
+        {name: 'chromedriver', version: versionsChrome});
   }
-  if (argv['iedriver'] as boolean) {
-    setVersions('iedriver', argv, options.browserDrivers);
+  if (argv.gecko as boolean) {
+    options.browserDrivers.push({name: 'geckodriver', version: versionsGecko});
   }
-  if (argv['selenium']) {
+  if (argv.iedriver as boolean) {
+    options.browserDrivers.push({name: 'iedriver', version: versionsIe});
+  }
+  if (argv.standalone as boolean) {
     options.server = {};
     options.server.name = 'selenium';
-    options.server.runAsNode = argv['selenium_node'] as boolean;
+    options.server.runAsNode = argv.standalone_node as boolean;
     options.server.runAsDetach = argv.detach as boolean;
-    options.server.version = argv['versions'] && argv['versions']['selenium'] ?
-      argv['versions']['selenium'] as string : undefined;
-    options.server.maxVersion = argv['max_versions']
-      && argv['max_versions']['selenium'] ?
-      argv['versions']['selenium'] as string : undefined;
+    options.server.version = versionsStandalone;
     options.server.chromeLogs = argv.chrome_logs as string;
     options.server.edge = argv.edge as string;
     options.server.port = argv.seleniumPort as number;
     options.server.logLevel = argv.seleniumLogLevel as string;
   }
   return options;
-}
-
-function setVersions(name: BrowserDriverName,
-    argv: yargs.Arguments, browserDrivers: BrowserDriver[]): BrowserDriver[] {
-  const version = argv['versions'] && argv['versions'][name] ?
-    argv['versions'][name] as string : undefined;
-  const maxVersion = argv['max_versions'] && argv['max_versions'][name] ?
-    argv['max_versions'][name] as string : undefined;
-  browserDrivers.push({name, version, maxVersion});
-  return browserDrivers;
 }

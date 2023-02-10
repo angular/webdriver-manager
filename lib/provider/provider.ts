@@ -11,11 +11,10 @@ export interface ProviderInterface {
   cleanFiles?: () => string;
   getBinaryPath?: (version?: string) => string | null;
   getStatus?: () => string | null;
-  updateBinary: (version?: string, maxVersion?: string) => Promise<void>;
+  updateBinary: (version?: string) => Promise<void>;
   seleniumFlag?: string;
   osType?: string;
-  version?: string;
-  maxVersion?: string;
+  versionConfig?: string;
 }
 
 /**
@@ -70,10 +69,8 @@ export interface ProviderConfig {
   proxy?: string;
   // Set the requests to ignore SSL (optional).
   ignoreSSL?: boolean;
-  // The version number (optional).
-  version?: string;
-  // The max version number. Partially match is okay (optional).
-  maxVersion?: string;
+  // Allow to pass a config for the max versions to download (optional).
+  versionConfig?: string;
   // Catch all for other things.
   [key: string]: string|boolean|number;
 }
