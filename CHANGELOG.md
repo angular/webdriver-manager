@@ -1,3 +1,7 @@
+# 13.0.2
+
+Removes undeclared usage of `rimraf` dependency.
+
 # 13.0.1
 
 Updates `adm-zip` to version `0.5.2`.
