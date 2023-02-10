@@ -13,7 +13,7 @@ describe('utils', () => {
       };
       const options = convertArgs2AllOptions(argv);
       expect(options.browserDrivers).toBeTruthy();
-      expect(options.browserDrivers.length).toBe(4);
+      expect(options.browserDrivers.length).toBe(3);
       expect(options.server).toBeTruthy();
       expect(options.server.name).toBe('selenium');
       expect(options.outDir).toBe('foobar_download');

@@ -1,14 +1,11 @@
-import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
-
 import { requestBody, JsonObject, requestBinary } from './utils/http_utils';
-import { changeFilePermissions, generateConfigFile, getBinaryPathFromConfig, removeFiles, unzipFile } from './utils/file_utils';
+import { getBinaryPathFromConfig, removeFiles, unzipFile } from './utils/file_utils';
 import { isExpired } from './utils/file_utils';
 import { OUT_DIR, ProviderClass, ProviderConfig, ProviderInterface } from './provider';
-import rimraf = require('rimraf');
 
 export class Chromium extends ProviderClass implements ProviderInterface {
   cacheFileName = 'chromium-all.json';
@@ -21,7 +18,6 @@ export class Chromium extends ProviderClass implements ProviderInterface {
   osArch = os.arch();
   outDir = OUT_DIR;
   proxy: string = null;
-  maxVersion: string = null;
 
   constructor(config?: ProviderConfig) {
     super();
@@ -32,7 +28,6 @@ export class Chromium extends ProviderClass implements ProviderInterface {
     this.osType = this.setVar('osType', this.osType, config);
     this.outDir = this.setVar('outDir', this.outDir, config);
     this.proxy = this.setVar('proxy', this.proxy, config);
-    this.maxVersion = this.setVar('maxVersion', this.maxVersion, config);
   }
 
   private makeDirectory(fileName: string) {
@@ -228,69 +223,16 @@ export class Chromium extends ProviderClass implements ProviderInterface {
         }
       }
     }
-
-    if (this.osType === 'Linux') {
-      unzipFile(fileName, this.outDir);
-      changeFilePermissions(
-        path.resolve(this.outDir, 'chrome-linux/chrome'), '0755', this.osType);
-    } else if (this.osType === 'Darwin') {
-      spawnProcess('unzip', [fileName, '-d', this.outDir], 'ignore');
-    } else if (this.osType === 'Windows_NT') {
-      unzipFile(fileName, this.outDir);
-    }
+    unzipFile(fileName, this.outDir);
   }
 
-  async updateBinary(_: string, majorVersion?: string): Promise<void> {
-    try {
-      this.cleanFiles();
-    } catch (_) {
-      // no-op: best attempt to clean files, there can be only one version.
-    }
+  async updateBinary(majorVersion?: string): Promise<void> {    
     const allJson = await this.downloadAllJson();
     const downloadVersionJson = await this.downloadVersionJson(
       allJson, majorVersion);
     const storageObject = await this.downloadStorageObject(
       downloadVersionJson, majorVersion);
     await this.downloadUrl(storageObject, majorVersion);
-
-    let binaryFolder = (): string => {
-      if (this.osType === 'Linux') {
-        return path.resolve(this.outDir, 'chrome-linux');
-      } else if (this.osType === 'Darwin') {
-        return path.resolve(this.outDir,
-          'chrome-mac/Chromium.app/Contents/MacOS');
-      } else if (this.osType === 'Windows_NT') {
-        return 'fix me';
-      }
-      throw new Error('os does not exist');
-    }
-
-    let binaryRegex = (): RegExp => {
-      if (this.osType === 'Linux') {
-        return /chrome$/g;
-      } else if (this.osType === 'Darwin') {
-        return /Chromium/g;
-      } else if (this.osType === 'Windows_NT') {
-        return /fix-me/g;
-      }
-      throw new Error('os does not exist');
-    };
-
-    let binaryFile = (): string => {
-      if (this.osType === 'Linux') {
-        return path.resolve(this.outDir, 'chrome-linux/chrome');
-      } else if (this.osType === 'Darwin') {
-        return path.resolve(this.outDir,
-          'chrome-mac/Chromium.app/Contents/MacOS/Chromium');
-      } else if (this.osType === 'Windows_NT') {
-        return 'fix me';
-      }
-      throw new Error('os does not exist');
-    }
-    
-    generateConfigFile(binaryFolder(),
-      path.resolve(this.outDir, this.configFileName),
-      binaryRegex(), binaryFile());
   }
 
   getBinaryPath(version?: string): string | null {
@@ -303,47 +245,11 @@ export class Chromium extends ProviderClass implements ProviderInterface {
   }
 
   getStatus(): string | null {
-    try {
-      const existFiles = fs.readdirSync(this.outDir);
-      for (const existFile of existFiles) {
-        if (existFile.match(/chromium\-version\.*/g)) {
-          const regex = /chromium\-version\-(\d+)\.json/g;
-          const exec = regex.exec(existFile);
-          if (exec) {
-            return exec[1]; 
-          }
-        }
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
+    return '';
   }
 
   cleanFiles(): string {
-    let chromiumPath= '';
-    if (this.osType === 'Darwin') {
-      chromiumPath = 'chrome-mac/';
-    } else if (this.osType === 'Linux') {
-      chromiumPath = 'chrome-linux/';
-    } else if (this.osType === 'Windows_NT') {
-      chromiumPath = 'chrome-win/';
-    }
-    
-    rimraf.sync(path.resolve(this.outDir, chromiumPath));
-    const files = removeFiles(this.outDir, [/chromium.*/g]);
-    try {
-      const fileList = files.split('\n');
-      if (files.length === 0) {
-        // No files listed to clean.
-        return '';
-      }
-      fileList.push(chromiumPath);
-      return (fileList.sort()).join('\n');
-    } catch (_) {
-      // If files returns null, catch split error.
-      return '';
-    }
+    return removeFiles(this.outDir, [/chromium.*/g]);
   }
 }
 
@@ -369,21 +275,4 @@ export function osHelper(ostype: string, osarch: string): string {
     }
   }
   return null;
-}
-
-/**
- * A command line to run. Example 'npm start', the task='npm' and the
- * opt_arg=['start']
- * @param task The task string.
- * @param optArg Optional task args.
- * @param optIo Optional io arg. By default, it should log to console.
- * @returns The child process.
- */
-export function spawnProcess(task: string, optArg?: string[], optIo?: string) {
-  optArg = typeof optArg !== 'undefined' ? optArg : [];
-  let stdio: childProcess.StdioOptions = 'inherit';
-  if (optIo === 'ignore') {
-    stdio = 'ignore';
-  }
-  return childProcess.spawnSync(task, optArg, {stdio});
 }

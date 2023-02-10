@@ -105,6 +105,7 @@ export function unzipFile(zipFileName: string, dstDir: string): string[] {
   const zip = new AdmZip(zipFileName);
   zip.extractAllTo(dstDir, true);
   for (const fileItem of zipFileList(zipFileName)) {
+    console.log(fileItem);
     fileList.push(path.resolve(dstDir, fileItem));
   }
   return fileList;
