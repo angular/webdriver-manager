@@ -5,7 +5,7 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 import * as q from 'q';
 
-import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
+import {AndroidSDK, Appium, Binary, BinaryMap, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program, unparseOptions} from '../cli';
 import {Config} from '../config';
 import {FileManager} from '../files';
@@ -27,6 +27,7 @@ let prog = new Program()
                .addOption(Opts[Opt.AVD_PORT])
                .addOption(Opts[Opt.VERSIONS_STANDALONE])
                .addOption(Opts[Opt.VERSIONS_CHROME])
+               .addOption(Opts[Opt.VERSIONS_EDGE])
                .addOption(Opts[Opt.VERSIONS_GECKO])
                .addOption(Opts[Opt.VERSIONS_ANDROID])
                .addOption(Opts[Opt.VERSIONS_APPIUM])
@@ -107,6 +108,7 @@ function start(options: Options) {
   }
   binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  binaries[EdgeDriver.id].versionCustom = options[Opt.VERSIONS_EDGE].getString();
   binaries[GeckoDriver.id].versionCustom = options[Opt.VERSIONS_GECKO].getString();
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
@@ -155,6 +157,18 @@ function start(options: Options) {
             .catch(err => {
               console.log(err);
             }));
+  }
+  if (downloadedBinaries[EdgeDriver.id] != null) {
+    let edge: EdgeDriver = binaries[EdgeDriver.id];
+    promises.push(edge.getUrl(edge.versionCustom)
+                      .then(() => {
+                        args.push(
+                            '-Dwebdriver.edge.driver=' +
+                            path.resolve(outputDir, binaries[EdgeDriver.id].executableFilename()));
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      }));
   }
   if (downloadedBinaries[GeckoDriver.id] != null) {
     let gecko: GeckoDriver = binaries[GeckoDriver.id];

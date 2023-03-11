@@ -3,6 +3,8 @@
     "selenium": "2.53.1",
     "chromedriver": "2.27",
     "maxChromedriver": "77",
+    "msedgewebdriver": "75.0.139.20",
+    "maxMsedgewebdriver": "77",
     "geckodriver": "v0.13.0",
     "iedriver": "2.53.1",
     "androidsdk": "24.4.1",
@@ -11,6 +13,7 @@
   "cdnUrls": {
     "selenium": "https://selenium-release.storage.googleapis.com/",
     "chromedriver": "https://chromedriver.storage.googleapis.com/",
+    "msedgewebdriver": "https://msedgewebdriverstorage.blob.core.windows.net/",
     "geckodriver": "https://github.com/mozilla/geckodriver/releases/download/",
     "iedriver": "https://selenium-release.storage.googleapis.com/",
     "androidsdk": "http://dl.google.com/android/"

@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as q from 'q';
 import * as rimraf from 'rimraf';
 
-import {AndroidSDK, Appium, Binary, ChromeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
+import {AndroidSDK, Appium, Binary, ChromeDriver, EdgeDriver, GeckoDriver, IEDriver, Standalone} from '../binaries';
 import {Logger, Options, Program} from '../cli';
 import {Config} from '../config';
 import {Downloader, FileManager} from '../files';
@@ -30,6 +30,7 @@ let prog = new Program()
                .addOption(Opts[Opt.ALTERNATE_CDN])
                .addOption(Opts[Opt.STANDALONE])
                .addOption(Opts[Opt.CHROME])
+               .addOption(Opts[Opt.EDGE_CHROMIUM])
                .addOption(Opts[Opt.GECKO])
                .addOption(Opts[Opt.ANDROID])
                .addOption(Opts[Opt.ANDROID_API_LEVELS])
@@ -47,6 +48,7 @@ if (Config.osType() === 'Windows_NT') {
 
 prog.addOption(Opts[Opt.VERSIONS_STANDALONE])
     .addOption(Opts[Opt.VERSIONS_CHROME])
+    .addOption(Opts[Opt.VERSIONS_EDGE])
     .addOption(Opts[Opt.VERSIONS_APPIUM])
     .addOption(Opts[Opt.VERSIONS_ANDROID])
     .addOption(Opts[Opt.VERSIONS_GECKO]);
@@ -74,6 +76,7 @@ function update(options: Options): Promise<void> {
   let promises: q.IPromise<void>[] = [];
   let standalone = options[Opt.STANDALONE].getBoolean();
   let chrome = options[Opt.CHROME].getBoolean();
+  let edge = options[Opt.EDGE_CHROMIUM].getBoolean();
   let gecko = options[Opt.GECKO].getBoolean();
   let ie32: boolean = false;
   let ie64: boolean = false;
@@ -121,6 +124,7 @@ function update(options: Options): Promise<void> {
   let binaries = FileManager.setupBinaries(options[Opt.ALTERNATE_CDN].getString());
   binaries[Standalone.id].versionCustom = options[Opt.VERSIONS_STANDALONE].getString();
   binaries[ChromeDriver.id].versionCustom = options[Opt.VERSIONS_CHROME].getString();
+  binaries[EdgeDriver.id].versionCustom = options[Opt.VERSIONS_EDGE].getString();
   if (options[Opt.VERSIONS_IE]) {
     binaries[IEDriver.id].versionCustom = options[Opt.VERSIONS_IE].getString();
   }
@@ -150,6 +154,12 @@ function update(options: Options): Promise<void> {
   }
   if (chrome) {
     let binary: ChromeDriver = binaries[ChromeDriver.id];
+    promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
+      return Promise.resolve(updateBrowserFile(binary, outputDir));
+    }));
+  }
+  if (edge) {
+    let binary: EdgeDriver = binaries[EdgeDriver.id];
     promises.push(updateBinary(binary, outputDir, proxy, ignoreSSL).then(() => {
       return Promise.resolve(updateBrowserFile(binary, outputDir));
     }));

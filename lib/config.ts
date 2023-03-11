@@ -11,11 +11,13 @@ export interface ConfigFile {
   [key: string]: string;
   selenium?: string;
   chrome?: string;
+  edge?: string;
   gecko?: string;
   ie?: string;
   android?: string;
   appium?: string;
   maxChrome?: string;
+  maxEdge?: string;
 }
 
 /**
@@ -91,11 +93,13 @@ export class Config {
     let configVersions: ConfigFile = {};
     configVersions.selenium = configFile.webdriverVersions.selenium;
     configVersions.chrome = configFile.webdriverVersions.chromedriver;
+    configVersions.edge = configFile.webdriverVersions.msedgewebdriver;
     configVersions.gecko = configFile.webdriverVersions.geckodriver;
     configVersions.ie = configFile.webdriverVersions.iedriver;
     configVersions.android = configFile.webdriverVersions.androidsdk;
     configVersions.appium = configFile.webdriverVersions.appium;
     configVersions.maxChrome = configFile.webdriverVersions.maxChromedriver;
+    configVersions.maxEdge = configFile.webdriverVersions.maxMsedgewebdriver;
     return configVersions;
   }
 
@@ -108,6 +112,7 @@ export class Config {
     let configCdnUrls: ConfigFile = {};
     configCdnUrls.selenium = configFile.cdnUrls.selenium;
     configCdnUrls.chrome = configFile.cdnUrls.chromedriver;
+    configCdnUrls.edge = configFile.cdnUrls.msedgewebdriver;
     configCdnUrls.gecko = configFile.cdnUrls.geckodriver;
     configCdnUrls.ie = configFile.cdnUrls.iedriver;
     configCdnUrls.android = configFile.cdnUrls.androidsdk;
