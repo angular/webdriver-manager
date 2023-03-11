@@ -264,7 +264,7 @@ export function matchBinaries(ostype: string): RegExp|null {
  * @param version The actual version.
  */
 export function formatVersion(version: string): string|null {
-  const newRegex = /([0-9]*\.[0-9]*\.[0-9]*).[0-9]*/g;
+  const newRegex = /([0-9]*\.[0-9]*\.[0-9]*)(\.[0-9]*)?/g;
   try {
     const exec = newRegex.exec(version);
     if (exec) {
